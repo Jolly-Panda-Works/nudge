@@ -1,8 +1,5 @@
-Suggested commits (conventional commits)
+ci: fix Windows build setup and pin runner images
 
-Section 1 (v0.1.0):
-1) feat(domain): add notification model, mapper and ingest policy
-2) ci: add format, analyze, test, Android APK and Windows build workflow
-
-Update v0.1.1 (this zip):
-3) ci: add bootstrap workflow to generate platform folders without local Flutter
+- install Flutter 3.35.0 on Windows from the git tag (flutter-action could not resolve the version)
+- pin windows-2022 and ubuntu-24.04
+- bump actions/checkout to v5 (Node 24)
