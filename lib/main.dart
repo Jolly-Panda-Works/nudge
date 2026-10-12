@@ -18,9 +18,7 @@ class NudgeApp extends StatelessWidget {
         brightness: Brightness.dark,
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(child: Text('$appName v$appVersion')),
-      ),
+      home: const Scaffold(body: Center(child: Text('$appName v$appVersion'))),
     );
   }
 }
