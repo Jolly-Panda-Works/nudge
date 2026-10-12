@@ -1,7 +1,7 @@
-name: unified_inbox
-description: Unified notifications inbox, tasks and calendar (Android + Windows).
+name: nudge
+description: Nudge - unified notifications inbox, tasks and calendar (Android + Windows).
 publish_to: 'none'
-version: 0.1.1+2
+version: 0.2.0+3
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
@@ -11,11 +11,15 @@ dependencies:
   flutter:
     sdk: flutter
   crypto: ^3.0.6
+  drift: ^2.26.0
+  drift_flutter: ^0.2.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  build_runner: ^2.5.0
+  drift_dev: ^2.26.0
 
 flutter:
   uses-material-design: true

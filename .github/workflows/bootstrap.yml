@@ -24,7 +24,7 @@ jobs:
           cache: true
       - name: Generate platform folders
         run: |
-          flutter create . --platforms=android,windows --project-name unified_inbox --org app.unifiedinbox
+          flutter create . --platforms=android,windows --project-name nudge --org app.nudge
           rm -f test/widget_test.dart
       - run: flutter pub get
       - run: dart format .

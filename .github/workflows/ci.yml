@@ -28,6 +28,7 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed .
+      - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter analyze
       - run: flutter test
 
@@ -46,6 +47,7 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
@@ -67,6 +69,7 @@ jobs:
           echo "C:/flutter/bin" >> "$GITHUB_PATH"
       - run: flutter --version
       - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter build windows --release
       - uses: actions/upload-artifact@v4
         with:

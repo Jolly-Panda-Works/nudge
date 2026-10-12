@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:unified_inbox/domain/raw_notification_payload.dart';
+import 'package:nudge/domain/raw_notification_payload.dart';
 
 import 'support/fixtures.dart';
 

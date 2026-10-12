@@ -1,0 +1,47 @@
+# ONE-TIME workflow: renames the generated android/ and windows/ projects from
+# "unified_inbox" to "Nudge" (display name) / app.nudge.nudge (Android id).
+name: Rename app to Nudge
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rename:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Rename
+        shell: bash
+        run: |
+          set -euo pipefail
+          OLD_PKG='app.unifiedinbox.unified_inbox'
+          NEW_PKG='app.nudge.nudge'
+          OLD_DIR='android/app/src/main/kotlin/app/unifiedinbox/unified_inbox'
+          NEW_DIR='android/app/src/main/kotlin/app/nudge/nudge'
+
+          # Android: application id / namespace and Kotlin package
+          grep -rl "$OLD_PKG" android | xargs -r sed -i "s/$OLD_PKG/$NEW_PKG/g"
+          if [ -d "$OLD_DIR" ]; then
+            mkdir -p "$NEW_DIR"
+            git mv "$OLD_DIR"/* "$NEW_DIR"/
+            rm -rf android/app/src/main/kotlin/app/unifiedinbox
+          fi
+          sed -i 's/android:label="unified_inbox"/android:label="Nudge"/' android/app/src/main/AndroidManifest.xml
+
+          # Windows: window title, resources, binary name
+          sed -i 's/L"unified_inbox"/L"Nudge"/' windows/runner/main.cpp
+          sed -i -e 's/unified_inbox\.exe/nudge.exe/g' -e 's/unified_inbox/Nudge/g' windows/runner/Runner.rc
+          sed -i 's/unified_inbox/nudge/g' windows/CMakeLists.txt
+
+          echo "Remaining references to the old name:"
+          grep -rn "unified_inbox\|unifiedinbox" android windows --include=* -I || echo "none"
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: rename app to Nudge (android id app.nudge.nudge)"
+          git push

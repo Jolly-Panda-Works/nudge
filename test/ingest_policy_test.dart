@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:unified_inbox/domain/captured_notification.dart';
-import 'package:unified_inbox/domain/ingest_policy.dart';
+import 'package:nudge/domain/captured_notification.dart';
+import 'package:nudge/domain/ingest_policy.dart';
 
 import 'support/fixtures.dart';
 
@@ -105,10 +105,7 @@ void main() {
         IngestDecision.ignoreFiltered,
       );
       expect(
-        decideIngest(
-          incoming: captured(pkg: 'com.other'),
-          policy: policy,
-        ),
+        decideIngest(incoming: captured(pkg: 'com.other'), policy: policy),
         IngestDecision.insert,
       );
     });
@@ -123,10 +120,7 @@ void main() {
         IngestDecision.insert,
       );
       expect(
-        decideIngest(
-          incoming: captured(pkg: 'com.other'),
-          policy: policy,
-        ),
+        decideIngest(incoming: captured(pkg: 'com.other'), policy: policy),
         IngestDecision.ignoreFiltered,
       );
     });

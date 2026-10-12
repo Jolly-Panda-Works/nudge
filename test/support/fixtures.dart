@@ -1,6 +1,6 @@
-import 'package:unified_inbox/domain/captured_notification.dart';
-import 'package:unified_inbox/domain/notification_mapper.dart';
-import 'package:unified_inbox/domain/raw_notification_payload.dart';
+import 'package:nudge/domain/captured_notification.dart';
+import 'package:nudge/domain/notification_mapper.dart';
+import 'package:nudge/domain/raw_notification_payload.dart';
 
 final DateTime fixedNow = DateTime.utc(2026, 10, 12, 8);
 
@@ -15,6 +15,7 @@ RawNotificationPayload payload({
   bool ongoing = false,
   bool summary = false,
   bool redactedHint = false,
+  List<String> actions = const <String>[],
 }) {
   return RawNotificationPayload(
     key: key,
@@ -27,6 +28,7 @@ RawNotificationPayload payload({
     isGroupSummary: summary,
     redactedHint: redactedHint,
     hasContentAction: true,
+    actionTitles: actions,
   );
 }
 
@@ -39,6 +41,7 @@ CapturedNotification captured({
   bool ongoing = false,
   bool summary = false,
   bool redactedHint = false,
+  List<String> actions = const <String>[],
 }) {
   return testMapper().map(
     payload(
@@ -50,6 +53,7 @@ CapturedNotification captured({
       ongoing: ongoing,
       summary: summary,
       redactedHint: redactedHint,
+      actions: actions,
     ),
   );
 }

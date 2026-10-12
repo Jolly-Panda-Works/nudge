@@ -1,0 +1,11 @@
+feat: Nudge v0.2.0 - Drift database and notification repositories
+
+- add Drift tables: notifications, source_rules, app_settings
+- add NotificationRepository: atomic ingest with dedupe policy, removal
+  marking, listener reconciliation, retention purge, delete-all, watch stream
+- add CaptureSettingsRepository: allow/blocklist rules, filters, retention
+- rename app to Nudge (Dart package nudge) and show version in the app shell
+- CI: build_runner step, pinned runners; add format and rename workflows
+- tests: repositories on in-memory SQLite, app version matches pubspec
+
+Milestone: M1 / Section 2

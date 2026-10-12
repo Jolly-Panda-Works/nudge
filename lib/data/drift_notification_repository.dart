@@ -1,0 +1,143 @@
+import 'package:drift/drift.dart';
+
+import '../domain/captured_notification.dart';
+import '../domain/ingest_policy.dart';
+import '../domain/notification_repository.dart';
+import 'database/app_database.dart';
+import 'notification_row_mapper.dart';
+
+final class DriftNotificationRepository implements NotificationRepository {
+  DriftNotificationRepository(this._db, {DateTime Function()? clock})
+    : _clock = clock ?? DateTime.now;
+
+  final AppDatabase _db;
+  final DateTime Function() _clock;
+
+  int get _nowMs => _clock().toUtc().millisecondsSinceEpoch;
+
+  @override
+  Future<CapturedNotification?> findByKey(String notificationKey) async {
+    final row = await (_db.select(
+      _db.notifications,
+    )..where((t) => t.notificationKey.equals(notificationKey))).getSingleOrNull();
+    return row == null ? null : notificationFromRow(row);
+  }
+
+  @override
+  Future<CapturedNotification?> findRecentSameContent({
+    required String packageName,
+    required String contentHash,
+    required DateTime around,
+    Duration window = const Duration(seconds: 2),
+  }) async {
+    final from = around.subtract(window).millisecondsSinceEpoch;
+    final to = around.add(window).millisecondsSinceEpoch;
+    final query = _db.select(_db.notifications)
+      ..where(
+        (t) =>
+            t.packageName.equals(packageName) &
+            t.contentHash.equals(contentHash) &
+            t.postedAtMs.isBetweenValues(from, to),
+      )
+      ..orderBy([(t) => OrderingTerm.desc(t.postedAtMs)])
+      ..limit(1);
+    final row = await query.getSingleOrNull();
+    return row == null ? null : notificationFromRow(row);
+  }
+
+  @override
+  Future<IngestDecision> ingest(
+    CapturedNotification incoming,
+    CapturePolicy policy,
+  ) {
+    return _db.transaction(() async {
+      final existing = await findByKey(incoming.key);
+      final recent = existing == null
+          ? await findRecentSameContent(
+              packageName: incoming.packageName,
+              contentHash: incoming.contentHash,
+              around: incoming.postedAt,
+            )
+          : null;
+      final decision = decideIngest(
+        incoming: incoming,
+        policy: policy,
+        existingByKey: existing,
+        recentSameContent: recent,
+      );
+      switch (decision) {
+        case IngestDecision.insert:
+          await _db
+              .into(_db.notifications)
+              .insert(notificationToCompanion(incoming));
+        case IngestDecision.update:
+          final updated = existing!.applyUpdateFrom(
+            incoming,
+            _clock().toUtc(),
+          );
+          await (_db.update(_db.notifications)
+                ..where((t) => t.notificationKey.equals(updated.key)))
+              .write(notificationToCompanion(updated));
+        case IngestDecision.ignoreDuplicate:
+        case IngestDecision.ignoreFiltered:
+          break;
+      }
+      return decision;
+    });
+  }
+
+  @override
+  Future<void> markRemoved(String notificationKey) async {
+    await (_db.update(_db.notifications)..where(
+          (t) =>
+              t.notificationKey.equals(notificationKey) &
+              t.status.equalsValue(NotificationStatus.active),
+        ))
+        .write(
+          NotificationsCompanion(
+            status: const Value(NotificationStatus.removed),
+            lastUpdatedAtMs: Value(_nowMs),
+          ),
+        );
+  }
+
+  @override
+  Future<int> markRemovedExcept(Set<String> activeKeys) {
+    return (_db.update(_db.notifications)..where(
+          (t) =>
+              t.status.equalsValue(NotificationStatus.active) &
+              t.notificationKey.isNotIn(activeKeys),
+        ))
+        .write(
+          NotificationsCompanion(
+            status: const Value(NotificationStatus.removed),
+            lastUpdatedAtMs: Value(_nowMs),
+          ),
+        );
+  }
+
+  @override
+  Stream<List<CapturedNotification>> watchInbox({bool includeRemoved = true}) {
+    final query = _db.select(_db.notifications);
+    if (!includeRemoved) {
+      query.where((t) => t.status.equalsValue(NotificationStatus.active));
+    }
+    query.orderBy([(t) => OrderingTerm.desc(t.postedAtMs)]);
+    return query.watch().map(
+      (rows) => rows.map(notificationFromRow).toList(growable: false),
+    );
+  }
+
+  @override
+  Future<int> purgeOlderThan(DateTime cutoff) {
+    return (_db.delete(_db.notifications)..where(
+          (t) => t.lastUpdatedAtMs.isSmallerThanValue(
+            cutoff.toUtc().millisecondsSinceEpoch,
+          ),
+        ))
+        .go();
+  }
+
+  @override
+  Future<int> deleteAll() => _db.delete(_db.notifications).go();
+}
