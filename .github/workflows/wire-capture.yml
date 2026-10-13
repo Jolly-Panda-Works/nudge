@@ -1,0 +1,28 @@
+# ONE-TIME workflow: wires the Kotlin capture service into the generated
+# android/ project (MainActivity + AndroidManifest). Safe to run again.
+name: Wire Android capture service
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  wire:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - run: python3 tools/wire_capture.py
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: wire Android capture service into MainActivity and manifest"
+          git push
+      - name: Run CI on the new commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref "${{ github.ref_name }}"

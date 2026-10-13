@@ -1,9 +1,18 @@
-docs: Nudge v0.2.2 - English-only docs and root ROADMAP
+feat: Nudge v0.3.0 - Android notification capture service and ingestion
 
-- remove README.fa.md; all documentation is now English only
-- add ROADMAP.md: done vs remaining per milestone and M1 section,
-  version history, known risks and open decisions
-- README and CODE_OF_CONDUCT updated to match
-- bump version to 0.2.2+5
+- Kotlin NotificationListenerService with a durable JSON-lines queue,
+  in-memory PendingIntent registry, reconciliation of active notifications
+  and method/event channels
+- Dart bridge (CapturePlatform) with Android and no-op implementations,
+  CaptureEvent parsing and CaptureIngestor (queue to database, ack after
+  storing, retry on failure)
+- temporary status screen: access, listener state, counts (never shows text)
+- NotificationRepository.count
+- tools/wire_capture.py and a one-time "Wire Android capture service"
+  workflow patch the generated MainActivity.kt and AndroidManifest.xml
+- tests: capture events, ingestor with fake platform, status screen
+- docs: roadmap, architecture, privacy and development guide updated
 
-Milestone: M1 / documentation
+Not verified on a physical device.
+
+Milestone: M1 / Section 3

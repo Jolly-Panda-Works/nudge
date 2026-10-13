@@ -4,6 +4,16 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.3.0] - 2026-10-13
+### Added
+- Android capture (M1 section 3): Kotlin `NotificationListenerService`, durable native event queue, method/event channels, reconciliation of active notifications, in-memory-only `PendingIntent` registry.
+- Dart side: capture events, platform interface with Android and no-op implementations, `CaptureIngestor` (native queue to database, acknowledge after storing).
+- Temporary status screen (notification access, listener state, counts; never shows notification text).
+- `NotificationRepository.count`.
+- `Wire Android capture service` workflow and `tools/wire_capture.py` to patch the generated `MainActivity.kt` and `AndroidManifest.xml`.
+### Known limitations
+- Not verified on a physical device. Notifications that arrive while the app is closed are ingested only when the app runs.
+
 ## [0.2.2] - 2026-10-13
 ### Added
 - `ROADMAP.md`: progress per milestone and section, what is done and what remains, known risks.

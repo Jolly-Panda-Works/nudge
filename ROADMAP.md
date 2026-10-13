@@ -1,6 +1,6 @@
 # Roadmap
 
-Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.2.2).
+Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.3.0).
 
 **How to read the status**
 
@@ -12,14 +12,14 @@ Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.2.2).
 
 | Milestone | Scope | Progress |
 |---|---|---|
-| M1 | Android notification capture and local inbox | In progress: 2 of 5 sections done |
+| M1 | Android notification capture and local inbox | In progress: 3 of 5 sections done in code |
 | M2 | Task conversion and source navigation | Not started |
 | M3 | Calendar UI with Persian (Jalali, RTL) support | Not started |
 | M4 | Android Calendar Provider integration | Not started |
 | M5 | Windows build and secure synchronization | Not started |
 | M6 | Optional direct Google Calendar API integration | Not started |
 
-Today the app is a placeholder shell that shows its name and version. There is no notification capture and no usable UI yet.
+Today the app has a temporary status screen (notification access, listener state, stored counts; never notification text). The Android listener, queue and ingestion exist in code but have not been verified on a physical device. There is no inbox UI yet.
 
 ## Done so far
 
@@ -30,6 +30,7 @@ Today the app is a placeholder shell that shows its name and version. There is n
 | 0.2.0 | 2026-10-12 | M1 section 2: Drift database and repositories; app renamed to Nudge; build_runner in CI |
 | 0.2.1 | 2026-10-13 | Open-source project files; CI publishes a rolling `nightly` pre-release after every push to `main` |
 | 0.2.2 | 2026-10-13 | Documentation in English only; this roadmap |
+| 0.3.0 | 2026-10-13 | M1 section 3: Kotlin listener service, durable native queue, platform bridge, ingestion into the database, temporary status screen, wiring workflow |
 
 ## M1: Notification capture and local inbox
 
@@ -53,17 +54,20 @@ Today the app is a placeholder shell that shows its name and version. There is n
 - [x] Repository tests on in-memory SQLite
 - [ ] Verified against the real Drift versions resolved on CI (versions are not pinned exactly yet)
 
-### Section 3: Android capture service (next)
-- [ ] Kotlin `NotificationListenerService` with `onListenerConnected`, `onNotificationPosted`, `onNotificationRemoved`
-- [ ] Notification Access settings flow and permission-state detection
-- [ ] Reconcile currently active notifications after the listener connects
-- [ ] Capture source package, app label, title, text, timestamp, key, group metadata and action metadata
-- [ ] Keep `PendingIntent`s in memory only, keyed by notification key, dropped on removal
-- [ ] Platform `MethodChannel`/`EventChannel` bridge behind an interface, with fake-channel tests
-- [ ] Survive app and device restarts (native queue drained by Flutter)
-- [ ] Handle permission revocation
-- [ ] Redacted content handling end to end
-- [ ] OEM-specific behavior (for example battery restrictions on Samsung devices), verified on physical devices
+### Section 3: Android capture service (done in code, 0.3.0; not verified on a device)
+- [x] Kotlin `NotificationListenerService`: connect, post, remove, and rebind request on disconnect
+- [x] Notification Access detection and a button that opens the system settings screen
+- [x] Reconcile currently active notifications after the listener connects (queued posts plus a snapshot of active keys)
+- [x] Capture source package, app label, title, text, timestamp, key, group metadata and action metadata
+- [x] Keep `PendingIntent`s in memory only, keyed by notification key, dropped on removal and disconnect
+- [x] Platform channel bridge behind an interface, with fake-platform tests of the ingestion logic
+- [x] Durable native queue so captures survive while the app is closed; acknowledged events are deleted
+- [x] Temporary status screen (access, listener state, counts; never shows notification text)
+- [x] Detect permission revocation (the screen updates when the listener disconnects)
+- [ ] Verify all of the above on a physical Android device
+- [ ] Ingest while the app UI is closed (headless Flutter engine). Today the queue is drained only while the app runs, and it keeps at most 1000 events
+- [ ] Redacted content end to end (only the "secret visibility" hint is detected; Android 15 sensitive-content redaction is unverified)
+- [ ] Device restart and OEM-specific behavior (for example Samsung battery restrictions), verified on physical devices
 
 ### Section 4: inbox UI and permissions (planned)
 - [ ] Inbox list and notification detail screens
@@ -78,7 +82,7 @@ Today the app is a placeholder shell that shows its name and version. There is n
 - [ ] Data deletion screen and retention setting in the UI
 - [ ] Confirm that no notification bodies or tokens reach application logs or CI logs
 
-M1 is complete when sections 3 to 5 are done and capture is verified on a physical device.
+M1 is complete when sections 4 and 5 are done and capture is verified on a physical device.
 
 ## M2: Task conversion and source navigation (not started)
 - [ ] Convert an inbox notification into a task or timed reminder, preserving the source notification ID
@@ -131,6 +135,9 @@ M1 is complete when sections 3 to 5 are done and capture is verified on a physic
 - [ ] Screenshots in the README once there is a UI
 
 ## Known risks and unverified assumptions
+- The Kotlin code (listener, queue, channels) has only been compiled by CI, never run on a device. The wiring script that patches the generated `MainActivity.kt` and `AndroidManifest.xml` has not been run yet.
+- Sideloaded debug APKs may need "Allow restricted settings" (Android 13+) before Notification Access can be enabled.
+- Until background ingestion exists, notifications that arrive while the app is closed wait in a small native queue (plain JSON in app-private, no-backup storage) until the app is opened.
 - The first CI runs for the Drift code and tests have not been confirmed green.
 - Windows CI installs Flutter from its git tag because the setup action could not resolve the version there; this is untested over time.
 - The rolling release needs the repository to allow workflows to write contents.

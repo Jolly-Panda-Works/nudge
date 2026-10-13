@@ -140,4 +140,17 @@ final class DriftNotificationRepository implements NotificationRepository {
 
   @override
   Future<int> deleteAll() => _db.delete(_db.notifications).go();
+
+  @override
+  Future<int> count({bool activeOnly = false}) async {
+    final total = _db.notifications.notificationKey.count();
+    final query = _db.selectOnly(_db.notifications)..addColumns([total]);
+    if (activeOnly) {
+      query.where(
+        _db.notifications.status.equalsValue(NotificationStatus.active),
+      );
+    }
+    final row = await query.getSingle();
+    return row.read(total) ?? 0;
+  }
 }

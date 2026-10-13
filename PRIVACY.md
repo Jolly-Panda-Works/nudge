@@ -14,6 +14,11 @@ Nudge handles notification text, which can be sensitive. These are the rules the
 - Authentication tokens or notification bodies in application logs or CI logs.
 - `PendingIntent` objects. Only the fact that an action existed is saved, because a PendingIntent cannot be persisted.
 
+## Temporary native queue
+The Android listener appends each event (including notification title and text) to a small file in the app's private, no-backup storage so that nothing is lost while the app is closed. The app moves the events into its database and deletes them from the file as soon as they are stored. The file keeps at most 1000 events and is not encrypted; it is protected by Android's app sandbox like the database. Events are never written to logs.
+
+Until background ingestion is implemented, notifications that arrive while the app is closed stay in this file until the app is opened.
+
 ## Your controls
 - You can revoke Notification Access in Android settings at any time; capture stops.
 - Source apps can be allowlisted or blocklisted (the rules are stored; the screen for them is planned).

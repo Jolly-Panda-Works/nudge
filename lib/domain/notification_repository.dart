@@ -34,4 +34,7 @@ abstract interface class NotificationRepository {
   Future<int> purgeOlderThan(DateTime cutoff);
 
   Future<int> deleteAll();
+
+  /// Number of stored notifications, optionally only the active ones.
+  Future<int> count({bool activeOnly = false});
 }

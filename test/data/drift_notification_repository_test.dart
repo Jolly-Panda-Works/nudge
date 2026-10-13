@@ -118,4 +118,16 @@ void main() {
     expect(await repo.deleteAll(), 2);
     expect(await repo.watchInbox().first, isEmpty);
   });
+
+  test('count returns the total and the active-only number', () async {
+    await repo.ingest(captured(key: 'A', text: 'one'), open);
+    await repo.ingest(
+      captured(key: 'B', text: 'two', time: 1760000100000),
+      open,
+    );
+    await repo.markRemoved('A');
+
+    expect(await repo.count(), 2);
+    expect(await repo.count(activeOnly: true), 1);
+  });
 }
