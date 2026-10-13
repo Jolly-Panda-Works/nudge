@@ -9,7 +9,7 @@
 
 It combines an inbox of accessible Android notifications, one-tap conversion to tasks or reminders (with a persistent link back to the original source), and a Persian-first calendar with Jalali dates.
 
-> **Status: early development (v0.2.x).** Only the foundations exist so far (domain model, deduplication, local storage). There is no usable UI and no notification capture yet. See [Project status](#project-status) for exactly what is implemented. Persian version: [README.fa.md](README.fa.md).
+> **Status: early development (v0.2.x).** Only the foundations exist so far (domain model, deduplication, local storage). There is no usable UI and no notification capture yet. See [Project status](#project-status) for exactly what is implemented.
 
 ## Features
 
@@ -71,7 +71,8 @@ lib/
   data/     Drift database and repository implementations
   main.dart app shell (placeholder UI)
 test/       unit and widget tests
-docs/       architecture, development and roadmap
+ROADMAP.md  what is done and what remains
+docs/       architecture and development guides
 .github/    CI, formatting and release workflows, issue and PR templates
 ```
 
@@ -88,7 +89,7 @@ Milestones (each is independently testable):
 | M5 | Windows build and secure sync | Not started |
 | M6 | Optional Google Calendar API | Not started |
 
-Full plan: [docs/ROADMAP.md](docs/ROADMAP.md). Release notes: [CHANGELOG.md](CHANGELOG.md).
+Detailed progress and remaining work: [ROADMAP.md](ROADMAP.md). Release notes: [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 

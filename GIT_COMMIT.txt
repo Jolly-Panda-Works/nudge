@@ -1,13 +1,9 @@
-chore: Nudge v0.2.1 - open-source project files and nightly builds
+docs: Nudge v0.2.2 - English-only docs and root ROADMAP
 
-- README (English and Persian) rewritten as an open-source project README
-  with an honest implemented/planned status table
-- add LICENSE (MIT), CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, PRIVACY,
-  CHANGELOG (Keep a Changelog), docs/ARCHITECTURE, DEVELOPMENT, ROADMAP
-- add issue and PR templates, Dependabot, .editorconfig, .gitattributes
-- CI: publish APK and Windows zip (version in file name) as rolling
-  "nightly" pre-release after every push to main
-- Format, Bootstrap and Rename workflows now start CI on the commit they
-  create; formatting check in CI is report-only; builds are never cancelled
+- remove README.fa.md; all documentation is now English only
+- add ROADMAP.md: done vs remaining per milestone and M1 section,
+  version history, known risks and open decisions
+- README and CODE_OF_CONDUCT updated to match
+- bump version to 0.2.2+5
 
-Milestone: M1 / infrastructure
+Milestone: M1 / documentation

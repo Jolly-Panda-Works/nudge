@@ -1,6 +1,6 @@
 # Code of Conduct
 
-We want Nudge to be a welcoming project for everyone, regardless of experience, background or language (contributions in English and Persian are welcome).
+We want Nudge to be a welcoming project for everyone, regardless of experience, background or language.
 
 **Expected:** be respectful, assume good intent, give and accept constructive feedback, and focus on what is best for the project and its users.
 
