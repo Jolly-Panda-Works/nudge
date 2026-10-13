@@ -107,10 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(title: const Text('Settings')),
       body: _failed
           ? Center(
-              child: FilledButton(
-                onPressed: _load,
-                child: const Text('Retry'),
-              ),
+              child: FilledButton(onPressed: _load, child: const Text('Retry')),
             )
           : policy == null
           ? const Center(child: CircularProgressIndicator())
@@ -148,7 +145,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                         ListTile(
-                          title: const Text('Open Notification Access settings'),
+                          title: const Text(
+                            'Open Notification Access settings',
+                          ),
                           trailing: const Icon(Icons.open_in_new),
                           onTap: _openAccessSettings,
                         ),

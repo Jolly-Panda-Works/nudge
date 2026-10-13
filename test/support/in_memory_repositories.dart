@@ -19,12 +19,13 @@ class InMemoryNotificationRepository implements NotificationRepository {
   }
 
   List<CapturedNotification> _snapshot(bool includeRemoved) {
-    final items = _items
-        .where(
-          (n) => includeRemoved || n.status == NotificationStatus.active,
-        )
-        .toList()
-      ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
+    final items =
+        _items
+            .where(
+              (n) => includeRemoved || n.status == NotificationStatus.active,
+            )
+            .toList()
+          ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
     return items;
   }
 
