@@ -16,11 +16,12 @@ RawNotificationPayload payload({
   bool summary = false,
   bool redactedHint = false,
   List<String> actions = const <String>[],
+  String? label = 'Chat',
 }) {
   return RawNotificationPayload(
     key: key,
     packageName: pkg,
-    appLabel: 'Chat',
+    appLabel: label,
     title: title,
     text: text,
     postTimeMillis: time,
@@ -42,6 +43,7 @@ CapturedNotification captured({
   bool summary = false,
   bool redactedHint = false,
   List<String> actions = const <String>[],
+  String? label = 'Chat',
 }) {
   return testMapper().map(
     payload(
@@ -54,6 +56,7 @@ CapturedNotification captured({
       summary: summary,
       redactedHint: redactedHint,
       actions: actions,
+      label: label,
     ),
   );
 }

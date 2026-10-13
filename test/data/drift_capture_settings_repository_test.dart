@@ -53,4 +53,23 @@ void main() {
     await repo.setRetentionDays(null);
     expect(await repo.getRetentionDays(), isNull);
   });
+
+  test('listRules returns the saved apps with their labels', () async {
+    await repo.addRule('com.chat', appLabel: 'Chat');
+    await repo.addRule('com.mail');
+
+    final rules = await repo.listRules();
+    expect(rules.map((r) => r.packageName).toSet(), <String>{
+      'com.chat',
+      'com.mail',
+    });
+    expect(
+      rules.firstWhere((r) => r.packageName == 'com.chat').label,
+      'Chat',
+    );
+    expect(
+      rules.firstWhere((r) => r.packageName == 'com.mail').displayName,
+      'com.mail',
+    );
+  });
 }

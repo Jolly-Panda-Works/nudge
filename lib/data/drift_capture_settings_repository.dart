@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../domain/capture_settings_repository.dart';
 import '../domain/ingest_policy.dart';
+import '../domain/source_app.dart';
 import 'database/app_database.dart';
 
 final class DriftCaptureSettingsRepository
@@ -93,5 +94,14 @@ final class DriftCaptureSettingsRepository
     return days == null
         ? _remove(_kRetentionDays)
         : _write(_kRetentionDays, days.toString());
+  }
+
+  @override
+  Future<List<SourceApp>> listRules() async {
+    final rows = await _db.select(_db.sourceRules).get();
+    return [
+      for (final row in rows)
+        SourceApp(packageName: row.packageName, label: row.appLabel),
+    ];
   }
 }

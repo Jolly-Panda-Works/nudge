@@ -7,6 +7,9 @@ final class NoopCapturePlatform implements CapturePlatform {
   const NoopCapturePlatform();
 
   @override
+  bool get isSupported => false;
+
+  @override
   Future<String> packageName() async => '';
 
   @override

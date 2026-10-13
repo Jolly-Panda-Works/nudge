@@ -4,6 +4,19 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.4.0] - 2026-10-13
+### Added
+- Inbox screen with an Active/All filter, live updates, and loading, empty and error states.
+- Notification details screen.
+- Settings screen: access and listener state, capture mode, ongoing and group-summary toggles, stored counts, version.
+- App filter screen: choose apps seen so far or add one by package name.
+- Permission banner (access off, listener not connected) that refreshes when the app returns to the foreground.
+- `CaptureStatusController`, `SourceApp`, `NotificationRepository.listSourceApps`, `CaptureSettingsRepository.listRules`, `CapturePlatform.isSupported`.
+- Widget tests with in-memory repositories; unit tests for time formatting and the status controller.
+### Changed
+- The temporary status screen is replaced by the inbox and settings screens.
+- CI runs `flutter analyze --no-fatal-infos`: warnings and errors still fail the build, info-level hints do not.
+
 ## [0.3.0] - 2026-10-13
 ### Added
 - Android capture (M1 section 3): Kotlin `NotificationListenerService`, durable native event queue, method/event channels, reconciliation of active notifications, in-memory-only `PendingIntent` registry.

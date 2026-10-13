@@ -1,4 +1,5 @@
 import 'ingest_policy.dart';
+import 'source_app.dart';
 
 /// Persistent capture settings (source-app rules, filters, retention).
 abstract interface class CaptureSettingsRepository {
@@ -9,6 +10,9 @@ abstract interface class CaptureSettingsRepository {
   Future<void> addRule(String packageName, {String? appLabel});
 
   Future<void> removeRule(String packageName);
+
+  /// The apps currently in the allowlist/blocklist.
+  Future<List<SourceApp>> listRules();
 
   Future<void> setCaptureOngoing({required bool value});
 

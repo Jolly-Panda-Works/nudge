@@ -1,18 +1,17 @@
-feat: Nudge v0.3.0 - Android notification capture service and ingestion
+feat: Nudge v0.4.0 - inbox, notification details and capture settings
 
-- Kotlin NotificationListenerService with a durable JSON-lines queue,
-  in-memory PendingIntent registry, reconciliation of active notifications
-  and method/event channels
-- Dart bridge (CapturePlatform) with Android and no-op implementations,
-  CaptureEvent parsing and CaptureIngestor (queue to database, ack after
-  storing, retry on failure)
-- temporary status screen: access, listener state, counts (never shows text)
-- NotificationRepository.count
-- tools/wire_capture.py and a one-time "Wire Android capture service"
-  workflow patch the generated MainActivity.kt and AndroidManifest.xml
-- tests: capture events, ingestor with fake platform, status screen
+- inbox with Active/All filter, live updates and loading/empty/error states
+- notification details screen
+- settings: access and listener state, capture mode, ongoing and
+  group-summary toggles, stored counts, version
+- app filter screen (apps seen so far or package name) for allow/blocklist
+- permission banner that refreshes when the app returns to the foreground
+- CaptureStatusController, SourceApp, listSourceApps, listRules,
+  CapturePlatform.isSupported
+- widget tests with in-memory repositories and a fake platform
+- CI: flutter analyze --no-fatal-infos (warnings and errors still fail)
 - docs: roadmap, architecture, privacy and development guide updated
 
 Not verified on a physical device.
 
-Milestone: M1 / Section 3
+Milestone: M1 / Section 4

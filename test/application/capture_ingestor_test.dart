@@ -113,18 +113,15 @@ void main() {
     expect(await repo.count(), 0);
   });
 
-  test(
-    'malformed events are skipped and later events still processed',
-    () async {
-      platform
-        ..addMalformed()
-        ..addPosted(payload());
+  test('malformed events are skipped and later events still processed', () async {
+    platform
+      ..addMalformed()
+      ..addPosted(payload());
 
-      await ingestor.drain();
-      expect(await repo.count(), 1);
-      expect(platform.queue, isEmpty);
-    },
-  );
+    await ingestor.drain();
+    expect(await repo.count(), 1);
+    expect(platform.queue, isEmpty);
+  });
 
   test('events stay queued when storing fails and are retried', () async {
     final flaky = FlakyNotificationRepository(repo);

@@ -21,8 +21,12 @@ Until background ingestion is implemented, notifications that arrive while the a
 
 ## Your controls
 - You can revoke Notification Access in Android settings at any time; capture stops.
-- Source apps can be allowlisted or blocklisted (the rules are stored; the screen for them is planned).
+- Source apps can be allowlisted or blocklisted from Settings > Choose apps.
 - Retention and "delete everything" exist in the storage layer. The screens for export and deletion are planned for M1 section 5.
+
+## Known gaps
+- The app shows captured text on its own screens. Android may show those screens in the app switcher; hiding them is not implemented yet.
+- Per-notification deletion, export and the retention setting have no screens yet (planned for M1 section 5).
 
 ## What Nudge does not do
 - It does not use an Accessibility Service, root access or hidden APIs to read content Android does not expose.

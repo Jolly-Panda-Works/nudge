@@ -8,7 +8,7 @@ Flutter 3.35.0 (stable, Dart 3.9), JDK 17, Android SDK; Visual Studio 2022 (C++ 
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 dart format .
-flutter analyze
+flutter analyze --no-fatal-infos   # same as CI
 flutter test
 ```
 
@@ -23,7 +23,7 @@ All steps run on GitHub Actions, so a browser and git are enough:
 ## Workflows
 | Workflow | Trigger | What it does |
 |---|---|---|
-| CI | push to `main`, PRs, manual | build_runner, analyze, tests, APK, Windows build, nightly pre-release |
+| CI | push to `main`, PRs, manual | build_runner, analyze (info-level hints do not fail the build; warnings and errors do), tests, APK, Windows build, nightly pre-release |
 | Format code | push to `main`, manual | `dart format`, commits, starts CI |
 | Bootstrap platforms | manual, once | generates `android/` and `windows/` (already done for this repo) |
 | Rename app to Nudge | manual, once | renames the generated Android/Windows projects (already done once it has been run) |
@@ -45,7 +45,9 @@ Capture works only on Android and needs the one-time **Wire Android capture serv
 2. On Android 13 and later, a sideloaded app cannot be given Notification Access until you allow restricted settings: open Settings > Apps > Nudge, open the three-dot menu and choose **Allow restricted settings**.
 3. Open Nudge and tap **Open Notification Access settings**, then enable Nudge.
 4. Return to the app. The status screen should show access granted and the listener connected.
-5. Trigger a notification from another app. The stored count increases. The screen never shows notification text.
-6. Dismiss the notification. The "active" count decreases while the stored count stays.
+5. Trigger a notification from another app. It appears in the inbox. Tap it to see the details.
+6. Dismiss the notification on the phone. It disappears from **Active** and shows as *Dismissed* under **All**.
+7. Open Settings: access and listener state, capture mode, the app filter and the two toggles should reflect what you choose. Try "Only selected apps" with one app selected and confirm other apps stop appearing.
+8. Turn Notification Access off in the system settings and return to Nudge: the banner "Notification access is off" should appear.
 
 If something does not match, note the Android version, the device manufacturer and what the status screen shows, and open an issue (without real notification content).

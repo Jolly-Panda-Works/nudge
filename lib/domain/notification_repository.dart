@@ -1,5 +1,6 @@
 import 'captured_notification.dart';
 import 'ingest_policy.dart';
+import 'source_app.dart';
 
 /// Storage of captured notifications. Implementations must never log
 /// notification titles or bodies.
@@ -37,4 +38,7 @@ abstract interface class NotificationRepository {
 
   /// Number of stored notifications, optionally only the active ones.
   Future<int> count({bool activeOnly = false});
+
+  /// Distinct apps found in stored notifications, sorted by display name.
+  Future<List<SourceApp>> listSourceApps();
 }

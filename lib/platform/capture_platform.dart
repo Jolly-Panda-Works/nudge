@@ -4,6 +4,9 @@ import 'capture_signal.dart';
 /// Bridge to the native notification listener. Implementations: the Android
 /// method channel, and a no-op for platforms without notification capture.
 abstract interface class CapturePlatform {
+  /// Whether notification capture exists on this platform.
+  bool get isSupported;
+
   Future<String> packageName();
 
   Future<bool> isAccessGranted();

@@ -9,14 +9,14 @@
 
 It combines an inbox of accessible Android notifications, one-tap conversion to tasks or reminders (with a persistent link back to the original source), and a Persian-first calendar with Jalali dates.
 
-> **Status: early development (v0.3.x).** The foundations (domain model, deduplication, local storage) and a first Android notification listener exist, but there is no inbox UI yet, only a temporary status screen, and nothing has been verified on a physical device. See [Project status](#project-status) for exactly what is implemented.
+> **Status: early development (v0.4.x).** Notification capture, local storage, an inbox and settings screens exist in code, but nothing has been verified on a physical device yet, and there are no tasks or calendar. See [Project status](#project-status) for exactly what is implemented.
 
 ## Features
 
 | Area | Goal | Status |
 |---|---|---|
 | Notification capture | Capture accessible Android notifications via `NotificationListenerService` | Implemented in code (Kotlin service, durable queue, ingestion); not verified on a device |
-| Inbox UI | List and detail screens | Planned (M1, section 4); a temporary status screen exists |
+| Inbox UI | List, details, settings, app filter screens, permission banner | Implemented in code; not verified on a device |
 | Deduplication | Handle updates, re-posts, removals, redacted content | Implemented in domain code, covered by unit tests |
 | Local storage | On-device database, retention purge, delete all | Implemented (Drift/SQLite), covered by unit tests |
 | Source filters | Allowlist / blocklist of source apps | Rules stored; UI planned |
@@ -72,7 +72,7 @@ lib/
   data/         Drift database and repository implementations
   platform/     bridge to the Android listener (events, channels, no-op for other platforms)
   application/  capture ingestor: native queue to database
-  ui/           temporary status screen
+  ui/           inbox, notification details, settings and app filter screens
   main.dart     app entry point
 android/app/src/main/kotlin/app/nudge/capture/   Kotlin listener service, queue, channels
 tools/          one-off scripts (wiring the Android service into the generated project)
@@ -88,7 +88,7 @@ Milestones (each is independently testable):
 
 | Milestone | Scope | State |
 |---|---|---|
-| M1 | Notification capture and local inbox | In progress: sections 1-3 done in code (domain, storage, capture service); 4-5 pending (inbox UI, share/import and export/delete) |
+| M1 | Notification capture and local inbox | In progress: sections 1-4 done in code (domain, storage, capture service, inbox UI); 5 pending (share/import, export and deletion) |
 | M2 | Task conversion and source navigation | Not started |
 | M3 | Calendar UI with Persian dates | Not started |
 | M4 | Android Calendar Provider | Not started |

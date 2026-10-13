@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'app_info.dart';
 import 'app_services.dart';
-import 'ui/capture_status_page.dart';
+import 'ui/inbox_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,12 +18,9 @@ void main() {
   }
   if (services != null) {
     unawaited(
-      services.ingestor.start().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Queued events are retried on the next native signal.
-        },
-      ),
+      services.start().then<void>((_) {}, onError: (Object _) {
+        // Queued events are retried on the next native signal.
+      }),
     );
   }
   runApp(NudgeApp(services: services, startupError: startupError));
@@ -47,7 +44,7 @@ class NudgeApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: services != null
-          ? CaptureStatusPage(services: services)
+          ? InboxPage(services: services)
           : Scaffold(
               body: Center(
                 child: Column(

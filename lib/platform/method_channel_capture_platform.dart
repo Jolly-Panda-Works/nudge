@@ -10,7 +10,8 @@ final class MethodChannelCapturePlatform implements CapturePlatform {
     MethodChannel? methodChannel,
     EventChannel? eventChannel,
   }) : _methods = methodChannel ?? const MethodChannel('app.nudge/capture'),
-       _events = eventChannel ?? const EventChannel('app.nudge/capture/events');
+       _events =
+           eventChannel ?? const EventChannel('app.nudge/capture/events');
 
   final MethodChannel _methods;
   final EventChannel _events;
@@ -24,6 +25,9 @@ final class MethodChannelCapturePlatform implements CapturePlatform {
         }
         return const WakeSignal();
       });
+
+  @override
+  bool get isSupported => true;
 
   @override
   Stream<CaptureSignal> get signals => _signals;

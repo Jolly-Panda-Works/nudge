@@ -6,7 +6,7 @@ import 'package:nudge/platform/capture_platform.dart';
 import 'package:nudge/platform/capture_signal.dart';
 
 /// In-memory stand-in for the native queue and listener.
-final class FakeCapturePlatform implements CapturePlatform {
+class FakeCapturePlatform implements CapturePlatform {
   final List<CaptureEvent> queue = <CaptureEvent>[];
   final StreamController<CaptureSignal> _signals =
       StreamController<CaptureSignal>.broadcast();
@@ -16,6 +16,8 @@ final class FakeCapturePlatform implements CapturePlatform {
   bool accessGranted = false;
   bool connected = false;
   bool settingsAvailable = true;
+  bool supported = true;
+  int settingsOpens = 0;
   int rebindRequests = 0;
   String package = 'app.nudge.nudge';
 
@@ -24,11 +26,15 @@ final class FakeCapturePlatform implements CapturePlatform {
 
   void addRemoved(String key) => queue.add(RemovedEvent(++_seq, key));
 
-  void addSnapshot(Set<String> keys) => queue.add(SnapshotEvent(++_seq, keys));
+  void addSnapshot(Set<String> keys) =>
+      queue.add(SnapshotEvent(++_seq, keys));
 
   void addMalformed() => queue.add(MalformedEvent(++_seq));
 
   void signal(CaptureSignal signal) => _signals.add(signal);
+
+  @override
+  bool get isSupported => supported;
 
   @override
   Future<String> packageName() async => package;
@@ -40,7 +46,10 @@ final class FakeCapturePlatform implements CapturePlatform {
   Future<bool> isServiceConnected() async => connected;
 
   @override
-  Future<bool> openAccessSettings() async => settingsAvailable;
+  Future<bool> openAccessSettings() async {
+    settingsOpens++;
+    return settingsAvailable;
+  }
 
   @override
   Future<void> requestRebind() async {

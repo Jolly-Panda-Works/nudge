@@ -1,4 +1,4 @@
-# Pinned versions (Nudge 0.3.0+6, M1 / Section 2)
+# Pinned versions (Nudge 0.4.0+7, M1 / Section 2)
 
 | Item | Version | Status |
 |---|---|---|
