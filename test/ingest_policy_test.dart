@@ -105,7 +105,10 @@ void main() {
         IngestDecision.ignoreFiltered,
       );
       expect(
-        decideIngest(incoming: captured(pkg: 'com.other'), policy: policy),
+        decideIngest(
+          incoming: captured(pkg: 'com.other'),
+          policy: policy,
+        ),
         IngestDecision.insert,
       );
     });
@@ -120,7 +123,10 @@ void main() {
         IngestDecision.insert,
       );
       expect(
-        decideIngest(incoming: captured(pkg: 'com.other'), policy: policy),
+        decideIngest(
+          incoming: captured(pkg: 'com.other'),
+          policy: policy,
+        ),
         IngestDecision.ignoreFiltered,
       );
     });
