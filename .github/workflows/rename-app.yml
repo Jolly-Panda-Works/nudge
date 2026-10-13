@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   rename:
@@ -45,3 +46,7 @@ jobs:
           git add -A
           git diff --cached --quiet || git commit -m "chore: rename app to Nudge (android id app.nudge.nudge)"
           git push
+      - name: Run CI on the new commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref "${{ github.ref_name }}"

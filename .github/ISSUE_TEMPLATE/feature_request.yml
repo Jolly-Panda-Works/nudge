@@ -1,0 +1,19 @@
+name: Feature request
+description: Suggest an improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Related milestone
+      options: [M1, M2, M3, M4, M5, M6, Not sure]

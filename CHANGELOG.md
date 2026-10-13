@@ -1,19 +1,28 @@
 # Changelog
 
-## 0.2.0+3 - M1 / Section 2
-- App renamed to **Nudge** (Dart package `nudge`, display name Nudge).
-- Drift database (`Notifications`, `SourceRules`, `AppSettings` tables).
-- `NotificationRepository` + `DriftNotificationRepository`: atomic ingest using
-  the Section 1 dedupe policy, removal marking, listener reconciliation,
-  retention purge, delete-all, watch stream.
-- `CaptureSettingsRepository` + Drift implementation (allow/blocklist rules,
-  ongoing/group-summary toggles, retention days).
-- CI: build_runner step, pinned runners, Windows install from git tag.
-- New workflows: `format.yml` (auto format), `rename-app.yml` (one-time rename
-  of the generated Android/Windows projects).
+All notable changes are documented here. Format based on
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
+[Semantic Versioning](https://semver.org/) (pre-1.0).
 
-## 0.1.1+2
-- `bootstrap.yml` workflow so Flutter does not need to be installed locally.
+## [0.2.1] - 2026-10-13
+### Added
+- Open-source project files: README (English and Persian), LICENSE (MIT), CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, PRIVACY, docs (architecture, development, roadmap), issue and PR templates, Dependabot, editorconfig.
+- CI publishes the outputs of every push to `main` as a rolling `nightly` pre-release (APK and Windows zip, version in the file name).
+- Workflows that commit to `main` (format, bootstrap, rename) now start CI on the new commit.
+### Changed
+- Formatting check in CI is report-only; the Format workflow fixes it.
+- CI no longer cancels a running build when a newer push arrives.
 
-## 0.1.0+1
-- M1 / Section 1: domain model, mapper, ingest policy, tests, CI.
+## [0.2.0] - 2026-10-12
+### Added
+- Drift database (notifications, source rules, settings) and repositories: atomic ingest with dedupe, removal marking, reconciliation, retention purge, delete-all.
+- App renamed to Nudge; version shown in the app shell.
+- Workflows: build_runner step, Format code, one-time rename.
+
+## [0.1.1] - 2026-10-12
+### Added
+- Bootstrap workflow to generate platform folders without a local Flutter installation.
+
+## [0.1.0] - 2026-10-12
+### Added
+- Domain model, notification mapper, ingest/dedupe policy, tests and CI.

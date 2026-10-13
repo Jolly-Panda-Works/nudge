@@ -9,9 +9,10 @@ on:
 permissions:
   contents: read
 
+# Never cancel a running build: it may be in the middle of publishing.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   FLUTTER_VERSION: '3.35.0'
@@ -27,7 +28,11 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: dart format --output=none --set-exit-if-changed .
+      # Formatting is fixed automatically by the "Format code" workflow, so a
+      # formatting difference must not block builds. It is reported only.
+      - name: Check formatting (report only)
+        continue-on-error: true
+        run: dart format --output=none --set-exit-if-changed .
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter analyze
       - run: flutter test
@@ -46,13 +51,20 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+      - name: Read app version
+        id: ver
+        run: echo "version=$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9.]+).*/\1/')" >> "$GITHUB_OUTPUT"
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter build apk --debug
+      - name: Name the output with the version
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-debug.apk "dist/Nudge_v${{ steps.ver.outputs.version }}_android-debug.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: android-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: nudge-android-debug
+          path: dist/*.apk
 
   windows-build:
     needs: analyze-and-test
@@ -67,11 +79,50 @@ jobs:
         run: |
           git clone --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git C:/flutter
           echo "C:/flutter/bin" >> "$GITHUB_PATH"
+      - name: Read app version
+        id: ver
+        shell: bash
+        run: echo "version=$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9.]+).*/\1/')" >> "$GITHUB_OUTPUT"
       - run: flutter --version
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter build windows --release
+      - name: Package with the version in the name
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "dist/Nudge_v${{ steps.ver.outputs.version }}_windows-x64.zip"
       - uses: actions/upload-artifact@v4
         with:
-          name: windows-release
-          path: build/windows/x64/runner/Release
+          name: nudge-windows
+          path: dist/*.zip
+
+  # Publishes the outputs of every push to main as a rolling pre-release, so
+  # they can be downloaded without opening the Actions run. Debug-signed.
+  publish-nightly:
+    needs: [android-debug-apk, windows-build]
+    if: >-
+      ${{ always()
+      && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      && github.ref == 'refs/heads/main'
+      && needs.android-debug-apk.result == 'success' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: nudge-*
+          merge-multiple: true
+          path: dist
+      - name: Publish rolling pre-release "nightly"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete nightly --cleanup-tag --yes || true
+          gh release create nightly dist/* \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Nightly build" \
+            --notes "Automated build of ${GITHUB_SHA::7} from main. Debug-signed, for testing only."

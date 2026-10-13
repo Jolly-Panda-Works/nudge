@@ -1,7 +1,9 @@
 name: nudge
 description: Nudge - unified notifications inbox, tasks and calendar (Android + Windows).
 publish_to: 'none'
-version: 0.2.0+3
+repository: https://github.com/Usef-Farahmand/nudge
+issue_tracker: https://github.com/Usef-Farahmand/nudge/issues
+version: 0.2.1+4
 
 environment:
   sdk: '>=3.9.0 <4.0.0'

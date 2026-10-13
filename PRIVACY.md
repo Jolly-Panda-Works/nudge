@@ -1,0 +1,24 @@
+# Privacy
+
+Nudge handles notification text, which can be sensitive. These are the rules the project follows. Where something is not implemented yet, it says so.
+
+## What is collected
+- Notifications that Android delivers to Nudge after you grant **Notification Access**: source app (package and label), title, text if available, timestamp, grouping information, and whether a content action existed.
+- Tasks, reminders and calendar references you create.
+
+## Where it is stored
+- **Only on your device**, in a local SQLite database. The current version has no network code and no cloud sync.
+- Cloud sync, if it is ever added (M5), will be optional, off by default and encrypted in transit, with credentials kept in platform secure storage.
+
+## What is never stored
+- Authentication tokens or notification bodies in application logs or CI logs.
+- `PendingIntent` objects. Only the fact that an action existed is saved, because a PendingIntent cannot be persisted.
+
+## Your controls
+- You can revoke Notification Access in Android settings at any time; capture stops.
+- Source apps can be allowlisted or blocklisted (the rules are stored; the screen for them is planned).
+- Retention and "delete everything" exist in the storage layer. The screens for export and deletion are planned for M1 section 5.
+
+## What Nudge does not do
+- It does not use an Accessibility Service, root access or hidden APIs to read content Android does not expose.
+- It does not read notifications from before you granted access.

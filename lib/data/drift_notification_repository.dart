@@ -17,10 +17,9 @@ final class DriftNotificationRepository implements NotificationRepository {
 
   @override
   Future<CapturedNotification?> findByKey(String notificationKey) async {
-    final row =
-        await (_db.select(_db.notifications)
-              ..where((t) => t.notificationKey.equals(notificationKey)))
-            .getSingleOrNull();
+    final row = await (_db.select(
+      _db.notifications,
+    )..where((t) => t.notificationKey.equals(notificationKey))).getSingleOrNull();
     return row == null ? null : notificationFromRow(row);
   }
 
@@ -72,7 +71,10 @@ final class DriftNotificationRepository implements NotificationRepository {
               .into(_db.notifications)
               .insert(notificationToCompanion(incoming));
         case IngestDecision.update:
-          final updated = existing!.applyUpdateFrom(incoming, _clock().toUtc());
+          final updated = existing!.applyUpdateFrom(
+            incoming,
+            _clock().toUtc(),
+          );
           await (_db.update(_db.notifications)
                 ..where((t) => t.notificationKey.equals(updated.key)))
               .write(notificationToCompanion(updated));
