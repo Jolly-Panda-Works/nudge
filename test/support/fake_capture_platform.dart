@@ -24,8 +24,7 @@ final class FakeCapturePlatform implements CapturePlatform {
 
   void addRemoved(String key) => queue.add(RemovedEvent(++_seq, key));
 
-  void addSnapshot(Set<String> keys) =>
-      queue.add(SnapshotEvent(++_seq, keys));
+  void addSnapshot(Set<String> keys) => queue.add(SnapshotEvent(++_seq, keys));
 
   void addMalformed() => queue.add(MalformedEvent(++_seq));
 
