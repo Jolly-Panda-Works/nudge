@@ -154,9 +154,7 @@ void main() {
     expect(await harness.notifications.count(), 0);
   });
 
-  testWidgets('a notification can be deleted from its details', (
-    tester,
-  ) async {
+  testWidgets('a notification can be deleted from its details', (tester) async {
     final harness = AppHarness()..notifications.add(captured(title: 'Sara'));
     await harness.pump(tester);
 
