@@ -1,8 +1,12 @@
 name: CI
 
+# - every branch push: analyze, test, build; outputs go to the run's artifacts
+# - main: also publishes the rolling "nightly" pre-release
+# - tags v*: also publish a permanent GitHub release for that version
 on:
   push:
-    branches: [main]
+    branches: ['**']
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -19,6 +23,8 @@ env:
 
 jobs:
   analyze-and-test:
+    # Pull requests from this repository are already covered by the push run.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
@@ -28,8 +34,8 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      # Formatting is fixed automatically by the "Format code" workflow, so a
-      # formatting difference must not block builds. It is reported only.
+      # Formatting is fixed automatically by the "Format code" workflow on
+      # main, so a formatting difference must not block builds. Report only.
       - name: Check formatting (report only)
         continue-on-error: true
         run: dart format --output=none --set-exit-if-changed .
@@ -51,20 +57,30 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
-      - name: Read app version
-        id: ver
-        run: echo "version=$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9.]+).*/\1/')" >> "$GITHUB_OUTPUT"
+      - name: Name the build (version, branch, commit)
+        id: name
+        shell: bash
+        run: |
+          version=$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9.]+).*/\1/')
+          if [ "$GITHUB_REF_TYPE" = "tag" ] || [ "$GITHUB_REF_NAME" = "main" ]; then
+            suffix=""
+          else
+            slug=$(echo "$GITHUB_REF_NAME" | sed 's/[^A-Za-z0-9._-]/-/g')
+            suffix="_${slug}-${GITHUB_SHA::7}"
+          fi
+          echo "base=Nudge_v${version}${suffix}" >> "$GITHUB_OUTPUT"
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter build apk --debug
-      - name: Name the output with the version
+      - name: Rename the output
         run: |
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-debug.apk "dist/Nudge_v${{ steps.ver.outputs.version }}_android-debug.apk"
+          cp build/app/outputs/flutter-apk/app-debug.apk "dist/${{ steps.name.outputs.base }}_android-debug.apk"
       - uses: actions/upload-artifact@v4
         with:
           name: nudge-android-debug
           path: dist/*.apk
+          retention-days: ${{ github.ref_name == 'main' && 30 || 14 }}
 
   windows-build:
     needs: analyze-and-test
@@ -79,26 +95,34 @@ jobs:
         run: |
           git clone --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git C:/flutter
           echo "C:/flutter/bin" >> "$GITHUB_PATH"
-      - name: Read app version
-        id: ver
+      - name: Name the build (version, branch, commit)
+        id: name
         shell: bash
-        run: echo "version=$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9.]+).*/\1/')" >> "$GITHUB_OUTPUT"
+        run: |
+          version=$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9.]+).*/\1/')
+          if [ "$GITHUB_REF_TYPE" = "tag" ] || [ "$GITHUB_REF_NAME" = "main" ]; then
+            suffix=""
+          else
+            slug=$(echo "$GITHUB_REF_NAME" | sed 's/[^A-Za-z0-9._-]/-/g')
+            suffix="_${slug}-${GITHUB_SHA::7}"
+          fi
+          echo "base=Nudge_v${version}${suffix}" >> "$GITHUB_OUTPUT"
       - run: flutter --version
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter build windows --release
-      - name: Package with the version in the name
+      - name: Package
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
-          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "dist/Nudge_v${{ steps.ver.outputs.version }}_windows-x64.zip"
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "dist/${{ steps.name.outputs.base }}_windows-x64.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: nudge-windows
           path: dist/*.zip
+          retention-days: ${{ github.ref_name == 'main' && 30 || 14 }}
 
-  # Publishes the outputs of every push to main as a rolling pre-release, so
-  # they can be downloaded without opening the Actions run. Debug-signed.
+  # Rolling pre-release with the latest build of main. Debug-signed.
   publish-nightly:
     needs: [android-debug-apk, windows-build]
     if: >-
@@ -120,9 +144,60 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          (cd dist && sha256sum * > SHA256SUMS.txt)
           gh release delete nightly --cleanup-tag --yes || true
           gh release create nightly dist/* \
             --prerelease \
             --target "$GITHUB_SHA" \
             --title "Nightly build" \
             --notes "Automated build of ${GITHUB_SHA::7} from main. Debug-signed, for testing only."
+
+  # Permanent release for a version tag such as v0.5.1.
+  publish-release:
+    needs: [android-debug-apk, windows-build]
+    if: >-
+      ${{ always()
+      && github.event_name == 'push'
+      && startsWith(github.ref, 'refs/tags/v')
+      && needs.android-debug-apk.result == 'success' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: nudge-*
+          merge-multiple: true
+          path: dist
+      - name: Check that the tag matches pubspec.yaml
+        run: |
+          version=$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9.]+).*/\1/')
+          if [ "$GITHUB_REF_NAME" != "v${version}" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match pubspec version v${version}"
+            exit 1
+          fi
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          (cd dist && sha256sum * > SHA256SUMS.txt)
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then echo "See CHANGELOG.md for details." > notes.md; fi
+          printf '\nDebug-signed builds, not verified on a physical device unless the notes say otherwise.\n' >> notes.md
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            # A release was already drafted in the GitHub UI: just attach the files.
+            gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          else
+            flags=""
+            case "$VERSION" in 0.*) flags="--prerelease";; esac
+            gh release create "$GITHUB_REF_NAME" dist/* \
+              --title "Nudge v${VERSION}" \
+              --notes-file notes.md \
+              --verify-tag $flags
+          fi

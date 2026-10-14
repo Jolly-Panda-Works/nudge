@@ -17,6 +17,9 @@ Thanks for helping! Please read the [Code of Conduct](CODE_OF_CONDUCT.md) first.
 4. Make sure `flutter analyze` and `flutter test` pass (CI runs them). If you generated code: `dart run build_runner build --delete-conflicting-outputs`.
 5. Formatting: run `dart format .`; the **Format code** workflow also fixes it on `main`.
 
+## Branches and builds
+Work on a branch. Every push to any branch is built by CI, and the APK and Windows zip are attached to that run as artifacts named with the branch and commit, so you can try your change without touching `main`. Merge to `main` through a pull request. Releases are made by tagging; see [docs/RELEASING.md](docs/RELEASING.md).
+
 ## Commit messages
 [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `test:`, `ci:`, `chore:`, `refactor:`, optionally with a scope, e.g. `feat(data): add retention purge`.
 

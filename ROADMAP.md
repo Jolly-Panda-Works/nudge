@@ -1,6 +1,6 @@
 # Roadmap
 
-Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.5.0).
+Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.5.1).
 
 **How to read the status**
 
@@ -33,6 +33,7 @@ Today the app captures notifications on Android, stores them locally, shows them
 | 0.3.0 | 2026-10-13 | M1 section 3: Kotlin listener service, durable native queue, platform bridge, ingestion into the database, temporary status screen, wiring workflow |
 | 0.4.0 | 2026-10-13 | M1 section 4: inbox, notification details, settings, app filter screen, permission banner |
 | 0.5.0 | 2026-10-13 | M1 section 5: share target and text import, JSON export, per-notification and bulk delete, retention setting, logging guard test |
+| 0.5.1 | 2026-10-13 | CI: builds for every branch, permanent releases from version tags, docs/RELEASING.md |
 
 ## M1: Notification capture and local inbox
 
@@ -141,6 +142,8 @@ M1 is complete when capture and the UI are verified on a physical device and the
 ## Project infrastructure
 - [x] GitHub Actions: analyze, test, Android debug APK, Windows build, artifact upload
 - [x] Rolling `nightly` pre-release with versioned file names after every push to `main`
+- [x] Builds for every branch (artifacts named with branch and commit) and permanent releases from `v*` tags
+- [ ] Verify the branch-build and tag-release workflows (first run pending)
 - [x] Automatic formatting workflow
 - [x] Open-source files: LICENSE (MIT), CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, PRIVACY, CHANGELOG, issue and PR templates
 - [ ] Pin exact versions of Drift, drift_dev, drift_flutter and build_runner (needs one successful dependency resolution log)

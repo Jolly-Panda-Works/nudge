@@ -42,12 +42,13 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [PRIVACY.md](PRIVACY.m
 
 ## Download
 
-Every push to `main` that passes the checks publishes a rolling pre-release called **nightly** with:
+| What | Where |
+|---|---|
+| Latest build of `main` | the rolling [nightly](https://github.com/Usef-Farahmand/nudge/releases/tag/nightly) pre-release (replaced on every push) |
+| A specific version | the [Releases](https://github.com/Usef-Farahmand/nudge/releases) page (created when a `v<version>` tag is pushed) |
+| Any other branch | the artifacts of that branch's [CI run](https://github.com/Usef-Farahmand/nudge/actions/workflows/ci.yml), named with the branch and commit |
 
-- `Nudge_v<version>_android-debug.apk`
-- `Nudge_v<version>_windows-x64.zip`
-
-Find it under [Releases](https://github.com/Usef-Farahmand/nudge/releases/tag/nightly), or download the same files from the artifacts of the latest [CI run](https://github.com/Usef-Farahmand/nudge/actions/workflows/ci.yml). These are debug builds for testing only.
+Each build contains `Nudge_v<version>..._android-debug.apk` and `Nudge_v<version>..._windows-x64.zip`. Releases also include `SHA256SUMS.txt`. These are debug builds for testing only. See [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Build from source
 

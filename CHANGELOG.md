@@ -4,6 +4,15 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.5.1] - 2026-10-13
+### Added
+- Builds for every branch: pushes to any branch are analyzed, tested and built, and the outputs are artifacts named with the version, branch and commit (kept 14 days; `main` 30 days).
+- Permanent releases: pushing a tag `v<version>` publishes a GitHub release with the APK, the Windows zip, `SHA256SUMS.txt` and the changelog section as notes (versions starting with `0.` are pre-releases). If a release was drafted in the GitHub UI, the files are attached to it.
+- `docs/RELEASING.md`.
+### Changed
+- CI runs on pushes to all branches; pull requests from this repository no longer run twice (forks still do).
+- The nightly release also includes `SHA256SUMS.txt`.
+
 ## [0.5.0] - 2026-10-13
 ### Added
 - Share target for plain text (Android) and an "Import text" button in the inbox; imported entries bypass the app filters.

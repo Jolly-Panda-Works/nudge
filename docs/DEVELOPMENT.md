@@ -17,13 +17,13 @@ All steps run on GitHub Actions, so a browser and git are enough:
 
 1. Push to `main`.
 2. **Format code** runs automatically and commits formatting changes, then starts CI on that commit.
-3. **CI** analyzes, tests, builds the Android debug APK and the Windows release, and publishes the `nightly` pre-release.
+3. **CI** analyzes, tests, builds the Android debug APK and the Windows release, and publishes the `nightly` pre-release. On any other branch the outputs stay in the run's artifacts, named with the branch and commit, so experiments never touch `main` or the nightly release.
 4. When something fails, open the failed step in the Actions run; the log is what maintainers need.
 
 ## Workflows
 | Workflow | Trigger | What it does |
 |---|---|---|
-| CI | push to `main`, PRs, manual | build_runner, analyze (info-level hints do not fail the build; warnings and errors do), tests, APK, Windows build, nightly pre-release |
+| CI | push to any branch, version tags (`v*`), PRs from forks, manual | build_runner, analyze (info-level hints do not fail the build; warnings and errors do), tests, APK, Windows build; `main` also publishes the nightly pre-release and `v*` tags publish a release (see [RELEASING.md](RELEASING.md)) |
 | Format code | push to `main`, manual | `dart format`, commits, starts CI |
 | Bootstrap platforms | manual, once | generates `android/` and `windows/` (already done for this repo) |
 | Rename app to Nudge | manual, once | renames the generated Android/Windows projects (already done once it has been run) |
@@ -32,7 +32,7 @@ All steps run on GitHub Actions, so a browser and git are enough:
 Commits made by workflows with `GITHUB_TOKEN` do not trigger other workflows, which is why the Format, Bootstrap, Rename and Wire workflows start CI explicitly.
 
 ## Versioning and outputs
-The version is in `pubspec.yaml` and `lib/app_info.dart` (a test keeps them equal). Build outputs carry it in the file name: `Nudge_v<version>_android-debug.apk`, `Nudge_v<version>_windows-x64.zip`. The nightly release is replaced on every successful push.
+The version is in `pubspec.yaml` and `lib/app_info.dart` (a test keeps them equal). Build outputs carry it in the file name: `Nudge_v<version>_android-debug.apk`, `Nudge_v<version>_windows-x64.zip`. The nightly release is replaced on every successful push to `main`; permanent releases come from version tags.
 
 ## Notes
 - `*.g.dart` files are generated and not committed.

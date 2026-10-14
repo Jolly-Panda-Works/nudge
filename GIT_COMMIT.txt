@@ -1,19 +1,13 @@
-feat: Nudge v0.5.0 - share/import, export, deletion and retention
+ci: Nudge v0.5.1 - builds for every branch and tagged releases
 
-- Android share target for plain text and an "Import text" button; imported
-  entries use the synthetic source "Shared" and bypass the app filters
-- JSON export: Android system file picker (no storage permission), desktop
-  writes to Documents/Nudge; the UI warns the file is not encrypted
-- delete one notification or all (also clears the native queue)
-- retention setting (forever, 7, 30, 90 days) applied at startup and on change
-- Kotlin ShareReceiver and DocumentExporter; tools/wire_capture.py now wires
-  the share intent filter, export channel and file picker result and upgrades
-  older installs (run the "Wire Android capture service" workflow again)
-- guard test against printing or logging notification content (heuristic)
-- tests: export format, importer, retention, shared events, delete/export/
-  import UI flows
-- docs: roadmap, architecture, privacy, development guide and changelog
+- CI runs on pushes to every branch; outputs are artifacts named
+  Nudge_v<version>_<branch>-<commit>_... (14 days, main 30 days)
+- main still publishes the rolling "nightly" pre-release
+- pushing a tag v<version> publishes a permanent release with the APK,
+  Windows zip, SHA256SUMS.txt and the CHANGELOG section as notes; fails if
+  the tag does not match pubspec.yaml; attaches files to a release that was
+  drafted in the GitHub UI; 0.x versions are pre-releases
+- same-repo pull requests are no longer built twice
+- docs: RELEASING.md, README download table, DEVELOPMENT, CONTRIBUTING
 
-Not verified on a physical device.
-
-Milestone: M1 / Section 5
+Milestone: infrastructure
