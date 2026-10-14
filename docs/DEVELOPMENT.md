@@ -6,7 +6,7 @@ Flutter 3.35.0 (stable, Dart 3.9), JDK 17, Android SDK; Visual Studio 2022 (C++ 
 ## Local commands
 ```bash
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 dart format .
 flutter analyze --no-fatal-infos   # same as CI
 flutter test

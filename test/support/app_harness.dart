@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart' show Size;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nudge/app_services.dart';
 import 'package:nudge/application/capture_ingestor.dart';

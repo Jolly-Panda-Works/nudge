@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../app_info.dart';
 import '../app_services.dart';
+import '../application/capture_status_controller.dart';
 import '../domain/captured_notification.dart';
 import 'dialogs.dart';
 import 'import_text_dialog.dart';
@@ -24,8 +25,9 @@ class _InboxPageState extends State<InboxPage> {
   bool _showRemoved = false;
   late Stream<List<CapturedNotification>> _stream = _openStream();
 
-  Stream<List<CapturedNotification>> _openStream() =>
-      widget.services.notifications.watchInbox(includeRemoved: _showRemoved);
+  Stream<List<CapturedNotification>> _openStream() => widget.services
+      .notifications
+      .watchInbox(includeRemoved: _showRemoved);
 
   @override
   void initState() {
@@ -135,7 +137,8 @@ class _InboxPageState extends State<InboxPage> {
                     listenable: controller,
                     builder: (context, _) => _EmptyState(
                       supported: controller.isSupported,
-                      accessGranted: controller.status?.accessGranted ?? false,
+                      accessGranted:
+                          controller.status?.accessGranted ?? false,
                     ),
                   );
                 }
@@ -172,8 +175,7 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appName = notification.appLabel ?? notification.packageName;
-    final title =
-        notification.title ??
+    final title = notification.title ??
         (notification.isRedacted ? 'Content hidden' : '(no title)');
     final removed = notification.status == NotificationStatus.removed;
     final snippet = notification.text;
@@ -239,9 +241,9 @@ class _AccessBanner extends StatelessWidget {
             Text(
               needsAccess
                   ? 'Nudge cannot capture notifications until you enable '
-                        'Notification Access for it.'
+                      'Notification Access for it.'
                   : 'Notification access is on, but the listener is not '
-                        'running. Try reconnecting.',
+                      'running. Try reconnecting.',
             ),
             const SizedBox(height: 8),
             Align(

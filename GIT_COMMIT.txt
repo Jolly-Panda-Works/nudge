@@ -1,13 +1,13 @@
-ci: Nudge v0.5.1 - builds for every branch and tagged releases
+fix: Nudge v0.5.2 - analyzer errors from CI, exact dependency pins
 
-- CI runs on pushes to every branch; outputs are artifacts named
-  Nudge_v<version>_<branch>-<commit>_... (14 days, main 30 days)
-- main still publishes the rolling "nightly" pre-release
-- pushing a tag v<version> publishes a permanent release with the APK,
-  Windows zip, SHA256SUMS.txt and the CHANGELOG section as notes; fails if
-  the tag does not match pubspec.yaml; attaches files to a release that was
-  drafted in the GitHub UI; 0.x versions are pre-releases
-- same-repo pull requests are no longer built twice
-- docs: RELEASING.md, README download table, DEVELOPMENT, CONTRIBUTING
+- import CaptureStatus in the inbox screen (undefined class error)
+- import Size in the test harness (creation_with_non_type error)
+- use braces in the privacy guard test (lint)
+- pin direct dependencies to the versions CI resolved: drift 2.31.0,
+  drift_dev 2.31.0, drift_flutter 0.2.8, build_runner 2.15.1,
+  path_provider 2.1.5, crypto 3.0.7, flutter_lints 5.0.0
+- drop the --delete-conflicting-outputs flag (ignored by build_runner)
+- repository links now point to Jolly-Panda-Works/nudge
+- VERSIONS.md, CHANGELOG and ROADMAP updated with what CI verified
 
-Milestone: infrastructure
+Milestone: M1 / CI fixes

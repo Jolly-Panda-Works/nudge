@@ -1,18 +1,20 @@
-# Pinned versions (Nudge 0.5.1+9, M1 / Section 2)
+# Pinned versions (Nudge 0.5.2+10)
+
+Direct dependencies are pinned to exact versions in `pubspec.yaml`. The versions below were resolved by pub on the GitHub Actions runner (Ubuntu, Flutter 3.35.0) on 2026-10-14. Transitive dependencies are not locked because `pubspec.lock` is not committed.
 
 | Item | Version | Status |
 |---|---|---|
-| Flutter (stable) | 3.35.0 | verified on GitHub runner (Linux) |
+| Flutter (stable) | 3.35.0 | verified on the Linux runner; the Windows job installs it from the git tag (unverified) |
 | Dart SDK | >=3.9.0 <4.0.0 | matches Flutter 3.35 |
-| crypto | ^3.0.6 | verified: resolved 3.0.7 |
-| flutter_lints | ^5.0.0 | verified: resolved 5.0.0 |
-| drift | ^2.26.0 | NOT yet verified (resolved by pub on first CI run) |
-| drift_dev | ^2.26.0 | NOT yet verified |
-| drift_flutter | ^0.2.4 | NOT yet verified |
-| build_runner | ^2.5.0 | NOT yet verified |
-| JDK (CI/Android) | 17 | |
-| Runners | ubuntu-24.04, windows-2022 | |
-| actions | checkout@v5, setup-java@v4, flutter-action@v2, upload-artifact@v4 | |
+| crypto | 3.0.7 | verified (resolved on CI) |
+| drift | 2.31.0 | verified (resolved on CI; 2.35.2 exists) |
+| drift_dev | 2.31.0 | verified (code generation ran on CI) |
+| drift_flutter | 0.2.8 | verified (resolved on CI; 0.3.1 exists) |
+| path_provider | 2.1.5 | verified (resolved on CI) |
+| build_runner | 2.15.1 | verified (code generation ran on CI) |
+| flutter_lints | 5.0.0 | verified |
+| JDK (CI/Android) | 17 | not yet exercised (the Android build has not run) |
+| Runners | ubuntu-24.04, windows-2022 | ubuntu verified |
+| actions | checkout@v5, setup-java@v4, flutter-action@v2, upload-artifact@v4, download-artifact@v4 | checkout and flutter-action verified |
 
-After the first successful CI run, send me the "Resolving dependencies" log
-section and I will pin drift/drift_dev/drift_flutter/build_runner exactly.
+Newer versions exist for several packages (for example drift 2.35, sqlite3 3.x, drift_flutter 0.3). They are not adopted yet; upgrading is a deliberate change that needs its own test run.

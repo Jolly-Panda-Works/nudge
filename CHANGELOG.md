@@ -4,6 +4,14 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.5.2] - 2026-10-14
+### Fixed
+- Analyzer errors found by the first CI run: missing import of `CaptureStatus` in the inbox screen, missing `Size` import in the test harness, and a lint in the privacy guard test.
+### Changed
+- Direct dependencies are pinned to the exact versions CI resolved (drift 2.31.0, drift_dev 2.31.0, drift_flutter 0.2.8, build_runner 2.15.1, path_provider 2.1.5, crypto 3.0.7, flutter_lints 5.0.0).
+- Removed the `--delete-conflicting-outputs` flag, which build_runner now ignores.
+- Repository links point to `Jolly-Panda-Works/nudge`.
+
 ## [0.5.1] - 2026-10-13
 ### Added
 - Builds for every branch: pushes to any branch are analyzed, tested and built, and the outputs are artifacts named with the version, branch and commit (kept 14 days; `main` 30 days).

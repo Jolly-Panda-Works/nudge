@@ -1,6 +1,6 @@
 # Roadmap
 
-Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.5.1).
+Where Nudge stands and what is left. Last updated: 2026-10-14 (version 0.5.2).
 
 **How to read the status**
 
@@ -34,6 +34,7 @@ Today the app captures notifications on Android, stores them locally, shows them
 | 0.4.0 | 2026-10-13 | M1 section 4: inbox, notification details, settings, app filter screen, permission banner |
 | 0.5.0 | 2026-10-13 | M1 section 5: share target and text import, JSON export, per-notification and bulk delete, retention setting, logging guard test |
 | 0.5.1 | 2026-10-13 | CI: builds for every branch, permanent releases from version tags, docs/RELEASING.md |
+| 0.5.2 | 2026-10-14 | Fixes for the first CI analysis run, exact dependency pins, repository links |
 
 ## M1: Notification capture and local inbox
 
@@ -55,7 +56,7 @@ Today the app captures notifications on Android, stores them locally, shows them
 - [x] Retention purge by age and delete-all (storage layer only)
 - [x] Settings storage: filter mode, rules, ongoing and group-summary toggles, retention days
 - [x] Repository tests on in-memory SQLite
-- [ ] Verified against the real Drift versions resolved on CI (versions are not pinned exactly yet)
+- [x] Drift code generation runs on CI with the pinned versions (drift 2.31.0); the repository tests have not been confirmed passing yet
 
 ### Section 3: Android capture service (done in code, 0.3.0; not verified on a device)
 - [x] Kotlin `NotificationListenerService`: connect, post, remove, and rebind request on disconnect
@@ -146,7 +147,7 @@ M1 is complete when capture and the UI are verified on a physical device and the
 - [ ] Verify the branch-build and tag-release workflows (first run pending)
 - [x] Automatic formatting workflow
 - [x] Open-source files: LICENSE (MIT), CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, PRIVACY, CHANGELOG, issue and PR templates
-- [ ] Pin exact versions of Drift, drift_dev, drift_flutter and build_runner (needs one successful dependency resolution log)
+- [x] Exact versions of Drift, drift_dev, drift_flutter, build_runner and the other direct dependencies (resolved on CI, pinned in 0.5.2)
 - [ ] Release-signed builds (the nightly APK is debug-signed)
 - [ ] Screenshots in the README (the UI exists now; screenshots need a device or emulator)
 
@@ -154,7 +155,7 @@ M1 is complete when capture and the UI are verified on a physical device and the
 - The Kotlin code (listener, queue, channels) has only been compiled by CI, never run on a device. The wiring script that patches the generated `MainActivity.kt` and `AndroidManifest.xml` has not been run yet.
 - Sideloaded debug APKs may need "Allow restricted settings" (Android 13+) before Notification Access can be enabled.
 - Until background ingestion exists, notifications that arrive while the app is closed wait in a small native queue (plain JSON in app-private, no-backup storage) until the app is opened.
-- The first CI runs for the Drift code and tests have not been confirmed green.
+- The first full CI run resolved dependencies and generated the Drift code, but its analysis step failed on three issues (fixed in 0.5.2). The tests, the Android build and the Windows build have not been confirmed yet.
 - Windows CI installs Flutter from its git tag because the setup action could not resolve the version there; this is untested over time.
 - The rolling release needs the repository to allow workflows to write contents.
 - Notification Access behavior (redaction on the lock screen, restart behavior, OEM battery restrictions) can only be verified on physical devices.

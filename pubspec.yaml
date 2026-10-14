@@ -1,9 +1,9 @@
 name: nudge
 description: Nudge - unified notifications inbox, tasks and calendar (Android + Windows).
 publish_to: 'none'
-repository: https://github.com/Usef-Farahmand/nudge
-issue_tracker: https://github.com/Usef-Farahmand/nudge/issues
-version: 0.5.1+9
+repository: https://github.com/Jolly-Panda-Works/nudge
+issue_tracker: https://github.com/Jolly-Panda-Works/nudge/issues
+version: 0.5.2+10
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
@@ -12,17 +12,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  crypto: ^3.0.6
-  drift: ^2.26.0
-  drift_flutter: ^0.2.4
-  path_provider: ^2.1.0
+  crypto: 3.0.7
+  drift: 2.31.0
+  drift_flutter: 0.2.8
+  path_provider: 2.1.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  build_runner: ^2.5.0
-  drift_dev: ^2.26.0
+  flutter_lints: 5.0.0
+  build_runner: 2.15.1
+  drift_dev: 2.31.0
 
 flutter:
   uses-material-design: true

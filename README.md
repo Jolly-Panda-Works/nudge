@@ -1,6 +1,6 @@
 # Nudge
 
-[![CI](https://github.com/Usef-Farahmand/nudge/actions/workflows/ci.yml/badge.svg)](https://github.com/Usef-Farahmand/nudge/actions/workflows/ci.yml)
+[![CI](https://github.com/Jolly-Panda-Works/nudge/actions/workflows/ci.yml/badge.svg)](https://github.com/Jolly-Panda-Works/nudge/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Flutter 3.35](https://img.shields.io/badge/Flutter-3.35.0-02569B?logo=flutter)
 ![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20Windows-lightgrey)
@@ -44,9 +44,9 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [PRIVACY.md](PRIVACY.m
 
 | What | Where |
 |---|---|
-| Latest build of `main` | the rolling [nightly](https://github.com/Usef-Farahmand/nudge/releases/tag/nightly) pre-release (replaced on every push) |
-| A specific version | the [Releases](https://github.com/Usef-Farahmand/nudge/releases) page (created when a `v<version>` tag is pushed) |
-| Any other branch | the artifacts of that branch's [CI run](https://github.com/Usef-Farahmand/nudge/actions/workflows/ci.yml), named with the branch and commit |
+| Latest build of `main` | the rolling [nightly](https://github.com/Jolly-Panda-Works/nudge/releases/tag/nightly) pre-release (replaced on every push) |
+| A specific version | the [Releases](https://github.com/Jolly-Panda-Works/nudge/releases) page (created when a `v<version>` tag is pushed) |
+| Any other branch | the artifacts of that branch's [CI run](https://github.com/Jolly-Panda-Works/nudge/actions/workflows/ci.yml), named with the branch and commit |
 
 Each build contains `Nudge_v<version>..._android-debug.apk` and `Nudge_v<version>..._windows-x64.zip`. Releases also include `SHA256SUMS.txt`. These are debug builds for testing only. See [docs/RELEASING.md](docs/RELEASING.md).
 
@@ -55,10 +55,10 @@ Each build contains `Nudge_v<version>..._android-debug.apk` and `Nudge_v<version
 Requirements: Flutter **3.35.0** (stable), JDK 17 and the Android SDK for Android, Visual Studio 2022 with the C++ desktop workload for Windows.
 
 ```bash
-git clone https://github.com/Usef-Farahmand/nudge.git
+git clone https://github.com/Jolly-Panda-Works/nudge.git
 cd nudge
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs   # generates Drift code
+dart run build_runner build   # generates Drift code
 flutter analyze
 flutter test
 flutter run                      # connected Android device

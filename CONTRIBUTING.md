@@ -14,7 +14,7 @@ Thanks for helping! Please read the [Code of Conduct](CODE_OF_CONDUCT.md) first.
 1. Open an issue (bug or feature) before large changes.
 2. Branch from `main`, keep PRs focused.
 3. Add or update tests. Domain logic must have unit tests; storage code uses in-memory SQLite.
-4. Make sure `flutter analyze` and `flutter test` pass (CI runs them). If you generated code: `dart run build_runner build --delete-conflicting-outputs`.
+4. Make sure `flutter analyze` and `flutter test` pass (CI runs them). If you generated code: `dart run build_runner build`.
 5. Formatting: run `dart format .`; the **Format code** workflow also fixes it on `main`.
 
 ## Branches and builds

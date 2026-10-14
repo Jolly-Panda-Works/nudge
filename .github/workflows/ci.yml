@@ -39,7 +39,7 @@ jobs:
       - name: Check formatting (report only)
         continue-on-error: true
         run: dart format --output=none --set-exit-if-changed .
-      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: dart run build_runner build
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
 
@@ -70,7 +70,7 @@ jobs:
           fi
           echo "base=Nudge_v${version}${suffix}" >> "$GITHUB_OUTPUT"
       - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: dart run build_runner build
       - run: flutter build apk --debug
       - name: Rename the output
         run: |
@@ -109,7 +109,7 @@ jobs:
           echo "base=Nudge_v${version}${suffix}" >> "$GITHUB_OUTPUT"
       - run: flutter --version
       - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: dart run build_runner build
       - run: flutter build windows --release
       - name: Package
         shell: pwsh
