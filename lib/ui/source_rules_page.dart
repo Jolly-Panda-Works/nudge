@@ -103,10 +103,7 @@ class _SourceRulesPageState extends State<SourceRulesPage> {
       ),
       body: _failed
           ? Center(
-              child: FilledButton(
-                onPressed: _load,
-                child: const Text('Retry'),
-              ),
+              child: FilledButton(onPressed: _load, child: const Text('Retry')),
             )
           : apps == null
           ? const Center(child: CircularProgressIndicator())

@@ -15,7 +15,8 @@ void main() {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
       final lines = entity.readAsLinesSync();
       for (var i = 0; i < lines.length; i++) {
-        if (pattern.hasMatch(lines[i])) offenders.add('${entity.path}:${i + 1}');
+        if (pattern.hasMatch(lines[i]))
+          offenders.add('${entity.path}:${i + 1}');
       }
     }
     expect(offenders, isEmpty, reason: 'Remove logging from: $offenders');
