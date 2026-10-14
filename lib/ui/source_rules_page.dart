@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../app_services.dart';
 import '../domain/ingest_policy.dart';
+import '../domain/shared_source.dart';
 import '../domain/source_app.dart';
 
 /// Lets the user pick the apps used by the allowlist or blocklist.
@@ -38,7 +39,9 @@ class _SourceRulesPageState extends State<SourceRulesPage> {
 
   Future<void> _load() async {
     try {
-      final seen = await widget.services.notifications.listSourceApps();
+      final seen = (await widget.services.notifications.listSourceApps())
+          .where((app) => app.packageName != sharedPackageName)
+          .toList();
       final rules = await widget.services.settings.listRules();
       final byPackage = <String, SourceApp>{
         for (final app in seen) app.packageName: app,
@@ -100,7 +103,10 @@ class _SourceRulesPageState extends State<SourceRulesPage> {
       ),
       body: _failed
           ? Center(
-              child: FilledButton(onPressed: _load, child: const Text('Retry')),
+              child: FilledButton(
+                onPressed: _load,
+                child: const Text('Retry'),
+              ),
             )
           : apps == null
           ? const Center(child: CircularProgressIndicator())

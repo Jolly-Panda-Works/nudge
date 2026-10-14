@@ -5,6 +5,7 @@ import '../domain/notification_mapper.dart';
 import '../domain/notification_repository.dart';
 import '../platform/capture_event.dart';
 import '../platform/capture_platform.dart';
+import 'text_importer.dart';
 
 /// Moves events from the native queue into the database.
 ///
@@ -17,17 +18,22 @@ final class CaptureIngestor {
     required NotificationRepository notifications,
     required CaptureSettingsRepository settings,
     NotificationMapper? mapper,
+    TextImporter? importer,
     int batchSize = 100,
   }) : _platform = platform,
        _notifications = notifications,
        _settings = settings,
        _mapper = mapper ?? NotificationMapper(),
+       _importer =
+           importer ??
+           TextImporter(notifications: notifications, mapper: mapper),
        _batchSize = batchSize;
 
   final CapturePlatform _platform;
   final NotificationRepository _notifications;
   final CaptureSettingsRepository _settings;
   final NotificationMapper _mapper;
+  final TextImporter _importer;
   final int _batchSize;
 
   final StreamController<int> _drained = StreamController<int>.broadcast();
@@ -41,12 +47,9 @@ final class CaptureIngestor {
   Future<void> start() async {
     _subscription ??= _platform.signals.listen((_) {
       unawaited(
-        drain().then<void>(
-          (_) {},
-          onError: (Object _) {
-            // Events stay queued natively and are retried on the next signal.
-          },
-        ),
+        drain().then<void>((_) {}, onError: (Object _) {
+          // Events stay queued natively and are retried on the next signal.
+        }),
       );
     });
     await drain();
@@ -87,6 +90,12 @@ final class CaptureIngestor {
             await _notifications.markRemoved(key);
           case SnapshotEvent(:final activeKeys):
             await _notifications.markRemovedExcept(activeKeys);
+          case SharedEvent(:final text, :final title, :final postedAt):
+            await _importer.importText(
+              text: text,
+              title: title,
+              postedAt: postedAt,
+            );
           case MalformedEvent():
             break;
         }

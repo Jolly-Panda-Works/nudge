@@ -50,6 +50,10 @@ object CaptureChannels {
                 val max = call.argument<Int>("max") ?: 100
                 result.success(CaptureQueues.get(context).peek(max))
             }
+            "clearQueue" -> {
+                CaptureQueues.get(context).clear()
+                result.success(null)
+            }
             "ackQueue" -> {
                 val upToSeq = call.argument<Number>("upToSeq")?.toLong()
                 if (upToSeq == null) {

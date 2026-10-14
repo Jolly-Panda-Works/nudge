@@ -61,34 +61,28 @@ void main() {
     expect(stored.firstSeenAt, fixedNow);
   });
 
-  test(
-    'markRemoved keeps content and hides it from the active inbox',
-    () async {
-      final n = captured();
-      await repo.ingest(n, open);
-      await repo.markRemoved(n.key);
+  test('markRemoved keeps content and hides it from the active inbox', () async {
+    final n = captured();
+    await repo.ingest(n, open);
+    await repo.markRemoved(n.key);
 
-      final stored = await repo.findByKey(n.key);
-      expect(stored!.status, NotificationStatus.removed);
-      expect(stored.text, 'Hello');
-      expect(await repo.watchInbox(includeRemoved: false).first, isEmpty);
-      expect((await repo.watchInbox().first).length, 1);
-    },
-  );
+    final stored = await repo.findByKey(n.key);
+    expect(stored!.status, NotificationStatus.removed);
+    expect(stored.text, 'Hello');
+    expect(await repo.watchInbox(includeRemoved: false).first, isEmpty);
+    expect((await repo.watchInbox().first).length, 1);
+  });
 
-  test(
-    'markRemovedExcept removes only entries missing from active set',
-    () async {
-      final a = captured(key: 'A', text: 'one');
-      final b = captured(key: 'B', text: 'two', time: 1760000100000);
-      await repo.ingest(a, open);
-      await repo.ingest(b, open);
+  test('markRemovedExcept removes only entries missing from active set', () async {
+    final a = captured(key: 'A', text: 'one');
+    final b = captured(key: 'B', text: 'two', time: 1760000100000);
+    await repo.ingest(a, open);
+    await repo.ingest(b, open);
 
-      expect(await repo.markRemovedExcept(<String>{'A'}), 1);
-      expect((await repo.findByKey('A'))!.status, NotificationStatus.active);
-      expect((await repo.findByKey('B'))!.status, NotificationStatus.removed);
-    },
-  );
+    expect(await repo.markRemovedExcept(<String>{'A'}), 1);
+    expect((await repo.findByKey('A'))!.status, NotificationStatus.active);
+    expect((await repo.findByKey('B'))!.status, NotificationStatus.removed);
+  });
 
   test('filtered notifications are not stored', () async {
     const policy = CapturePolicy(
@@ -113,20 +107,14 @@ void main() {
 
   test('purgeOlderThan deletes only entries older than the cutoff', () async {
     await repo.ingest(captured(), open);
-    expect(
-      await repo.purgeOlderThan(later.subtract(const Duration(days: 30))),
-      0,
-    );
+    expect(await repo.purgeOlderThan(later.subtract(const Duration(days: 30))), 0);
     expect(await repo.purgeOlderThan(later.add(const Duration(days: 1))), 1);
     expect(await repo.watchInbox().first, isEmpty);
   });
 
   test('deleteAll removes everything', () async {
     await repo.ingest(captured(key: 'A', text: 'one'), open);
-    await repo.ingest(
-      captured(key: 'B', text: 'two', time: 1760000100000),
-      open,
-    );
+    await repo.ingest(captured(key: 'B', text: 'two', time: 1760000100000), open);
     expect(await repo.deleteAll(), 2);
     expect(await repo.watchInbox().first, isEmpty);
   });
@@ -160,5 +148,31 @@ void main() {
     final apps = await repo.listSourceApps();
     expect(apps.map((a) => a.packageName), <String>['com.alpha', 'com.zeta']);
     expect(apps.map((a) => a.displayName), <String>['Alpha', 'Zeta']);
+  });
+
+  test('listAll returns every notification, newest first', () async {
+    await repo.ingest(captured(key: 'A', text: 'old'), open);
+    await repo.ingest(
+      captured(key: 'B', text: 'new', time: 1760000100000),
+      open,
+    );
+    await repo.markRemoved('A');
+
+    final all = await repo.listAll();
+    expect(all.map((n) => n.key), <String>['B', 'A']);
+    expect(all.last.status, NotificationStatus.removed);
+  });
+
+  test('deleteByKey deletes only the given notification', () async {
+    await repo.ingest(captured(key: 'A', text: 'one'), open);
+    await repo.ingest(
+      captured(key: 'B', text: 'two', time: 1760000100000),
+      open,
+    );
+
+    expect(await repo.deleteByKey('A'), isTrue);
+    expect(await repo.deleteByKey('A'), isFalse);
+    expect(await repo.findByKey('A'), isNull);
+    expect(await repo.findByKey('B'), isNotNull);
   });
 }

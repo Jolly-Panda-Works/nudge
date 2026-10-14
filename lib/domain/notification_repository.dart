@@ -41,4 +41,10 @@ abstract interface class NotificationRepository {
 
   /// Distinct apps found in stored notifications, sorted by display name.
   Future<List<SourceApp>> listSourceApps();
+
+  /// Every stored notification, newest first (used for export).
+  Future<List<CapturedNotification>> listAll();
+
+  /// Deletes one notification. Returns whether something was deleted.
+  Future<bool> deleteByKey(String notificationKey);
 }

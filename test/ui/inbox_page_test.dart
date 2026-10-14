@@ -114,4 +114,76 @@ void main() {
 
     expect(find.text('Fresh'), findsOneWidget);
   });
+
+  testWidgets('imported text appears in the inbox', (tester) async {
+    final harness = AppHarness();
+    await harness.pump(tester);
+
+    await tester.tap(find.byTooltip('Import text'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Title (optional)'),
+      'Todo',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Text'),
+      'Remember the milk',
+    );
+    await tester.tap(find.text('Import'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Todo'), findsOneWidget);
+    expect(find.text('Remember the milk'), findsOneWidget);
+
+    await tester.tap(find.text('Todo'));
+    await tester.pumpAndSettle();
+    expect(find.text('Shared or imported text'), findsOneWidget);
+    expect(find.text('Package'), findsNothing);
+  });
+
+  testWidgets('importing blank text shows an error', (tester) async {
+    final harness = AppHarness();
+    await harness.pump(tester);
+
+    await tester.tap(find.byTooltip('Import text'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Import'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enter some text to import'), findsOneWidget);
+    expect(await harness.notifications.count(), 0);
+  });
+
+  testWidgets('a notification can be deleted from its details', (
+    tester,
+  ) async {
+    final harness = AppHarness()..notifications.add(captured(title: 'Sara'));
+    await harness.pump(tester);
+
+    await tester.tap(find.text('Sara'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Delete notification'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No notifications yet'), findsOneWidget);
+    expect(find.text('Notification deleted'), findsOneWidget);
+    expect(await harness.notifications.count(), 0);
+  });
+
+  testWidgets('cancelling the delete keeps the notification', (tester) async {
+    final harness = AppHarness()..notifications.add(captured(title: 'Sara'));
+    await harness.pump(tester);
+
+    await tester.tap(find.text('Sara'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Delete notification'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Notification details'), findsOneWidget);
+    expect(await harness.notifications.count(), 1);
+  });
 }

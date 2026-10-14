@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nudge/domain/ingest_policy.dart';
+import 'package:nudge/platform/data_exporter.dart';
 
 import '../support/app_harness.dart';
 import '../support/fixtures.dart';
@@ -104,5 +107,94 @@ void main() {
 
     expect(harness.settings.rules.keys, contains('com.example.app'));
     expect(find.text('com.example.app'), findsOneWidget);
+  });
+
+  testWidgets('retention can be changed', (tester) async {
+    final harness = AppHarness();
+    await harness.pump(tester);
+    await openSettings(tester);
+
+    expect(find.text('Forever'), findsOneWidget);
+    await tester.tap(find.text('Keep notifications for'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('30 days'));
+    await tester.pumpAndSettle();
+
+    expect(harness.settings.retentionDays, 30);
+    expect(find.text('30 days'), findsOneWidget);
+  });
+
+  testWidgets('export asks for confirmation and saves the data', (
+    tester,
+  ) async {
+    final harness = AppHarness()..notifications.add(captured(title: 'Sara'));
+    await harness.pump(tester);
+    await openSettings(tester);
+
+    await tester.tap(find.text('Export data'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('not encrypted'), findsOneWidget);
+    await tester.tap(find.text('Export'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Exported to /fake/Nudge/export.json'), findsOneWidget);
+    expect(harness.exporter.lastFileName, startsWith('nudge-export-'));
+    expect(harness.exporter.lastFileName, endsWith('.json'));
+    final data =
+        jsonDecode(harness.exporter.lastContent!) as Map<String, Object?>;
+    expect(data['notifications'], hasLength(1));
+  });
+
+  testWidgets('export reports cancellation and failure', (tester) async {
+    final harness = AppHarness();
+    harness.exporter.result = const ExportResult(ExportOutcome.cancelled);
+    await harness.pump(tester);
+    await openSettings(tester);
+
+    await tester.tap(find.text('Export data'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Export'));
+    await tester.pumpAndSettle();
+    expect(find.text('Export cancelled'), findsOneWidget);
+
+    harness.exporter.failOnSave = true;
+    await tester.pump(const Duration(seconds: 5));
+    await tester.tap(find.text('Export data'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Export'));
+    await tester.pumpAndSettle();
+    expect(find.text('Export failed.'), findsOneWidget);
+  });
+
+  testWidgets('delete all removes notifications and the native queue', (
+    tester,
+  ) async {
+    final harness = AppHarness()..notifications.add(captured());
+    await harness.pump(tester);
+    await openSettings(tester);
+
+    await tester.tap(find.text('Delete all notifications'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(await harness.notifications.count(), 0);
+    expect(harness.platform.clearedQueue, 1);
+    expect(find.text('Deleted 1 notification'), findsOneWidget);
+    expect(find.text('Stored notifications: 0'), findsOneWidget);
+  });
+
+  testWidgets('cancelling delete all changes nothing', (tester) async {
+    final harness = AppHarness()..notifications.add(captured());
+    await harness.pump(tester);
+    await openSettings(tester);
+
+    await tester.tap(find.text('Delete all notifications'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(await harness.notifications.count(), 1);
+    expect(harness.platform.clearedQueue, 0);
   });
 }

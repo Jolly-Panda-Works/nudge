@@ -7,6 +7,7 @@ import 'package:nudge/data/drift_notification_repository.dart';
 import 'package:nudge/domain/captured_notification.dart';
 import 'package:nudge/domain/ingest_policy.dart';
 import 'package:nudge/domain/notification_repository.dart';
+import 'package:nudge/domain/shared_source.dart';
 import 'package:nudge/platform/capture_signal.dart';
 
 import '../support/fake_capture_platform.dart';
@@ -113,18 +114,15 @@ void main() {
     expect(await repo.count(), 0);
   });
 
-  test(
-    'malformed events are skipped and later events still processed',
-    () async {
-      platform
-        ..addMalformed()
-        ..addPosted(payload());
+  test('malformed events are skipped and later events still processed', () async {
+    platform
+      ..addMalformed()
+      ..addPosted(payload());
 
-      await ingestor.drain();
-      expect(await repo.count(), 1);
-      expect(platform.queue, isEmpty);
-    },
-  );
+    await ingestor.drain();
+    expect(await repo.count(), 1);
+    expect(platform.queue, isEmpty);
+  });
 
   test('events stay queued when storing fails and are retried', () async {
     final flaky = FlakyNotificationRepository(repo);
@@ -140,6 +138,19 @@ void main() {
     flaky.failIngest = false;
     await failing.drain();
     expect(await repo.count(), 1);
+    expect(platform.queue, isEmpty);
+  });
+
+  test('shared text is stored even when app filters would block it', () async {
+    await settings.setMode(FilterMode.allowlist);
+    platform.addShared(text: 'Remember the milk', title: 'Todo');
+
+    await ingestor.drain();
+
+    final stored = (await repo.listAll()).single;
+    expect(stored.packageName, sharedPackageName);
+    expect(stored.title, 'Todo');
+    expect(stored.text, 'Remember the milk');
     expect(platform.queue, isEmpty);
   });
 

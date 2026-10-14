@@ -58,6 +58,34 @@ void main() {
       expect(event.seq, 3);
     });
 
+    test('parses a shared event', () {
+      final event = CaptureEvent.fromJson(
+        json(<String, Object?>{
+          'seq': 5,
+          'type': 'shared',
+          'text': 'Remember the milk',
+          'title': 'Todo',
+          'postTimeMillis': 1760000000000,
+        }),
+      );
+      final shared = event as SharedEvent;
+      expect(shared.text, 'Remember the milk');
+      expect(shared.title, 'Todo');
+      expect(shared.postedAt.isUtc, isTrue);
+    });
+
+    test('a shared event without text is malformed', () {
+      final event = CaptureEvent.fromJson(
+        json(<String, Object?>{
+          'seq': 6,
+          'type': 'shared',
+          'text': '  ',
+          'postTimeMillis': 1760000000000,
+        }),
+      );
+      expect(event, isA<MalformedEvent>());
+    });
+
     test('an unknown type is malformed', () {
       final event = CaptureEvent.fromJson(
         json(<String, Object?>{'seq': 4, 'type': 'mystery'}),

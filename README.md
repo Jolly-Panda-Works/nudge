@@ -9,7 +9,7 @@
 
 It combines an inbox of accessible Android notifications, one-tap conversion to tasks or reminders (with a persistent link back to the original source), and a Persian-first calendar with Jalali dates.
 
-> **Status: early development (v0.4.x).** Notification capture, local storage, an inbox and settings screens exist in code, but nothing has been verified on a physical device yet, and there are no tasks or calendar. See [Project status](#project-status) for exactly what is implemented.
+> **Status: early development (v0.5.x).** Notification capture, local storage, an inbox, text import, export and deletion exist in code, but nothing has been verified on a physical device yet, and there are no tasks or calendar. See [Project status](#project-status) for exactly what is implemented.
 
 ## Features
 
@@ -17,6 +17,8 @@ It combines an inbox of accessible Android notifications, one-tap conversion to 
 |---|---|---|
 | Notification capture | Capture accessible Android notifications via `NotificationListenerService` | Implemented in code (Kotlin service, durable queue, ingestion); not verified on a device |
 | Inbox UI | List, details, settings, app filter screens, permission banner | Implemented in code; not verified on a device |
+| Share / import | Share text to Nudge from other Android apps, or paste it in the app | Implemented in code; not verified on a device |
+| Export and deletion | JSON export, delete one or all, retention period | Implemented in code; not verified on a device |
 | Deduplication | Handle updates, re-posts, removals, redacted content | Implemented in domain code, covered by unit tests |
 | Local storage | On-device database, retention purge, delete all | Implemented (Drift/SQLite), covered by unit tests |
 | Source filters | Allowlist / blocklist of source apps | Rules stored; UI planned |
@@ -71,8 +73,8 @@ lib/
   domain/       pure Dart: models, mapper, ingest/dedupe policy, repository interfaces
   data/         Drift database and repository implementations
   platform/     bridge to the Android listener (events, channels, no-op for other platforms)
-  application/  capture ingestor: native queue to database
-  ui/           inbox, notification details, settings and app filter screens
+  application/  capture ingestor, text importer, retention, status controller
+  ui/           inbox, notification details, settings, app filter and import screens
   main.dart     app entry point
 android/app/src/main/kotlin/app/nudge/capture/   Kotlin listener service, queue, channels
 tools/          one-off scripts (wiring the Android service into the generated project)
@@ -88,7 +90,7 @@ Milestones (each is independently testable):
 
 | Milestone | Scope | State |
 |---|---|---|
-| M1 | Notification capture and local inbox | In progress: sections 1-4 done in code (domain, storage, capture service, inbox UI); 5 pending (share/import, export and deletion) |
+| M1 | Notification capture and local inbox | All 5 sections done in code; device verification and a few open items remain |
 | M2 | Task conversion and source navigation | Not started |
 | M3 | Calendar UI with Persian dates | Not started |
 | M4 | Android Calendar Provider | Not started |

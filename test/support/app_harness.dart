@@ -4,6 +4,7 @@ import 'package:nudge/application/capture_ingestor.dart';
 import 'package:nudge/main.dart';
 
 import 'fake_capture_platform.dart';
+import 'fake_data_exporter.dart';
 import 'in_memory_repositories.dart';
 
 /// Builds the app with fakes so widget tests need no device and no database.
@@ -21,11 +22,13 @@ final class AppHarness {
   final InMemoryNotificationRepository notifications =
       InMemoryNotificationRepository();
   final InMemorySettingsRepository settings = InMemorySettingsRepository();
+  final FakeDataExporter exporter = FakeDataExporter();
 
   late final AppServices services = AppServices(
     platform: platform,
     notifications: notifications,
     settings: settings,
+    exporter: exporter,
     ingestor: CaptureIngestor(
       platform: platform,
       notifications: notifications,

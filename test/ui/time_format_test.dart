@@ -6,21 +6,12 @@ void main() {
 
   group('formatTimestamp', () {
     test('recent times are relative', () {
-      expect(
-        formatTimestamp(DateTime(2026, 10, 13, 12, 0, 0), now: now),
-        'just now',
-      );
-      expect(
-        formatTimestamp(DateTime(2026, 10, 13, 11, 45, 30), now: now),
-        '15 min ago',
-      );
+      expect(formatTimestamp(DateTime(2026, 10, 13, 12, 0, 0), now: now), 'just now');
+      expect(formatTimestamp(DateTime(2026, 10, 13, 11, 45, 30), now: now), '15 min ago');
     });
 
     test('a future time is shown as just now', () {
-      expect(
-        formatTimestamp(DateTime(2026, 10, 13, 12, 5), now: now),
-        'just now',
-      );
+      expect(formatTimestamp(DateTime(2026, 10, 13, 12, 5), now: now), 'just now');
     });
 
     test('earlier today shows the clock time', () {
@@ -28,31 +19,23 @@ void main() {
     });
 
     test('yesterday is labelled', () {
-      expect(
-        formatTimestamp(DateTime(2026, 10, 12, 23, 10), now: now),
-        'Yesterday 23:10',
-      );
+      expect(formatTimestamp(DateTime(2026, 10, 12, 23, 10), now: now), 'Yesterday 23:10');
     });
 
     test('earlier this year shows month and day', () {
-      expect(
-        formatTimestamp(DateTime(2026, 3, 5, 9, 7), now: now),
-        'Mar 5, 09:07',
-      );
+      expect(formatTimestamp(DateTime(2026, 3, 5, 9, 7), now: now), 'Mar 5, 09:07');
     });
 
     test('other years show the date', () {
-      expect(
-        formatTimestamp(DateTime(2025, 12, 31, 23, 59), now: now),
-        '2025-12-31',
-      );
+      expect(formatTimestamp(DateTime(2025, 12, 31, 23, 59), now: now), '2025-12-31');
     });
   });
 
   test('formatFullTimestamp includes seconds', () {
-    expect(
-      formatFullTimestamp(DateTime(2026, 1, 2, 3, 4, 5)),
-      '2026-01-02 03:04:05',
-    );
+    expect(formatFullTimestamp(DateTime(2026, 1, 2, 3, 4, 5)), '2026-01-02 03:04:05');
+  });
+
+  test('formatFileStamp is compact and sortable', () {
+    expect(formatFileStamp(DateTime(2026, 10, 13, 14, 25, 30)), '20261013-142530');
   });
 }

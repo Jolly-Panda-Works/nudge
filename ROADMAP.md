@@ -1,6 +1,6 @@
 # Roadmap
 
-Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.4.0).
+Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.5.0).
 
 **How to read the status**
 
@@ -12,14 +12,14 @@ Where Nudge stands and what is left. Last updated: 2026-10-13 (version 0.4.0).
 
 | Milestone | Scope | Progress |
 |---|---|---|
-| M1 | Android notification capture and local inbox | In progress: 4 of 5 sections done in code |
+| M1 | Android notification capture and local inbox | All 5 sections done in code; device verification and 4 open items remain |
 | M2 | Task conversion and source navigation | Not started |
 | M3 | Calendar UI with Persian (Jalali, RTL) support | Not started |
 | M4 | Android Calendar Provider integration | Not started |
 | M5 | Windows build and secure synchronization | Not started |
 | M6 | Optional direct Google Calendar API integration | Not started |
 
-Today the app has an inbox (list, details, active/all filter), a settings screen (access state, capture mode, app filter, toggles) and the Android listener behind it. All of it exists in code but has not been run on a physical device, and there are no screenshots yet.
+Today the app captures notifications on Android, stores them locally, shows them in an inbox, lets you share or paste text into it, filter apps, export or delete your data and set a retention period. All of it exists in code, but none of it has been run on a physical device, and there are no screenshots yet.
 
 ## Done so far
 
@@ -32,6 +32,7 @@ Today the app has an inbox (list, details, active/all filter), a settings screen
 | 0.2.2 | 2026-10-13 | Documentation in English only; this roadmap |
 | 0.3.0 | 2026-10-13 | M1 section 3: Kotlin listener service, durable native queue, platform bridge, ingestion into the database, temporary status screen, wiring workflow |
 | 0.4.0 | 2026-10-13 | M1 section 4: inbox, notification details, settings, app filter screen, permission banner |
+| 0.5.0 | 2026-10-13 | M1 section 5: share target and text import, JSON export, per-notification and bulk delete, retention setting, logging guard test |
 
 ## M1: Notification capture and local inbox
 
@@ -81,13 +82,19 @@ Today the app has an inbox (list, details, active/all filter), a settings screen
 - [ ] Accessibility review (TalkBack, large fonts, contrast)
 - [ ] Hide notification content in the app switcher / optional screen security (not done)
 
-### Section 5: import, export and deletion (planned)
-- [ ] Optional Share/import path for user-selected content
-- [ ] Data export
-- [ ] Data deletion screen and retention setting in the UI
-- [ ] Confirm that no notification bodies or tokens reach application logs or CI logs
+### Section 5: import, export and deletion (done in code, 0.5.0; not verified on a device)
+- [x] Import: Android share target for plain text, and an "Import text" button in the inbox (works on every platform). Imported entries bypass the app filters
+- [x] Data export as a JSON file (Android: system file picker; desktop: a Nudge folder in Documents), with a warning that the file is not encrypted
+- [x] Delete one notification from its details screen; delete all (also clears the native queue)
+- [x] Retention setting (forever, 7, 30 or 90 days), applied at startup and when changed
+- [x] Automated guard test against printing or logging notification content (a heuristic, not a proof)
+- [x] Wiring script upgrades older installs (share intent filter, export channel, activity result)
+- [ ] Verify on devices: sharing from several apps, the file picker, delete, retention
+- [ ] Windows export location and behavior (written to Documents/Nudge, unverified)
+- [ ] Export of tasks and calendar data (arrives with M2 and M3)
+- [ ] Retention must not delete notifications linked to tasks (M2)
 
-M1 is complete when section 5 is done and capture and the UI are verified on a physical device.
+M1 is complete when capture and the UI are verified on a physical device and the open items above (background ingestion, redacted content, restart and OEM behavior) are resolved or consciously deferred.
 
 ## M2: Task conversion and source navigation (not started)
 - [ ] Convert an inbox notification into a task or timed reminder, preserving the source notification ID

@@ -19,13 +19,12 @@ class InMemoryNotificationRepository implements NotificationRepository {
   }
 
   List<CapturedNotification> _snapshot(bool includeRemoved) {
-    final items =
-        _items
-            .where(
-              (n) => includeRemoved || n.status == NotificationStatus.active,
-            )
-            .toList()
-          ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
+    final items = _items
+        .where(
+          (n) => includeRemoved || n.status == NotificationStatus.active,
+        )
+        .toList()
+      ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
     return items;
   }
 
@@ -106,6 +105,17 @@ class InMemoryNotificationRepository implements NotificationRepository {
   @override
   Future<int> count({bool activeOnly = false}) async =>
       _snapshot(!activeOnly).length;
+
+  @override
+  Future<List<CapturedNotification>> listAll() async => _snapshot(true);
+
+  @override
+  Future<bool> deleteByKey(String notificationKey) async {
+    final before = _items.length;
+    _items.removeWhere((n) => n.key == notificationKey);
+    _changes.add(null);
+    return _items.length < before;
+  }
 
   @override
   Future<List<SourceApp>> listSourceApps() async {

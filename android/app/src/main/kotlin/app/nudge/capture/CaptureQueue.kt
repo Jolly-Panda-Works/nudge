@@ -51,6 +51,13 @@ internal class CaptureQueue(
         }
     }
 
+    /** Drops every queued event (used by "delete all data"). */
+    fun clear() {
+        synchronized(lock) {
+            file.delete()
+        }
+    }
+
     private fun seqOf(line: String): Long? = try {
         JSONObject(line).getLong("seq")
     } catch (e: JSONException) {

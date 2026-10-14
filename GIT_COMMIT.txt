@@ -1,17 +1,19 @@
-feat: Nudge v0.4.0 - inbox, notification details and capture settings
+feat: Nudge v0.5.0 - share/import, export, deletion and retention
 
-- inbox with Active/All filter, live updates and loading/empty/error states
-- notification details screen
-- settings: access and listener state, capture mode, ongoing and
-  group-summary toggles, stored counts, version
-- app filter screen (apps seen so far or package name) for allow/blocklist
-- permission banner that refreshes when the app returns to the foreground
-- CaptureStatusController, SourceApp, listSourceApps, listRules,
-  CapturePlatform.isSupported
-- widget tests with in-memory repositories and a fake platform
-- CI: flutter analyze --no-fatal-infos (warnings and errors still fail)
-- docs: roadmap, architecture, privacy and development guide updated
+- Android share target for plain text and an "Import text" button; imported
+  entries use the synthetic source "Shared" and bypass the app filters
+- JSON export: Android system file picker (no storage permission), desktop
+  writes to Documents/Nudge; the UI warns the file is not encrypted
+- delete one notification or all (also clears the native queue)
+- retention setting (forever, 7, 30, 90 days) applied at startup and on change
+- Kotlin ShareReceiver and DocumentExporter; tools/wire_capture.py now wires
+  the share intent filter, export channel and file picker result and upgrades
+  older installs (run the "Wire Android capture service" workflow again)
+- guard test against printing or logging notification content (heuristic)
+- tests: export format, importer, retention, shared events, delete/export/
+  import UI flows
+- docs: roadmap, architecture, privacy, development guide and changelog
 
 Not verified on a physical device.
 
-Milestone: M1 / Section 4
+Milestone: M1 / Section 5

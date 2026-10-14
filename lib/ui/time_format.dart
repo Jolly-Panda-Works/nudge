@@ -43,3 +43,10 @@ String formatFullTimestamp(DateTime time) {
   return '${local.year}-${_two(local.month)}-${_two(local.day)} '
       '${_clock(local)}:${_two(local.second)}';
 }
+
+/// Compact stamp for file names, for example 20261013-142530.
+String formatFileStamp(DateTime time) {
+  final local = time.toLocal();
+  return '${local.year}${_two(local.month)}${_two(local.day)}-'
+      '${_two(local.hour)}${_two(local.minute)}${_two(local.second)}';
+}

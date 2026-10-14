@@ -24,5 +24,8 @@ abstract interface class CapturePlatform {
   /// Removes every event with a sequence number up to [upToSeq].
   Future<void> ack(int upToSeq);
 
+  /// Drops every event still waiting in the native queue.
+  Future<void> clearQueue();
+
   Stream<CaptureSignal> get signals;
 }

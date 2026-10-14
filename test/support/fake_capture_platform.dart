@@ -18,6 +18,7 @@ class FakeCapturePlatform implements CapturePlatform {
   bool settingsAvailable = true;
   bool supported = true;
   int settingsOpens = 0;
+  int clearedQueue = 0;
   int rebindRequests = 0;
   String package = 'app.nudge.nudge';
 
@@ -26,9 +27,19 @@ class FakeCapturePlatform implements CapturePlatform {
 
   void addRemoved(String key) => queue.add(RemovedEvent(++_seq, key));
 
-  void addSnapshot(Set<String> keys) => queue.add(SnapshotEvent(++_seq, keys));
+  void addSnapshot(Set<String> keys) =>
+      queue.add(SnapshotEvent(++_seq, keys));
 
   void addMalformed() => queue.add(MalformedEvent(++_seq));
+
+  void addShared({required String text, String? title}) => queue.add(
+    SharedEvent(
+      ++_seq,
+      text: text,
+      title: title,
+      postedAt: DateTime.utc(2026, 10, 13, 9),
+    ),
+  );
 
   void signal(CaptureSignal signal) => _signals.add(signal);
 
@@ -58,6 +69,12 @@ class FakeCapturePlatform implements CapturePlatform {
   @override
   Future<List<CaptureEvent>> peek({int max = 100}) async =>
       queue.take(max).toList(growable: false);
+
+  @override
+  Future<void> clearQueue() async {
+    clearedQueue++;
+    queue.clear();
+  }
 
   @override
   Future<void> ack(int upToSeq) async {

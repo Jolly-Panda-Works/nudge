@@ -29,6 +29,9 @@ final class NoopCapturePlatform implements CapturePlatform {
       const <CaptureEvent>[];
 
   @override
+  Future<void> clearQueue() async {}
+
+  @override
   Future<void> ack(int upToSeq) async {}
 
   @override

@@ -63,7 +63,10 @@ void main() {
       'com.chat',
       'com.mail',
     });
-    expect(rules.firstWhere((r) => r.packageName == 'com.chat').label, 'Chat');
+    expect(
+      rules.firstWhere((r) => r.packageName == 'com.chat').label,
+      'Chat',
+    );
     expect(
       rules.firstWhere((r) => r.packageName == 'com.mail').displayName,
       'com.mail',

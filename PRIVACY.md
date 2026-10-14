@@ -22,11 +22,15 @@ Until background ingestion is implemented, notifications that arrive while the a
 ## Your controls
 - You can revoke Notification Access in Android settings at any time; capture stops.
 - Source apps can be allowlisted or blocklisted from Settings > Choose apps.
-- Retention and "delete everything" exist in the storage layer. The screens for export and deletion are planned for M1 section 5.
+- **Retention:** Settings > Keep notifications for (forever, 7, 30 or 90 days).
+- **Delete:** one notification from its details screen, or everything (including anything still waiting in the native queue) from Settings.
+- **Export:** Settings > Export data saves a JSON file you choose the location of. The file contains the full text of every stored notification and is not encrypted.
+- **Share and import:** text you share with Nudge or paste into it is stored like a notification, labelled "Shared", and is not subject to the app filters.
 
 ## Known gaps
 - The app shows captured text on its own screens. Android may show those screens in the app switcher; hiding them is not implemented yet.
-- Per-notification deletion, export and the retention setting have no screens yet (planned for M1 section 5).
+- Exports are not encrypted, and Nudge cannot protect a file after you save it.
+- Notifications that arrive while the app is closed wait in the native queue until the app is opened.
 
 ## What Nudge does not do
 - It does not use an Accessibility Service, root access or hidden APIs to read content Android does not expose.

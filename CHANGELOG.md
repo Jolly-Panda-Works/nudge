@@ -4,6 +4,19 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.5.0] - 2026-10-13
+### Added
+- Share target for plain text (Android) and an "Import text" button in the inbox; imported entries bypass the app filters.
+- Data export as a JSON file (Android system file picker; desktop writes to Documents/Nudge).
+- Delete one notification from its details screen; delete all notifications (also clears the native queue).
+- Retention setting (forever, 7, 30 or 90 days), applied at startup and when changed.
+- `TextImporter`, `RetentionService`, `DataExporter`, `exportNotificationsJson`, `NotificationRepository.listAll` and `deleteByKey`, `CapturePlatform.clearQueue`.
+- Kotlin `ShareReceiver` and `DocumentExporter`; `tools/wire_capture.py` now also wires the share intent filter, the export channel and the file picker result, and upgrades installs wired by 0.3.0 and 0.4.0 (run the **Wire Android capture service** workflow again).
+- Guard test that fails if code prints or logs notification content (heuristic).
+- Direct dependency on `path_provider` (already used transitively).
+### Known limitations
+- Not verified on a physical device. Export files are not encrypted.
+
 ## [0.4.0] - 2026-10-13
 ### Added
 - Inbox screen with an Active/All filter, live updates, and loading, empty and error states.

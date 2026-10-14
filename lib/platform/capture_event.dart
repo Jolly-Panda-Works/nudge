@@ -34,6 +34,22 @@ sealed class CaptureEvent {
           final keys = decoded['keys'];
           if (keys is! List<Object?>) return MalformedEvent(seq);
           return SnapshotEvent(seq, keys.whereType<String>().toSet());
+        case 'shared':
+          final text = decoded['text'];
+          final postTime = decoded['postTimeMillis'];
+          final title = decoded['title'];
+          if (text is! String || text.trim().isEmpty || postTime is! int) {
+            return MalformedEvent(seq);
+          }
+          return SharedEvent(
+            seq,
+            text: text,
+            postedAt: DateTime.fromMillisecondsSinceEpoch(
+              postTime,
+              isUtc: true,
+            ),
+            title: title is String ? title : null,
+          );
         default:
           return MalformedEvent(seq);
       }
@@ -62,6 +78,20 @@ final class SnapshotEvent extends CaptureEvent {
   const SnapshotEvent(super.seq, this.activeKeys);
 
   final Set<String> activeKeys;
+}
+
+/// Text the user shared with the app from another app.
+final class SharedEvent extends CaptureEvent {
+  const SharedEvent(
+    super.seq, {
+    required this.text,
+    required this.postedAt,
+    this.title,
+  });
+
+  final String text;
+  final DateTime postedAt;
+  final String? title;
 }
 
 final class MalformedEvent extends CaptureEvent {

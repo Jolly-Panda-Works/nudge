@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 import '../app_info.dart';
 import '../app_services.dart';
 import '../domain/ingest_policy.dart';
+import '../domain/notification_export.dart';
+import '../platform/data_exporter.dart';
+import 'dialogs.dart';
 import 'source_rules_page.dart';
+import 'time_format.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({required this.services, super.key});
@@ -18,6 +22,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   CapturePolicy? _policy;
+  int? _retentionDays;
   int _total = 0;
   int _active = 0;
   bool _failed = false;
@@ -31,14 +36,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _load() async {
     try {
-      final policy = await widget.services.settings.loadPolicy();
-      final total = await widget.services.notifications.count();
-      final active = await widget.services.notifications.count(
-        activeOnly: true,
-      );
+      final services = widget.services;
+      final policy = await services.settings.loadPolicy();
+      final retention = await services.settings.getRetentionDays();
+      final total = await services.notifications.count();
+      final active = await services.notifications.count(activeOnly: true);
       if (!mounted) return;
       setState(() {
         _policy = policy;
+        _retentionDays = retention;
         _total = total;
         _active = active;
         _failed = false;
@@ -54,6 +60,9 @@ class _SettingsPageState extends State<SettingsPage> {
     FilterMode.allowlist => 'Only selected apps',
     FilterMode.blocklist => 'All apps except selected',
   };
+
+  static String _retentionLabel(int? days) =>
+      days == null ? 'Forever' : '$days days';
 
   Future<void> _chooseMode(FilterMode current) async {
     final chosen = await showDialog<FilterMode>(
@@ -79,6 +88,34 @@ class _SettingsPageState extends State<SettingsPage> {
     await _load();
   }
 
+  Future<void> _chooseRetention() async {
+    // 0 stands for "forever".
+    const options = <int>[0, 7, 30, 90];
+    final chosen = await showDialog<int>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Keep notifications for'),
+        children: [
+          for (final days in options)
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(context).pop(days),
+              child: Text(_retentionLabel(days == 0 ? null : days)),
+            ),
+        ],
+      ),
+    );
+    if (chosen == null) return;
+    final days = chosen == 0 ? null : chosen;
+    if (days == _retentionDays) return;
+    await widget.services.settings.setRetentionDays(days);
+    try {
+      await widget.services.retention.apply();
+    } on Exception {
+      if (mounted) showMessage(context, 'Could not apply the new setting.');
+    }
+    await _load();
+  }
+
   Future<void> _openRules(FilterMode mode) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -91,11 +128,69 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _openAccessSettings() async {
     final opened = await widget.services.platform.openAccessSettings();
     if (!opened && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not open the settings screen on this device.'),
-        ),
+      showMessage(context, 'Could not open the settings screen on this device.');
+    }
+  }
+
+  Future<void> _export() async {
+    final confirmed = await confirmAction(
+      context,
+      title: 'Export data',
+      message: 'The export file contains the full text of every stored '
+          'notification and is not encrypted. Keep it somewhere safe.',
+      action: 'Export',
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final all = await widget.services.notifications.listAll();
+      final now = DateTime.now();
+      final json = exportNotificationsJson(
+        all,
+        appVersion: appVersion,
+        exportedAt: now,
       );
+      final result = await widget.services.exporter.save(
+        fileName: 'nudge-export-${formatFileStamp(now)}.json',
+        content: json,
+      );
+      if (!mounted) return;
+      showMessage(
+        context,
+        switch (result.outcome) {
+          ExportOutcome.saved =>
+            result.location == null
+                ? 'Export saved'
+                : 'Exported to ${result.location}',
+          ExportOutcome.cancelled => 'Export cancelled',
+          ExportOutcome.unsupported =>
+            'Export is not available on this platform',
+        },
+      );
+    } on Exception {
+      if (mounted) showMessage(context, 'Export failed.');
+    }
+  }
+
+  Future<void> _deleteAll() async {
+    final confirmed = await confirmAction(
+      context,
+      title: 'Delete all notifications?',
+      message: 'This removes every stored notification and anything still '
+          'waiting to be stored. It cannot be undone. Your settings are kept.',
+      action: 'Delete',
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final deleted = await widget.services.notifications.deleteAll();
+      await widget.services.platform.clearQueue();
+      if (!mounted) return;
+      showMessage(
+        context,
+        'Deleted $deleted ${deleted == 1 ? 'notification' : 'notifications'}',
+      );
+      await _load();
+    } on Exception {
+      if (mounted) showMessage(context, 'Could not delete the notifications.');
     }
   }
 
@@ -107,7 +202,10 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(title: const Text('Settings')),
       body: _failed
           ? Center(
-              child: FilledButton(onPressed: _load, child: const Text('Retry')),
+              child: FilledButton(
+                onPressed: _load,
+                child: const Text('Retry'),
+              ),
             )
           : policy == null
           ? const Center(child: CircularProgressIndicator())
@@ -126,28 +224,24 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       );
                     }
+                    final access = status == null
+                        ? 'checking'
+                        : status.accessGranted
+                        ? 'granted'
+                        : 'not granted';
+                    final listener = status == null
+                        ? 'checking'
+                        : status.listenerConnected
+                        ? 'connected'
+                        : 'not connected';
                     return Column(
                       children: [
                         ListTile(
-                          title: Text(
-                            'Access: ${status == null
-                                ? 'checking'
-                                : status.accessGranted
-                                ? 'granted'
-                                : 'not granted'}',
-                          ),
-                          subtitle: Text(
-                            'Listener: ${status == null
-                                ? 'checking'
-                                : status.listenerConnected
-                                ? 'connected'
-                                : 'not connected'}',
-                          ),
+                          title: Text('Access: $access'),
+                          subtitle: Text('Listener: $listener'),
                         ),
                         ListTile(
-                          title: const Text(
-                            'Open Notification Access settings',
-                          ),
+                          title: const Text('Open Notification Access settings'),
                           trailing: const Icon(Icons.open_in_new),
                           onTap: _openAccessSettings,
                         ),
@@ -209,10 +303,31 @@ class _SettingsPageState extends State<SettingsPage> {
                     await _load();
                   },
                 ),
-                const _SectionHeader('Stored data'),
+                const _SectionHeader('Your data'),
                 ListTile(
                   title: Text('Stored notifications: $_total'),
                   subtitle: Text('$_active active'),
+                ),
+                ListTile(
+                  title: const Text('Keep notifications for'),
+                  subtitle: Text(_retentionLabel(_retentionDays)),
+                  onTap: _chooseRetention,
+                ),
+                ListTile(
+                  title: const Text('Export data'),
+                  subtitle: const Text(
+                    'Save all stored notifications as a JSON file',
+                  ),
+                  trailing: const Icon(Icons.file_download_outlined),
+                  onTap: _export,
+                ),
+                ListTile(
+                  title: const Text('Delete all notifications'),
+                  subtitle: const Text(
+                    'Removes stored notifications and anything still queued',
+                  ),
+                  trailing: const Icon(Icons.delete_outline),
+                  onTap: _deleteAll,
                 ),
                 const _SectionHeader('About'),
                 const ListTile(title: Text('$appName v$appVersion')),
