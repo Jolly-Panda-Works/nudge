@@ -1,5 +1,6 @@
 # ONE-TIME workflow: renames the generated android/ and windows/ projects from
 # "unified_inbox" to "Nudge" (display name) / app.nudge.nudge (Android id).
+# Safe to run again: it only changes what still has the old name.
 name: Rename app to Nudge
 
 on:
@@ -15,7 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Rename
-        shell: bash
         run: |
           set -euo pipefail
           OLD_PKG='app.unifiedinbox.unified_inbox'
@@ -38,7 +38,7 @@ jobs:
           sed -i 's/unified_inbox/nudge/g' windows/CMakeLists.txt
 
           echo "Remaining references to the old name:"
-          grep -rn "unified_inbox\|unifiedinbox" android windows --include=* -I || echo "none"
+          grep -rn "unified_inbox\|unifiedinbox" android windows -I || echo "none"
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"

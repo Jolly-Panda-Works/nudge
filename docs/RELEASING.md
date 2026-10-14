@@ -1,24 +1,27 @@
 # Releasing
 
-## Where builds come from
-| You do this | CI does this | Where the output is |
+Every push is built. What you get depends on where you push.
+
+| You push to | Version | Where the output is |
 |---|---|---|
-| Push to any branch | analyze, test, build APK and Windows zip | Artifacts of that run, named `Nudge_v<version>_<branch>-<commit>_...`, kept 14 days |
-| Push to `main` | the same, plus publishes the rolling `nightly` pre-release | Artifacts (30 days) and the **nightly** release, replaced on every push |
-| Push a tag `v<version>` | the same, plus publishes a permanent release | A GitHub release named `Nudge v<version>` with the APK, the Windows zip, `SHA256SUMS.txt` and the changelog section as notes |
-| Open a pull request from a fork | analyze, test, build | Artifacts of that run (no release) |
+| `main` | `MAJOR.MINOR.<run number>`, for example `0.5.123` | A permanent GitHub release `v0.5.123` with the APK, the Windows zip, `SHA256SUMS.txt` and generated notes |
+| a tag `vX.Y.Z` | exactly `X.Y.Z` | A permanent GitHub release for that tag (files are attached if the release already exists) |
+| any other branch | `MAJOR.MINOR.0-dev.<run number>` | Artifacts of the run only, named `Nudge_v0.5.0-dev.45_<branch>-<commit>_...`, kept 14 days |
+| a pull request from a fork | like a branch | Artifacts of the run only |
 
-Pull requests from branches of this repository are not run twice: the branch push already covers them.
+`MAJOR.MINOR` comes from `version:` in `pubspec.yaml`. To start a new release line, bump the minor (or major) number there. The run number only ever grows, so each release has a unique version and the Android version code increases with every build.
 
-## Cutting a release
-1. On a branch, bump `version:` in `pubspec.yaml` and `appVersion` in `lib/app_info.dart` (a test keeps them equal) and add a `## [x.y.z]` section to `CHANGELOG.md`.
-2. Merge to `main` and wait for CI to pass.
-3. Create the tag `v<version>` on that commit. Either:
-   - `git tag v0.5.1 && git push origin v0.5.1`, or
-   - on GitHub: Releases > Draft a new release > choose or create the tag > Publish. CI then attaches the files to that release.
-4. CI checks that the tag matches the version in `pubspec.yaml` and fails otherwise. Versions starting with `0.` are published as pre-releases.
+The version is built into the app: CI passes `--build-name`, `--build-number` and `--dart-define=NUDGE_VERSION=<version>`, so Settings > About shows exactly the version of the file you installed.
 
-## Notes
+## Details worth knowing
+- **Builds do not wait for the tests.** Analysis and tests run in parallel and show red or green on the commit, but a failing test never blocks the APK or the release. To require green tests before building, add `verify` to `needs:` of the `android` and `windows` jobs in `ci.yml`.
+- **The release is created as soon as the Android build succeeds.** The Windows zip is attached when its build also succeeded; otherwise the release notes say so.
+- **Releases accumulate**, one per push to `main`, like a build history. Delete old ones from the Releases page when you no longer need them.
+- **Pull requests from branches of this repository** are not built twice: the branch push already covers them.
 - All builds are debug-signed. A signed release build needs a keystore stored as repository secrets and is not set up yet.
-- Re-running a tag build attaches the files again and overwrites the previous ones.
-- A tag should point at a commit that is on `main`; CI does not enforce this.
+- Tags created by the workflow itself (for `main` releases) do not start another run. Tags you push yourself do.
+
+## Cutting a named version
+1. Merge what you want to ship to `main` and wait for it to build.
+2. Create the tag `vX.Y.Z` on that commit: `git tag v0.6.0 && git push origin v0.6.0`, or on GitHub: Releases > Draft a new release > choose or create the tag > Publish. CI then builds that commit and attaches the files to the release.
+3. Add a `## [X.Y.Z]` section to `CHANGELOG.md` for the notes you want to keep with the repository.

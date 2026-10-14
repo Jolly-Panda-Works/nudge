@@ -1,6 +1,6 @@
 # Roadmap
 
-Where Nudge stands and what is left. Last updated: 2026-10-14 (version 0.5.2).
+Where Nudge stands and what is left. Last updated: 2026-10-14 (version 0.5.3).
 
 **How to read the status**
 
@@ -35,6 +35,7 @@ Today the app captures notifications on Android, stores them locally, shows them
 | 0.5.0 | 2026-10-13 | M1 section 5: share target and text import, JSON export, per-notification and bulk delete, retention setting, logging guard test |
 | 0.5.1 | 2026-10-13 | CI: builds for every branch, permanent releases from version tags, docs/RELEASING.md |
 | 0.5.2 | 2026-10-14 | Fixes for the first CI analysis run, exact dependency pins, repository links |
+| 0.5.3 | 2026-10-14 | Workflows rewritten: a release per push to `main`, builds independent of tests, version built into the app |
 
 ## M1: Notification capture and local inbox
 
@@ -142,13 +143,13 @@ M1 is complete when capture and the UI are verified on a physical device and the
 
 ## Project infrastructure
 - [x] GitHub Actions: analyze, test, Android debug APK, Windows build, artifact upload
-- [x] Rolling `nightly` pre-release with versioned file names after every push to `main`
+- [x] A GitHub release with versioned file names for every push to `main` (replaces the rolling nightly release)
 - [x] Builds for every branch (artifacts named with branch and commit) and permanent releases from `v*` tags
-- [ ] Verify the branch-build and tag-release workflows (first run pending)
+- [ ] Verify the rewritten workflows end to end: Android build, Windows build, release creation (first run pending)
 - [x] Automatic formatting workflow
 - [x] Open-source files: LICENSE (MIT), CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, PRIVACY, CHANGELOG, issue and PR templates
 - [x] Exact versions of Drift, drift_dev, drift_flutter, build_runner and the other direct dependencies (resolved on CI, pinned in 0.5.2)
-- [ ] Release-signed builds (the nightly APK is debug-signed)
+- [ ] Release-signed builds (release APKs are debug-signed)
 - [ ] Screenshots in the README (the UI exists now; screenshots need a device or emulator)
 
 ## Known risks and unverified assumptions
@@ -165,4 +166,4 @@ M1 is complete when capture and the UI are verified on a physical device and the
 ## Open decisions
 - Calendar approach: library versus custom widgets (decided in M3 after the evaluation).
 - License: MIT is a placeholder choice; change it before the first public release if needed.
-- Distribution: debug nightly builds only for now; store release and signing are undecided.
+- Distribution: debug builds only for now; store release and signing are undecided.

@@ -1,6 +1,6 @@
-# One-time workflow: generates android/ and windows/ folders (normally done
-# locally by `flutter create`), formats the code, commits the result to the
-# branch it was run on, then analyzes and tests.
+# ONE-TIME workflow for a new repository: generates android/ and windows/
+# (normally done locally by `flutter create`), formats the code and commits.
+# It does nothing when android/ already exists.
 name: Bootstrap platforms
 
 on:
@@ -18,27 +18,36 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
+      - name: Stop if the platform folders already exist
+        id: guard
+        run: |
+          if [ -d android ] && [ -d windows ]; then
+            echo "android/ and windows/ already exist; nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: subosito/flutter-action@v2
+        if: steps.guard.outputs.skip != 'true'
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
       - name: Generate platform folders
+        if: steps.guard.outputs.skip != 'true'
         run: |
           flutter create . --platforms=android,windows --project-name nudge --org app.nudge
           rm -f test/widget_test.dart
-      - run: flutter pub get
-      - run: dart format .
-      - name: Commit generated files
+      - name: Format and commit
+        if: steps.guard.outputs.skip != 'true'
         run: |
+          flutter pub get
+          dart format .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --cached --quiet || git commit -m "chore: generate android/windows platform folders and format"
           git push
-      - run: flutter analyze
-      - run: flutter test
       - name: Run CI on the new commit
+        if: steps.guard.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run ci.yml --ref "${{ github.ref_name }}"

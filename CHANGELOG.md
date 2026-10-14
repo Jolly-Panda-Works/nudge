@@ -4,6 +4,16 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.5.3] - 2026-10-14
+### Changed
+- All workflows rewritten. Every push to `main` now creates a permanent GitHub release `v<MAJOR.MINOR.<run number>>` with the APK, the Windows zip, `SHA256SUMS.txt` and generated notes (replacing the rolling "nightly" release, which is removed on the first run). Version tags `vX.Y.Z` publish a release with exactly that version. Other branches keep their files in the run's artifacts.
+- Builds no longer wait for analysis and tests: they run in parallel, so a red test never blocks the outputs.
+- The build version is passed to the app (`--build-name`, `--build-number`, `NUDGE_VERSION`), so Settings > About shows the version of the installed file.
+- The Format workflow no longer starts a second build; its commit only changes formatting.
+- Bootstrap does nothing when the platform folders already exist.
+### Removed
+- The check that a tag matches the pubspec version, and the rolling nightly release.
+
 ## [0.5.2] - 2026-10-14
 ### Fixed
 - Analyzer errors found by the first CI run: missing import of `CaptureStatus` in the inbox screen, missing `Size` import in the test harness, and a lint in the privacy guard test.

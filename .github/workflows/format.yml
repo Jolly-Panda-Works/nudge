@@ -1,6 +1,6 @@
-# Formats all Dart code with the pinned Flutter version, commits the result and
-# starts CI on the new commit (commits made with GITHUB_TOKEN do not trigger
-# workflows by themselves, but workflow_dispatch is allowed).
+# Formats all Dart code with the pinned Flutter version and commits the result.
+# Needed because the code is written without a local Flutter installation.
+# The commit is formatting only, so it does not start another build.
 name: Format code
 
 on:
@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 env:
   FLUTTER_VERSION: '3.35.0'
@@ -29,20 +28,13 @@ jobs:
       - run: flutter pub get
       - run: dart format .
       - name: Commit formatting changes
-        id: fmt
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing to format."
           else
             git commit -m "style: dart format"
-            git push
-            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git push || echo "The branch moved while formatting; it will be formatted again on the next push."
           fi
-      - name: Run CI on the formatted commit
-        if: steps.fmt.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run ci.yml --ref "${{ github.ref_name }}"

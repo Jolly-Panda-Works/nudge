@@ -18,13 +18,13 @@ Thanks for helping! Please read the [Code of Conduct](CODE_OF_CONDUCT.md) first.
 5. Formatting: run `dart format .`; the **Format code** workflow also fixes it on `main`.
 
 ## Branches and builds
-Work on a branch. Every push to any branch is built by CI, and the APK and Windows zip are attached to that run as artifacts named with the branch and commit, so you can try your change without touching `main`. Merge to `main` through a pull request. Releases are made by tagging; see [docs/RELEASING.md](docs/RELEASING.md).
+Work on a branch. Every push to any branch is built by CI, and the APK and Windows zip are attached to that run as artifacts named with the branch and commit, so you can try your change without touching `main`. Merge to `main` through a pull request; each push to `main` publishes a release. Named versions are made by tagging; see [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Commit messages
 [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `test:`, `ci:`, `chore:`, `refactor:`, optionally with a scope, e.g. `feat(data): add retention purge`.
 
 ## Versioning
-Semantic versioning, pre-1.0. The version lives in `pubspec.yaml` (`version: x.y.z+build`) and in `lib/app_info.dart` (`appVersion`, a test keeps them equal). Bump the minor version for a new feature section and the patch version for fixes or docs/CI changes, and add an entry to `CHANGELOG.md`.
+Semantic versioning, pre-1.0. The base version lives in `pubspec.yaml` (`version: x.y.z+build`) and as the default in `lib/app_info.dart` (a test keeps them equal). CI builds use `MAJOR.MINOR.<run number>`, so bump the minor version in `pubspec.yaml` to start a new release line. Add an entry to `CHANGELOG.md` for user-visible changes.
 
 ## Pinned toolchain
 Flutter **3.35.0** is pinned in `pubspec.yaml` and the workflows. Please do not change it inside an unrelated PR.

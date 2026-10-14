@@ -17,22 +17,22 @@ All steps run on GitHub Actions, so a browser and git are enough:
 
 1. Push to `main`.
 2. **Format code** runs automatically and commits formatting changes, then starts CI on that commit.
-3. **CI** analyzes, tests, builds the Android debug APK and the Windows release, and publishes the `nightly` pre-release. On any other branch the outputs stay in the run's artifacts, named with the branch and commit, so experiments never touch `main` or the nightly release.
+3. **CI** builds the Android debug APK and the Windows release, runs analysis and tests in parallel, and publishes a GitHub release for the commit. On any other branch the outputs stay in the run's artifacts, named with the branch and commit, so experiments never touch `main` or the releases.
 4. When something fails, open the failed step in the Actions run; the log is what maintainers need.
 
 ## Workflows
 | Workflow | Trigger | What it does |
 |---|---|---|
-| CI | push to any branch, version tags (`v*`), PRs from forks, manual | build_runner, analyze (info-level hints do not fail the build; warnings and errors do), tests, APK, Windows build; `main` also publishes the nightly pre-release and `v*` tags publish a release (see [RELEASING.md](RELEASING.md)) |
-| Format code | push to `main`, manual | `dart format`, commits, starts CI |
-| Bootstrap platforms | manual, once | generates `android/` and `windows/` (already done for this repo) |
+| CI | push to any branch, version tags (`v*`), PRs from forks, manual | decides the version; in parallel: analyze and tests, the Android debug APK, the Windows build; `main` and `v*` tags publish a GitHub release (see [RELEASING.md](RELEASING.md)) |
+| Format code | push to `main`, manual | `dart format`, commits (formatting only, so no extra build) |
+| Bootstrap platforms | manual, once | generates `android/` and `windows/`; does nothing when they exist |
 | Rename app to Nudge | manual, once | renames the generated Android/Windows projects (already done once it has been run) |
 | Wire Android capture service | manual, after changes to `tools/wire_capture.py` | runs `tools/wire_capture.py`: patches `MainActivity.kt` (capture and export channels, share intent, file picker result) and `AndroidManifest.xml` (listener service, `<queries>` entry, share target); idempotent and upgrades older installs |
 
-Commits made by workflows with `GITHUB_TOKEN` do not trigger other workflows, which is why the Format, Bootstrap, Rename and Wire workflows start CI explicitly.
+Commits made by workflows with `GITHUB_TOKEN` do not trigger other workflows, which is why the Bootstrap, Rename and Wire workflows start CI explicitly. The Format workflow does not: its commit only changes formatting.
 
 ## Versioning and outputs
-The version is in `pubspec.yaml` and `lib/app_info.dart` (a test keeps them equal). Build outputs carry it in the file name: `Nudge_v<version>_android-debug.apk`, `Nudge_v<version>_windows-x64.zip`. The nightly release is replaced on every successful push to `main`; permanent releases come from version tags.
+The version is in `pubspec.yaml` and `lib/app_info.dart` (a test keeps them equal). Build outputs carry it in the file name: `Nudge_v<version>_android-debug.apk`, `Nudge_v<version>_windows-x64.zip`. Every push to `main` creates a release; named versions come from `vX.Y.Z` tags.
 
 ## Notes
 - `*.g.dart` files are generated and not committed.
@@ -41,7 +41,7 @@ The version is in `pubspec.yaml` and `lib/app_info.dart` (a test keeps them equa
 ## Trying notification capture on a phone
 Capture works only on Android and needs the **Wire Android capture service** workflow to have been run on this version (it is safe to run again).
 
-1. Install the APK from the `nightly` release.
+1. Install the APK from the latest release.
 2. On Android 13 and later, a sideloaded app cannot be given Notification Access until you allow restricted settings: open Settings > Apps > Nudge, open the three-dot menu and choose **Allow restricted settings**.
 3. Open Nudge and tap **Open Notification Access settings**, then enable Nudge.
 4. Return to the app. The status screen should show access granted and the listener connected.

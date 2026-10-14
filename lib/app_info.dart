@@ -1,5 +1,10 @@
 /// Display name and version shown in the UI.
-/// `appVersion` must match the part of `version:` before "+" in pubspec.yaml
-/// (checked by test/app_info_test.dart).
+///
+/// CI passes the exact build version with `--dart-define=NUDGE_VERSION=...`.
+/// Without it (local runs, tests) the default below is used; it must match the
+/// `version:` in pubspec.yaml before the "+" (checked by test/app_info_test.dart).
 const String appName = 'Nudge';
-const String appVersion = '0.5.2';
+const String appVersion = String.fromEnvironment(
+  'NUDGE_VERSION',
+  defaultValue: '0.5.3',
+);

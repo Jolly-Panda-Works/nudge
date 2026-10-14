@@ -44,11 +44,11 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [PRIVACY.md](PRIVACY.m
 
 | What | Where |
 |---|---|
-| Latest build of `main` | the rolling [nightly](https://github.com/Jolly-Panda-Works/nudge/releases/tag/nightly) pre-release (replaced on every push) |
-| A specific version | the [Releases](https://github.com/Jolly-Panda-Works/nudge/releases) page (created when a `v<version>` tag is pushed) |
-| Any other branch | the artifacts of that branch's [CI run](https://github.com/Jolly-Panda-Works/nudge/actions/workflows/ci.yml), named with the branch and commit |
+| Latest build | the newest entry on the [Releases](https://github.com/Jolly-Panda-Works/nudge/releases) page (one release per push to `main`) |
+| A named version | the release for that `vX.Y.Z` tag on the same page |
+| Another branch | the artifacts of that branch's [CI run](https://github.com/Jolly-Panda-Works/nudge/actions/workflows/ci.yml), named with the branch and commit |
 
-Each build contains `Nudge_v<version>..._android-debug.apk` and `Nudge_v<version>..._windows-x64.zip`. Releases also include `SHA256SUMS.txt`. These are debug builds for testing only. See [docs/RELEASING.md](docs/RELEASING.md).
+Each build contains `Nudge_v<version>_android-debug.apk` and `Nudge_v<version>_windows-x64.zip`; releases also include `SHA256SUMS.txt`. These are debug builds for testing only. See [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Build from source
 

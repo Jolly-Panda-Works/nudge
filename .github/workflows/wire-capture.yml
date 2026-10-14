@@ -1,6 +1,6 @@
-# Wires the Kotlin capture, share and export code into the generated
-# android/ project (MainActivity + AndroidManifest). Safe to run again; run it
-# again after updates that change tools/wire_capture.py.
+# Wires the Kotlin capture, share and export code into the generated android/
+# project (MainActivity + AndroidManifest). Safe to run again; run it again
+# after updates that change tools/wire_capture.py.
 name: Wire Android capture service
 
 on:

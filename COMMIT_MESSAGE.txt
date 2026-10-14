@@ -1,5 +1,0 @@
-ci: fix Windows build setup and pin runner images
-
-- install Flutter 3.35.0 on Windows from the git tag (flutter-action could not resolve the version)
-- pin windows-2022 and ubuntu-24.04
-- bump actions/checkout to v5 (Node 24)
