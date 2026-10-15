@@ -4,6 +4,16 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.5.4] - 2026-10-14
+### Fixed
+- Builds produced nothing after the 0.5.3 commit because that commit deleted the generated `android/` and `windows/` projects (zips never contained them, and replacing the repository contents with the zip removed them). CI now generates a missing platform project with `flutter create` and wires it with `tools/wire_capture.py` before every build, so the folders no longer have to be committed.
+### Changed
+- `tools/wire_capture.py` also sets the display name to "Nudge" (Android application label, Windows window title and file description) and accepts `--only android|windows`.
+- `pubspec.lock` and `.gitignore` are part of the project again, so every transitive dependency version is pinned and a full replacement of the repository contents no longer drops them.
+### Removed
+- The one-time workflows Bootstrap platforms, Rename app to Nudge and Wire Android capture service (CI does their job on every build).
+- Dependabot configuration: it opened a branch and a build for each proposed update, and the project pins its dependency versions on purpose. Updates are done deliberately.
+
 ## [0.5.3] - 2026-10-14
 ### Changed
 - All workflows rewritten. Every push to `main` now creates a permanent GitHub release `v<MAJOR.MINOR.<run number>>` with the APK, the Windows zip, `SHA256SUMS.txt` and generated notes (replacing the rolling "nightly" release, which is removed on the first run). Version tags `vX.Y.Z` publish a release with exactly that version. Other branches keep their files in the run's artifacts.

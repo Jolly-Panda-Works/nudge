@@ -5,6 +5,9 @@ name: CI
 #   tag v*.*.*  -> a permanent GitHub release with exactly that version
 #   any branch  -> files stay in the run's artifacts (version ...-dev.<run>)
 # Builds do not wait for the tests: a red test never blocks the outputs.
+# The android/ and windows/ projects do not have to be committed: when they
+# are missing, the build generates them with `flutter create` and applies
+# tools/wire_capture.py (service, share target, file picker, display name).
 on:
   push:
     branches: ['**']
@@ -122,6 +125,14 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: dart run build_runner build
+      - name: Prepare the Android project
+        run: |
+          if [ ! -f android/app/build.gradle.kts ] && [ ! -f android/app/build.gradle ]; then
+            echo "Generating the Android project (it is not committed)."
+            flutter create . --platforms=android --project-name nudge --org app.nudge
+            rm -f test/widget_test.dart
+          fi
+          python3 tools/wire_capture.py --only android
       - name: Build the debug APK
         run: >-
           flutter build apk --debug
@@ -161,6 +172,15 @@ jobs:
       - run: flutter --version
       - run: flutter pub get
       - run: dart run build_runner build
+      - name: Prepare the Windows project
+        run: |
+          if [ ! -f windows/CMakeLists.txt ]; then
+            echo "Generating the Windows project (it is not committed)."
+            flutter create . --platforms=windows --project-name nudge --org app.nudge
+            rm -f test/widget_test.dart
+          fi
+          PY=$(command -v python3 || command -v python)
+          "$PY" tools/wire_capture.py --only windows
       - name: Build the Windows app
         run: >-
           flutter build windows --release

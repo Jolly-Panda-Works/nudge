@@ -9,7 +9,7 @@ body:
     id: version
     attributes:
       label: Nudge version
-      placeholder: "0.5.3"
+      placeholder: "0.5.4"
     validations:
       required: true
   - type: dropdown

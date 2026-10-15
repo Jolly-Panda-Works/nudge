@@ -1,16 +1,14 @@
-ci: Nudge v0.5.3 - rewrite all workflows, a release per push to main
+fix: Nudge v0.5.4 - CI regenerates missing Android/Windows projects
 
-- every push to main publishes a release v<MAJOR.MINOR.<run number>> with the
-  APK, the Windows zip, SHA256SUMS.txt and generated notes; tags vX.Y.Z
-  publish exactly that version; other branches keep run artifacts
-  (modelled on how SnapshotAll publishes its builds)
-- builds no longer wait for analysis and tests; they run in parallel
-- build version is passed to the app (--build-name, --build-number,
-  NUDGE_VERSION) so Settings > About matches the installed file
-- Format workflow commits formatting only and starts no extra build
-- Bootstrap, Rename and Wire workflows rewritten (checkout v5, guards,
-  explicit CI start); rolling nightly release is removed on first run
-- docs: RELEASING rewritten, README download table, DEVELOPMENT, CONTRIBUTING,
-  CHANGELOG, ROADMAP
+- builds produced nothing since 0.5.3: that commit deleted the generated
+  android/ and windows/ folders; CI now runs `flutter create` for a missing
+  platform project and then tools/wire_capture.py before every build
+- wire_capture.py also sets the display name to Nudge on Android and Windows
+  and accepts --only android|windows (tested on the real generated project)
+- remove the one-time workflows (Bootstrap, Rename, Wire) and Dependabot
+  (it opened a branch and a build per update; versions are pinned on purpose)
+- restore pubspec.lock and .gitignore in the project so a full replacement
+  of the repository contents keeps them
+- docs: DEVELOPMENT explains platform folders and applying a delivered zip
 
 Milestone: infrastructure
