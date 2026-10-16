@@ -47,9 +47,12 @@ final class CaptureIngestor {
   Future<void> start() async {
     _subscription ??= _platform.signals.listen((_) {
       unawaited(
-        drain().then<void>((_) {}, onError: (Object _) {
-          // Events stay queued natively and are retried on the next signal.
-        }),
+        drain().then<void>(
+          (_) {},
+          onError: (Object _) {
+            // Events stay queued natively and are retried on the next signal.
+          },
+        ),
       );
     });
     await drain();
