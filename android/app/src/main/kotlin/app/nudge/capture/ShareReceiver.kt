@@ -7,7 +7,7 @@ import org.json.JSONObject
 
 /**
  * Queues plain text that the user shares with Nudge from another app
- * (ACTION_SEND, text/*). The text is chosen by the user, so it is stored like
+ * (ACTION_SEND with a text MIME type). The text is chosen by the user, so it is stored like
  * a captured notification but is not subject to the app filters. Content is
  * never logged.
  */

@@ -11,7 +11,7 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-/** Registers the method and event channels used by lib/platform/*.dart. */
+/** Registers the method and event channels used by the Dart code in lib/platform. */
 object CaptureChannels {
     private const val METHODS = "app.nudge/capture"
     private const val EVENTS = "app.nudge/capture/events"

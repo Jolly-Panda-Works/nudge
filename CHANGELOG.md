@@ -4,6 +4,14 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.5.5] - 2026-10-15
+### Fixed
+- The first Android build failed to compile: two Kotlin comments contained `/*` (a MIME type and a file pattern). Block comments nest in Kotlin, so they never closed. The comments are reworded and a test now checks that block comments in the Kotlin sources are balanced, so this fails in seconds instead of after a five-minute Gradle build.
+### Changed
+- `actions/setup-java` updated from v4 (deprecated) to v5.
+### Verified by CI
+- The self-healing Android step worked: it generated the project with `flutter create` and wired the manifest and `MainActivity.kt`.
+
 ## [0.5.4] - 2026-10-14
 ### Fixed
 - Builds produced nothing after the 0.5.3 commit because that commit deleted the generated `android/` and `windows/` projects (zips never contained them, and replacing the repository contents with the zip removed them). CI now generates a missing platform project with `flutter create` and wires it with `tools/wire_capture.py` before every build, so the folders no longer have to be committed.

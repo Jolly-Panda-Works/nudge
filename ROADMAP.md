@@ -1,6 +1,6 @@
 # Roadmap
 
-Where Nudge stands and what is left. Last updated: 2026-10-14 (version 0.5.4).
+Where Nudge stands and what is left. Last updated: 2026-10-15 (version 0.5.5).
 
 **How to read the status**
 
@@ -37,6 +37,7 @@ Today the app captures notifications on Android, stores them locally, shows them
 | 0.5.2 | 2026-10-14 | Fixes for the first CI analysis run, exact dependency pins, repository links |
 | 0.5.3 | 2026-10-14 | Workflows rewritten: a release per push to `main`, builds independent of tests, version built into the app |
 | 0.5.4 | 2026-10-14 | CI generates the Android and Windows projects when missing; one-time workflows and Dependabot removed; lock file restored |
+| 0.5.5 | 2026-10-15 | Fix for the first Android compile (nested comment openers in two Kotlin files), guard test, setup-java v5 |
 
 ## M1: Notification capture and local inbox
 
@@ -146,7 +147,7 @@ M1 is complete when capture and the UI are verified on a physical device and the
 - [x] GitHub Actions: analyze, test, Android debug APK, Windows build, artifact upload
 - [x] A GitHub release with versioned file names for every push to `main` (replaces the rolling nightly release)
 - [x] Builds for every branch (artifacts named with branch and commit) and permanent releases from `v*` tags
-- [x] CI regenerates and wires the Android and Windows projects, so they do not need to be committed
+- [x] CI regenerates and wires the Android project (confirmed on CI on 2026-10-15); the Windows project is generated the same way but unconfirmed
 - [ ] Verify the workflows end to end: Android build, Windows build, release creation (first successful run pending)
 - [x] Automatic formatting workflow
 - [x] Open-source files: LICENSE (MIT), CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, PRIVACY, CHANGELOG, issue and PR templates
@@ -155,7 +156,7 @@ M1 is complete when capture and the UI are verified on a physical device and the
 - [ ] Screenshots in the README (the UI exists now; screenshots need a device or emulator)
 
 ## Known risks and unverified assumptions
-- The Kotlin code (listener, queue, channels) has only been compiled by CI, never run on a device. The wiring script that patches the generated `MainActivity.kt` and `AndroidManifest.xml` was tested on a copy of the generated project from the repository history (not on a fresh `flutter create` output) and has never run in CI.
+- The Kotlin code (listener, queue, channels) reached the compiler for the first time on 2026-10-15 and failed on two syntax errors (fixed in 0.5.5); further compile errors are possible, and it has never run on a device. The wiring script that patches the generated `MainActivity.kt` and `AndroidManifest.xml` was tested on a copy of the generated project from the repository history (not on a fresh `flutter create` output) and has never run in CI.
 - Sideloaded debug APKs may need "Allow restricted settings" (Android 13+) before Notification Access can be enabled.
 - Until background ingestion exists, notifications that arrive while the app is closed wait in a small native queue (plain JSON in app-private, no-backup storage) until the app is opened.
 - The first full CI run resolved dependencies and generated the Drift code, but its analysis step failed on three issues (fixed in 0.5.2). The tests, the Android build and the Windows build have not been confirmed yet.

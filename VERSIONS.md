@@ -1,4 +1,4 @@
-# Pinned versions (Nudge 0.5.4+12)
+# Pinned versions (Nudge 0.5.5+13)
 
 Direct dependencies are pinned to exact versions in `pubspec.yaml`. The versions below were resolved by pub on the GitHub Actions runner (Ubuntu, Flutter 3.35.0) on 2026-10-14. `pubspec.lock` is committed, so transitive dependencies are locked too.
 
@@ -13,8 +13,8 @@ Direct dependencies are pinned to exact versions in `pubspec.yaml`. The versions
 | path_provider | 2.1.5 | verified (resolved on CI) |
 | build_runner | 2.15.1 | verified (code generation ran on CI) |
 | flutter_lints | 5.0.0 | verified |
-| JDK (CI/Android) | 17 | not yet exercised (the Android build has not run) |
+| JDK (CI/Android) | 17 (Temurin 17.0.20) | verified: Gradle started and compiled Kotlin |
 | Runners | ubuntu-24.04, windows-2022 | ubuntu verified |
-| actions | checkout@v5, setup-java@v4, flutter-action@v2, upload-artifact@v4, download-artifact@v4; `gh` CLI preinstalled on runners | checkout and flutter-action verified |
+| actions | checkout@v5, setup-java@v5, flutter-action@v2, upload-artifact@v4, download-artifact@v4; `gh` CLI preinstalled on runners | checkout and flutter-action verified |
 
 Newer versions exist for several packages (for example drift 2.35, sqlite3 3.x, drift_flutter 0.3). They are not adopted yet; upgrading is a deliberate change that needs its own test run.

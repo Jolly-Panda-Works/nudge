@@ -1,14 +1,13 @@
-fix: Nudge v0.5.4 - CI regenerates missing Android/Windows projects
+fix: Nudge v0.5.5 - Kotlin comments that broke the Android build
 
-- builds produced nothing since 0.5.3: that commit deleted the generated
-  android/ and windows/ folders; CI now runs `flutter create` for a missing
-  platform project and then tools/wire_capture.py before every build
-- wire_capture.py also sets the display name to Nudge on Android and Windows
-  and accepts --only android|windows (tested on the real generated project)
-- remove the one-time workflows (Bootstrap, Rename, Wire) and Dependabot
-  (it opened a branch and a build per update; versions are pinned on purpose)
-- restore pubspec.lock and .gitignore in the project so a full replacement
-  of the repository contents keeps them
-- docs: DEVELOPMENT explains platform folders and applying a delivered zip
+- CaptureChannels.kt and ShareReceiver.kt had "/*" inside comments (a file
+  pattern and a MIME type); Kotlin block comments nest, so they never closed
+  ("Syntax error: Unclosed comment") and MainActivity could not resolve
+  CaptureChannels/ShareReceiver
+- add a test that checks Kotlin block comments are balanced, so the next
+  mistake fails in the fast test job instead of the 5-minute Gradle build
+- actions/setup-java v4 -> v5 (v4 is deprecated)
+- CHANGELOG, ROADMAP and VERSIONS updated with what the first Android CI run
+  confirmed (project generation and wiring work)
 
-Milestone: infrastructure
+Milestone: M1 / Android build
