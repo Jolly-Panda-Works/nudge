@@ -50,3 +50,10 @@ String formatFileStamp(DateTime time) {
   return '${local.year}${_two(local.month)}${_two(local.day)}-'
       '${_two(local.hour)}${_two(local.minute)}${_two(local.second)}';
 }
+
+/// Date and time of a due or reminder time, in local time: 2026-10-18 09:00.
+String formatDue(DateTime time) {
+  final local = time.toLocal();
+  return '${local.year}-${_two(local.month)}-${_two(local.day)} '
+      '${_clock(local)}';
+}

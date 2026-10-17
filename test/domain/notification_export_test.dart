@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nudge/domain/captured_notification.dart';
 import 'package:nudge/domain/notification_export.dart';
+import 'package:nudge/domain/task.dart';
 
 import '../support/fixtures.dart';
 
@@ -49,5 +50,52 @@ void main() {
     );
     final data = jsonDecode(json) as Map<String, Object?>;
     expect(data['notifications'], isEmpty);
+  });
+
+  test('tasks are exported with their source snapshot', () {
+    final created = DateTime.utc(2026, 10, 13, 8);
+    final json = exportNotificationsJson(
+      const [],
+      appVersion: '0.8.0',
+      exportedAt: DateTime.utc(2026, 10, 13, 9),
+      tasks: <TaskItem>[
+        TaskItem(
+          id: 't_1',
+          title: 'Call Sara',
+          kind: TaskKind.reminder,
+          status: TaskStatus.open,
+          createdAt: created,
+          updatedAt: created,
+          dueAt: DateTime.utc(2026, 10, 14, 9),
+          source: const TaskSource(
+            notificationKey: 'K',
+            packageName: 'com.chat',
+            appLabel: 'Chat',
+            hasContentAction: true,
+          ),
+        ),
+      ],
+    );
+    final data = jsonDecode(json) as Map<String, Object?>;
+    final tasks = (data['tasks']! as List<Object?>)
+        .cast<Map<String, Object?>>();
+    expect(tasks, hasLength(1));
+    expect(tasks.single['title'], 'Call Sara');
+    expect(tasks.single['kind'], 'reminder');
+    expect(tasks.single['dueAt'], '2026-10-14T09:00:00.000Z');
+    expect(tasks.single['completedAt'], isNull);
+    final source = tasks.single['source']! as Map<String, Object?>;
+    expect(source['notificationKey'], 'K');
+    expect(source['packageName'], 'com.chat');
+  });
+
+  test('without tasks the export has an empty tasks array', () {
+    final json = exportNotificationsJson(
+      const [],
+      appVersion: '0.8.0',
+      exportedAt: DateTime.utc(2026, 10, 13),
+    );
+    final data = jsonDecode(json) as Map<String, Object?>;
+    expect(data['tasks'], isEmpty);
   });
 }

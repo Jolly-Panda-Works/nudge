@@ -1,19 +1,19 @@
-feat: Nudge v0.7.0 - source navigation (M2 section 2), keep only the latest release
+feat: Nudge v0.8.0 - task screens (M2 section 3)
 
-- SourceNavigator: open the live notification action, else the source
-  app's launch intent, else an explicit "unavailable" result
-- Kotlin: ContentIntentRegistry.send/openLauncher; channel methods
-  openLiveContent and openSourceApp; no PendingIntent is ever stored
-- CapturePlatform gains openLiveContent/openSourceApp (method channel,
-  no-op, fake); AppServices exposes the navigator
-- tests: fallback order with a fake platform
-- ci: every push to main is tagged and released automatically as the
-  Latest release; all older releases and their tags are deleted, except
-  releases from hand-pushed tags (marked nudge-keep)
-- ci: Android release build split per ABI (arm64-v8a, armeabi-v7a)
-  instead of a ~140 MB universal debug APK
-- docs: changelog, roadmap, status, releasing
+- Tasks screen (Open/Done/Archived) with complete/reopen checkbox and a
+  button to add a stand-alone task
+- Task form: title, notes, task or reminder, date and time; a reminder
+  needs a date and time
+- Task detail: mark done, reopen, snooze, archive, restore, edit, delete,
+  Open original (live action, then app, then "unavailable")
+- Notification details: Create task, Create reminder or View task, and
+  Open original
+- Export includes tasks; Settings gets "Delete all tasks"
+- tests: widget tests for the flows, export tests, in-memory task
+  repository for the test harness
+- docs: changelog, roadmap, status
 
-Written without a Flutter toolchain: not compiled, tested or run. CI first.
+No alerts at the reminder time yet (section 4). Written without a Flutter
+toolchain: not compiled, tested or run. CI first.
 
-Milestone: M2 / Section 2
+Milestone: M2 / Section 3

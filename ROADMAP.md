@@ -123,11 +123,13 @@ M1 is complete when capture and the UI are verified on a physical device and the
 - [x] Tests for the fallback order with a fake platform
 - [ ] Tested on a device for each supported app
 
-### Section 3: screens (not started)
-- [ ] "Create task" and "Create reminder" from a notification, with an editable form (title, notes, due date and time, destination calendar)
-- [ ] Task list and task details with complete, snooze, archive and delete
-- [ ] A visible "Open original" action on notification details and on task details
-- [ ] Tasks included in export and in "delete all"
+### Section 3: screens (done in code, 0.8.0; not compiled or run yet)
+- [x] "Create task" and "Create reminder" from a notification, with an editable form (title, notes, due date and time)
+- [ ] Destination calendar in the form (arrives with the calendar milestone)
+- [x] Task list and task details with complete, snooze, archive and delete
+- [x] A visible "Open original" action on notification details and on task details
+- [x] Tasks included in export; a separate "Delete all tasks" in Settings
+- [ ] Verify the screens on a device
 
 ### Section 4: reminder delivery (not started)
 - [ ] Alert at the reminder time (scheduled with the system alarm service), including after a restart

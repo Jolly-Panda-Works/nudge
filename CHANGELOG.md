@@ -4,6 +4,15 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.8.0] - 2026-10-18
+### Added
+- M2 section 3: task screens. A Tasks screen (Open, Done, Archived) with a checkbox to complete or reopen, a form to create or edit a task or reminder (title, notes, kind, date, time), and a task detail with Mark done, Reopen, Snooze, Archive, Restore, Edit and Delete.
+- Notification details: Create task, Create reminder (or View task when one exists) and Open original. Task details also have Open original, using the live action, then the app, then a clear unavailable message.
+- Export now includes tasks with their source snapshot. Settings has Delete all tasks.
+- Tests: widget tests for creating, linking, completing, archiving and Open original; export tests for tasks; an in-memory task repository for widget tests.
+### Known limitations
+- A reminder's time is saved and shown but nothing alerts at that time yet (section 4). The destination calendar is not selectable until the calendar milestone. Not compiled, tested or run: written without a Flutter toolchain, so CI is the first check. Not tested on a device.
+
 ## [0.7.0] - 2026-10-18
 ### Added
 - M2 section 2: source navigation. `SourceNavigator` opens the original of a notification in a fixed order: the live notification action, then the source app's launch intent, then an explicit "unavailable" result. No deep link is invented and no `PendingIntent` is stored.

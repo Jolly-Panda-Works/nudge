@@ -128,10 +128,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _openAccessSettings() async {
     final opened = await widget.services.platform.openAccessSettings();
     if (!opened && mounted) {
-      showMessage(
-        context,
-        'Could not open the settings screen on this device.',
-      );
+      showMessage(context, 'Could not open the settings screen on this device.');
     }
   }
 
@@ -139,33 +136,39 @@ class _SettingsPageState extends State<SettingsPage> {
     final confirmed = await confirmAction(
       context,
       title: 'Export data',
-      message:
-          'The export file contains the full text of every stored '
-          'notification and is not encrypted. Keep it somewhere safe.',
+      message: 'The export file contains the full text of every stored '
+          'notification, plus your tasks, and is not encrypted. Keep it '
+          'somewhere safe.',
       action: 'Export',
     );
     if (!confirmed || !mounted) return;
     try {
       final all = await widget.services.notifications.listAll();
+      final tasks = await widget.services.tasks.listAll();
       final now = DateTime.now();
       final json = exportNotificationsJson(
         all,
         appVersion: appVersion,
         exportedAt: now,
+        tasks: tasks,
       );
       final result = await widget.services.exporter.save(
         fileName: 'nudge-export-${formatFileStamp(now)}.json',
         content: json,
       );
       if (!mounted) return;
-      showMessage(context, switch (result.outcome) {
-        ExportOutcome.saved =>
-          result.location == null
-              ? 'Export saved'
-              : 'Exported to ${result.location}',
-        ExportOutcome.cancelled => 'Export cancelled',
-        ExportOutcome.unsupported => 'Export is not available on this platform',
-      });
+      showMessage(
+        context,
+        switch (result.outcome) {
+          ExportOutcome.saved =>
+            result.location == null
+                ? 'Export saved'
+                : 'Exported to ${result.location}',
+          ExportOutcome.cancelled => 'Export cancelled',
+          ExportOutcome.unsupported =>
+            'Export is not available on this platform',
+        },
+      );
     } on Exception {
       if (mounted) showMessage(context, 'Export failed.');
     }
@@ -175,8 +178,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final confirmed = await confirmAction(
       context,
       title: 'Delete all notifications?',
-      message:
-          'This removes every stored notification and anything still '
+      message: 'This removes every stored notification and anything still '
           'waiting to be stored. It cannot be undone. Your settings are kept.',
       action: 'Delete',
     );
@@ -195,6 +197,27 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _deleteAllTasks() async {
+    final confirmed = await confirmAction(
+      context,
+      title: 'Delete all tasks?',
+      message: 'This removes every task and reminder, including done and '
+          'archived ones. It cannot be undone. Notifications are kept.',
+      action: 'Delete',
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      final deleted = await widget.services.tasks.deleteAll();
+      if (!mounted) return;
+      showMessage(
+        context,
+        'Deleted $deleted ${deleted == 1 ? 'task' : 'tasks'}',
+      );
+    } on Exception {
+      if (mounted) showMessage(context, 'Could not delete the tasks.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final policy = _policy;
@@ -203,7 +226,10 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(title: const Text('Settings')),
       body: _failed
           ? Center(
-              child: FilledButton(onPressed: _load, child: const Text('Retry')),
+              child: FilledButton(
+                onPressed: _load,
+                child: const Text('Retry'),
+              ),
             )
           : policy == null
           ? const Center(child: CircularProgressIndicator())
@@ -239,9 +265,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           subtitle: Text('Listener: $listener'),
                         ),
                         ListTile(
-                          title: const Text(
-                            'Open Notification Access settings',
-                          ),
+                          title: const Text('Open Notification Access settings'),
                           trailing: const Icon(Icons.open_in_new),
                           onTap: _openAccessSettings,
                         ),
@@ -316,7 +340,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ListTile(
                   title: const Text('Export data'),
                   subtitle: const Text(
-                    'Save all stored notifications as a JSON file',
+                    'Save all stored notifications and tasks as a JSON file',
                   ),
                   trailing: const Icon(Icons.file_download_outlined),
                   onTap: _export,
@@ -328,6 +352,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   trailing: const Icon(Icons.delete_outline),
                   onTap: _deleteAll,
+                ),
+                ListTile(
+                  title: const Text('Delete all tasks'),
+                  subtitle: const Text(
+                    'Removes every task and reminder, including done ones',
+                  ),
+                  trailing: const Icon(Icons.delete_outline),
+                  onTap: _deleteAllTasks,
                 ),
                 const _SectionHeader('About'),
                 const ListTile(title: Text('$appName v$appVersion')),

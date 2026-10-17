@@ -1,6 +1,6 @@
 # Nudge: goal, current status and remaining work
 
-Last updated: 2026-10-16. Latest delivered version: 0.7.0.
+Last updated: 2026-10-16. Latest delivered version: 0.8.0.
 Repository: https://github.com/Jolly-Panda-Works/nudge
 
 ---
@@ -26,7 +26,7 @@ Nudge is a productivity app for **Android and Windows**, built with Flutter and 
 
 ## 2. Current status in one paragraph
 
-All five sections of milestone M1 (notification capture and local inbox) are **written**: domain logic, local storage, the Android listener service, the inbox and settings screens, text import, export and deletion. The delivery pipeline (GitHub Actions) builds on every push. **Nothing has been verified on a phone**, the **Android build has not yet succeeded in CI**, and the tests have not been confirmed passing. Milestone M2 has started: the storage for tasks and reminders (section 1 of 4) and source navigation (section 2, `SourceNavigator` plus Kotlin) are written; the task screens and reminder alerts are not. The calendar (M3, M4), Windows sync (M5) and Google Calendar (M6) have not been started.
+All five sections of milestone M1 (notification capture and local inbox) are **written**: domain logic, local storage, the Android listener service, the inbox and settings screens, text import, export and deletion. The delivery pipeline (GitHub Actions) builds on every push. **Nothing has been verified on a phone**, the **Android build has not yet succeeded in CI**, and the tests have not been confirmed passing. Milestone M2 has started: the storage for tasks and reminders (section 1 of 4) and source navigation (section 2, `SourceNavigator` plus Kotlin) are written; the task screens (section 3: list, form, detail, create from a notification, Open original buttons, export and delete) are written; reminder alerts (section 4) are not. The calendar (M3, M4), Windows sync (M5) and Google Calendar (M6) have not been started.
 
 ---
 
@@ -45,7 +45,8 @@ All five sections of milestone M1 (notification capture and local inbox) are **w
 | Open-source project files (README, LICENSE MIT, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, PRIVACY, CHANGELOG, ROADMAP, docs, issue and PR templates) | Done, English only |
 | Tasks and reminders storage (create from a notification, duplicate prevention, complete, archive, snooze, edit; retention never deletes a linked notification) | Written with tests, no screens yet |
 | Source navigation: live action, then launch intent, then unavailable (no button yet) | Written with tests, not compiled or run |
-| Task screens, reminder alerts | Not started |
+| Task screens, create from a notification, "Open original" buttons, tasks in export | Written with widget tests, not compiled or run |
+| Reminder alerts at the due time | Not started |
 | Calendar (any view), Persian/Jalali, calendar integrations | Not started |
 | Windows app features beyond a placeholder build, sync | Not started |
 

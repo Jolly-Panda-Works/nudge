@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import '../app_services.dart';
 import '../domain/captured_notification.dart';
 import '../domain/shared_source.dart';
+import '../domain/task.dart';
 import 'dialogs.dart';
+import 'task_detail_page.dart';
+import 'task_form_page.dart';
 import 'time_format.dart';
 
-class NotificationDetailPage extends StatelessWidget {
+class NotificationDetailPage extends StatefulWidget {
   const NotificationDetailPage({
     required this.notification,
     required this.services,
@@ -16,12 +19,60 @@ class NotificationDetailPage extends StatelessWidget {
   final CapturedNotification notification;
   final AppServices services;
 
+  @override
+  State<NotificationDetailPage> createState() => _NotificationDetailPageState();
+}
+
+class _NotificationDetailPageState extends State<NotificationDetailPage> {
+  CapturedNotification get notification => widget.notification;
+  AppServices get services => widget.services;
+
+  late Future<TaskItem?> _linkedTask = _findTask();
+
+  Future<TaskItem?> _findTask() async {
+    try {
+      return await services.tasks.findBySourceKey(notification.key);
+    } on Exception {
+      return null;
+    }
+  }
+
+  Future<void> _createTask(TaskKind kind) async {
+    await Navigator.of(context).push<TaskItem>(
+      MaterialPageRoute<TaskItem>(
+        builder: (_) => TaskFormPage(
+          services: services,
+          notification: notification,
+          initialKind: kind,
+        ),
+      ),
+    );
+    if (mounted) setState(() => _linkedTask = _findTask());
+  }
+
+  Future<void> _viewTask(TaskItem task) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => TaskDetailPage(task: task, services: services),
+      ),
+    );
+    if (mounted) setState(() => _linkedTask = _findTask());
+  }
+
+  Future<void> _openOriginal() async {
+    final outcome = await services.sourceNavigator.open(
+      packageName: notification.packageName,
+      notificationKey: notification.key,
+    );
+    if (!mounted) return;
+    showMessage(context, sourceOutcomeMessage(outcome));
+  }
+
   Future<void> _delete(BuildContext context) async {
     final confirmed = await confirmAction(
       context,
       title: 'Delete notification?',
-      message:
-          'It will be removed from Nudge. The original notification in '
+      message: 'It will be removed from Nudge. The original notification in '
           'the source app is not affected.',
       action: 'Delete',
     );
@@ -79,9 +130,7 @@ class NotificationDetailPage extends StatelessWidget {
           const SizedBox(height: 24),
           _Row(
             label: 'Source',
-            value: imported
-                ? 'Shared or imported text'
-                : n.appLabel ?? n.packageName,
+            value: imported ? 'Shared or imported text' : n.appLabel ?? n.packageName,
           ),
           if (!imported) _Row(label: 'Package', value: n.packageName),
           _Row(
@@ -103,6 +152,43 @@ class NotificationDetailPage extends StatelessWidget {
                   ? 'Existed when captured'
                   : 'None when captured',
             ),
+          const SizedBox(height: 16),
+          FutureBuilder<TaskItem?>(
+            future: _linkedTask,
+            builder: (context, snapshot) {
+              final task = snapshot.data;
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (task != null)
+                    FilledButton.icon(
+                      onPressed: () => _viewTask(task),
+                      icon: const Icon(Icons.task_alt),
+                      label: const Text('View task'),
+                    )
+                  else if (snapshot.connectionState == ConnectionState.done) ...[
+                    FilledButton.icon(
+                      onPressed: () => _createTask(TaskKind.task),
+                      icon: const Icon(Icons.add_task),
+                      label: const Text('Create task'),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => _createTask(TaskKind.reminder),
+                      icon: const Icon(Icons.alarm_add),
+                      label: const Text('Create reminder'),
+                    ),
+                  ],
+                  if (!imported)
+                    OutlinedButton.icon(
+                      onPressed: _openOriginal,
+                      icon: const Icon(Icons.open_in_new),
+                      label: const Text('Open original'),
+                    ),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
@@ -124,7 +210,10 @@ class _Row extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
           ),
           Expanded(child: Text(value)),
         ],
