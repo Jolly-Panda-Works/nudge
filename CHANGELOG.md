@@ -10,6 +10,8 @@ All notable changes are documented here. Format based on
 - Kotlin: `ContentIntentRegistry.send` and `openLauncher`, and the channel methods `openLiveContent` and `openSourceApp`. A cancelled intent is dropped and reported as not opened.
 - `CapturePlatform.openLiveContent` and `openSourceApp` (method channel, no-op and fake implementations).
 - Tests for the fallback order with a fake platform.
+### Changed
+- Releases: a push to `main` is tagged automatically and becomes the Latest release; all older releases and their tags are deleted, except releases made from tags pushed by hand.
 ### Known limitations
 - No button calls it yet (screens arrive in section 3). Not compiled, tested or run: this version was written without a Flutter toolchain, so CI is the first check. Not tested on a device.
 

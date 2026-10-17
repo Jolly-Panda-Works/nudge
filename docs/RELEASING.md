@@ -16,7 +16,7 @@ The version is built into the app: CI passes `--build-name`, `--build-number` an
 ## Details worth knowing
 - **Builds do not wait for the tests.** Analysis and tests run in parallel and show red or green on the commit, but a failing test never blocks the APK or the release. To require green tests before building, add `verify` to `needs:` of the `android` and `windows` jobs in `ci.yml`.
 - **The release is created as soon as the Android build succeeds.** The Windows zip is attached when its build also succeeded; otherwise the release notes say so.
-- **Releases accumulate**, one per push to `main`, like a build history. Delete old ones from the Releases page when you no longer need them.
+- **Only the newest release is kept.** Each push to `main` gets the next version and tag automatically, becomes the "Latest" release, and every older release and its tag are deleted. Releases made from a tag you pushed yourself (`vX.Y.Z`) are marked as kept and are not deleted.
 - **Pull requests from branches of this repository** are not built twice: the branch push already covers them.
 - All builds are debug-signed. A signed release build needs a keystore stored as repository secrets and is not set up yet.
 - Tags created by the workflow itself (for `main` releases) do not start another run. Tags you push yourself do.

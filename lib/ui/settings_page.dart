@@ -128,10 +128,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _openAccessSettings() async {
     final opened = await widget.services.platform.openAccessSettings();
     if (!opened && mounted) {
-      showMessage(
-        context,
-        'Could not open the settings screen on this device.',
-      );
+      showMessage(context, 'Could not open the settings screen on this device.');
     }
   }
 
@@ -139,8 +136,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final confirmed = await confirmAction(
       context,
       title: 'Export data',
-      message:
-          'The export file contains the full text of every stored '
+      message: 'The export file contains the full text of every stored '
           'notification and is not encrypted. Keep it somewhere safe.',
       action: 'Export',
     );
@@ -158,14 +154,18 @@ class _SettingsPageState extends State<SettingsPage> {
         content: json,
       );
       if (!mounted) return;
-      showMessage(context, switch (result.outcome) {
-        ExportOutcome.saved =>
-          result.location == null
-              ? 'Export saved'
-              : 'Exported to ${result.location}',
-        ExportOutcome.cancelled => 'Export cancelled',
-        ExportOutcome.unsupported => 'Export is not available on this platform',
-      });
+      showMessage(
+        context,
+        switch (result.outcome) {
+          ExportOutcome.saved =>
+            result.location == null
+                ? 'Export saved'
+                : 'Exported to ${result.location}',
+          ExportOutcome.cancelled => 'Export cancelled',
+          ExportOutcome.unsupported =>
+            'Export is not available on this platform',
+        },
+      );
     } on Exception {
       if (mounted) showMessage(context, 'Export failed.');
     }
@@ -175,8 +175,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final confirmed = await confirmAction(
       context,
       title: 'Delete all notifications?',
-      message:
-          'This removes every stored notification and anything still '
+      message: 'This removes every stored notification and anything still '
           'waiting to be stored. It cannot be undone. Your settings are kept.',
       action: 'Delete',
     );
@@ -203,7 +202,10 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(title: const Text('Settings')),
       body: _failed
           ? Center(
-              child: FilledButton(onPressed: _load, child: const Text('Retry')),
+              child: FilledButton(
+                onPressed: _load,
+                child: const Text('Retry'),
+              ),
             )
           : policy == null
           ? const Center(child: CircularProgressIndicator())
@@ -239,9 +241,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           subtitle: Text('Listener: $listener'),
                         ),
                         ListTile(
-                          title: const Text(
-                            'Open Notification Access settings',
-                          ),
+                          title: const Text('Open Notification Access settings'),
                           trailing: const Icon(Icons.open_in_new),
                           onTap: _openAccessSettings,
                         ),
