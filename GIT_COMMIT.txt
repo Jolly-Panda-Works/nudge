@@ -1,4 +1,4 @@
-feat: Nudge v0.7.0 - source navigation (M2 section 2)
+feat: Nudge v0.7.0 - source navigation (M2 section 2), keep only the latest release
 
 - SourceNavigator: open the live notification action, else the source
   app's launch intent, else an explicit "unavailable" result
@@ -7,7 +7,12 @@ feat: Nudge v0.7.0 - source navigation (M2 section 2)
 - CapturePlatform gains openLiveContent/openSourceApp (method channel,
   no-op, fake); AppServices exposes the navigator
 - tests: fallback order with a fake platform
-- docs: changelog, roadmap, status
+- ci: every push to main is tagged and released automatically as the
+  Latest release; all older releases and their tags are deleted, except
+  releases from hand-pushed tags (marked nudge-keep)
+- ci: Android release build split per ABI (arm64-v8a, armeabi-v7a)
+  instead of a ~140 MB universal debug APK
+- docs: changelog, roadmap, status, releasing
 
 Written without a Flutter toolchain: not compiled, tested or run. CI first.
 

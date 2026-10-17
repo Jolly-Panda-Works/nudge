@@ -133,16 +133,23 @@ jobs:
             rm -f test/widget_test.dart
           fi
           python3 tools/wire_capture.py --only android
-      - name: Build the debug APK
+      # A release build, split per CPU architecture: a debug APK carries every
+      # architecture, debug tooling and unoptimized code, which is why it is
+      # around 140 MB. Without a keystore it is signed with the debug key.
+      - name: Build the release APKs
         run: >-
-          flutter build apk --debug
+          flutter build apk --release --split-per-abi
+          --target-platform android-arm64,android-arm
           --build-name="$BUILD_NAME"
           --build-number="$GITHUB_RUN_NUMBER"
           --dart-define=NUDGE_VERSION="$VERSION"
       - name: Name the output
         run: |
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-debug.apk "dist/${ASSET_BASE}_android-debug.apk"
+          out=build/app/outputs/flutter-apk
+          cp "$out/app-arm64-v8a-release.apk" "dist/${ASSET_BASE}_android-arm64-v8a.apk"
+          cp "$out/app-armeabi-v7a-release.apk" "dist/${ASSET_BASE}_android-armeabi-v7a.apk"
+          ls -l dist
       - uses: actions/upload-artifact@v4
         with:
           name: nudge-android
@@ -228,7 +235,7 @@ jobs:
           set -euo pipefail
           (cd dist && sha256sum * > SHA256SUMS.txt)
 
-          notes="Build of ${GITHUB_SHA::7}. Debug-signed, for testing only."
+          notes="Build of ${GITHUB_SHA::7}. Signed with the debug key, for testing only. Install the arm64-v8a APK on any recent phone; armeabi-v7a is for old 32-bit devices."
           if [ "$WINDOWS_RESULT" != "success" ]; then
             notes="$notes The Windows build did not succeed in this run, so there is no Windows file."
           fi

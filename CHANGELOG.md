@@ -12,6 +12,7 @@ All notable changes are documented here. Format based on
 - Tests for the fallback order with a fake platform.
 ### Changed
 - Releases: a push to `main` is tagged automatically and becomes the Latest release; all older releases and their tags are deleted, except releases made from tags pushed by hand.
+- Android output is now a release build split per architecture (arm64-v8a and armeabi-v7a) instead of one universal debug APK of about 140 MB.
 ### Known limitations
 - No button calls it yet (screens arrive in section 3). Not compiled, tested or run: this version was written without a Flutter toolchain, so CI is the first check. Not tested on a device.
 

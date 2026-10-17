@@ -75,12 +75,9 @@ final class AppServices {
   Future<void> start() async {
     statusController.start();
     unawaited(
-      retention.apply().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Retention is retried on the next start or when the setting changes.
-        },
-      ),
+      retention.apply().then<void>((_) {}, onError: (Object _) {
+        // Retention is retried on the next start or when the setting changes.
+      }),
     );
     await ingestor.start();
   }

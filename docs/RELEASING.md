@@ -18,6 +18,7 @@ The version is built into the app: CI passes `--build-name`, `--build-number` an
 - **The release is created as soon as the Android build succeeds.** The Windows zip is attached when its build also succeeded; otherwise the release notes say so.
 - **Only the newest release is kept.** Each push to `main` gets the next version and tag automatically, becomes the "Latest" release, and every older release and its tag are deleted. Releases made from a tag you pushed yourself (`vX.Y.Z`) are marked as kept and are not deleted.
 - **Pull requests from branches of this repository** are not built twice: the branch push already covers them.
+- Android files are release builds split per architecture (`arm64-v8a` for recent phones, `armeabi-v7a` for old 32-bit ones), a fraction of the size of the earlier universal debug APK. They are still signed with the debug key, which CI generates fresh on each run, so an update may need an uninstall first until a keystore is set up.
 - All builds are debug-signed. A signed release build needs a keystore stored as repository secrets and is not set up yet.
 - Tags created by the workflow itself (for `main` releases) do not start another run. Tags you push yourself do.
 
