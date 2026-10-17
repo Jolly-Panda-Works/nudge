@@ -3,6 +3,7 @@ import 'dart:async';
 import 'application/capture_ingestor.dart';
 import 'application/capture_status_controller.dart';
 import 'application/retention_service.dart';
+import 'application/source_navigator.dart';
 import 'application/text_importer.dart';
 import 'data/database/app_database.dart';
 import 'data/database/open_connection.dart';
@@ -27,12 +28,14 @@ final class AppServices {
     required this.exporter,
     TextImporter? importer,
     RetentionService? retention,
+    SourceNavigator? sourceNavigator,
     CaptureStatusController? statusController,
     this.database,
   }) : importer = importer ?? TextImporter(notifications: notifications),
        retention =
            retention ??
            RetentionService(notifications: notifications, settings: settings),
+       sourceNavigator = sourceNavigator ?? SourceNavigator(platform),
        statusController = statusController ?? CaptureStatusController(platform);
 
   factory AppServices.create() {
@@ -64,6 +67,7 @@ final class AppServices {
   final DataExporter exporter;
   final TextImporter importer;
   final RetentionService retention;
+  final SourceNavigator sourceNavigator;
   final CaptureStatusController statusController;
 
   /// Starts status tracking, applies the retention setting and drains the
@@ -71,12 +75,9 @@ final class AppServices {
   Future<void> start() async {
     statusController.start();
     unawaited(
-      retention.apply().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Retention is retried on the next start or when the setting changes.
-        },
-      ),
+      retention.apply().then<void>((_) {}, onError: (Object _) {
+        // Retention is retried on the next start or when the setting changes.
+      }),
     );
     await ingestor.start();
   }

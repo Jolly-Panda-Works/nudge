@@ -20,8 +20,7 @@ class NotificationDetailPage extends StatelessWidget {
     final confirmed = await confirmAction(
       context,
       title: 'Delete notification?',
-      message:
-          'It will be removed from Nudge. The original notification in '
+      message: 'It will be removed from Nudge. The original notification in '
           'the source app is not affected.',
       action: 'Delete',
     );
@@ -79,9 +78,7 @@ class NotificationDetailPage extends StatelessWidget {
           const SizedBox(height: 24),
           _Row(
             label: 'Source',
-            value: imported
-                ? 'Shared or imported text'
-                : n.appLabel ?? n.packageName,
+            value: imported ? 'Shared or imported text' : n.appLabel ?? n.packageName,
           ),
           if (!imported) _Row(label: 'Package', value: n.packageName),
           _Row(
@@ -124,7 +121,10 @@ class _Row extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
           ),
           Expanded(child: Text(value)),
         ],

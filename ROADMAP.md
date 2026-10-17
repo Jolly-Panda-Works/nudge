@@ -117,10 +117,10 @@ M1 is complete when capture and the UI are verified on a physical device and the
 - [x] Unit tests for the draft rules and the repository on in-memory SQLite
 - [ ] The migration has not been exercised on a database created by an older version
 
-### Section 2: source navigation (not started)
-- [ ] Kotlin side: open the original notification action while it is still live, otherwise the source app's launch intent
-- [ ] Dart side: a service that tries both in order and reports "unavailable" with the saved content kept
-- [ ] Tests for the fallback order with a fake platform
+### Section 2: source navigation (done in code, 0.7.0; not compiled or run yet)
+- [x] Kotlin side: open the original notification action while it is still live, otherwise the source app's launch intent
+- [x] Dart side: a service that tries both in order and reports "unavailable" with the saved content kept
+- [x] Tests for the fallback order with a fake platform
 - [ ] Tested on a device for each supported app
 
 ### Section 3: screens (not started)

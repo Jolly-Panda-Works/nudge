@@ -227,12 +227,11 @@ final class DriftTaskRepository implements TaskRepository {
     Set<TaskStatus> statuses = const <TaskStatus>{TaskStatus.open},
   }) {
     return _db.select(_db.tasks).watch().map((rows) {
-      final items =
-          rows
-              .map(taskFromRow)
-              .where((task) => statuses.contains(task.status))
-              .toList()
-            ..sort(_compare);
+      final items = rows
+          .map(taskFromRow)
+          .where((task) => statuses.contains(task.status))
+          .toList()
+        ..sort(_compare);
       return items;
     });
   }

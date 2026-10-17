@@ -25,6 +25,12 @@ final class NoopCapturePlatform implements CapturePlatform {
   Future<void> requestRebind() async {}
 
   @override
+  Future<bool> openLiveContent(String notificationKey) async => false;
+
+  @override
+  Future<bool> openSourceApp(String packageName) async => false;
+
+  @override
   Future<List<CaptureEvent>> peek({int max = 100}) async =>
       const <CaptureEvent>[];
 

@@ -18,6 +18,13 @@ abstract interface class CapturePlatform {
 
   Future<void> requestRebind();
 
+  /// Fires the live content action of a notification that is still posted.
+  /// False when it is gone, cancelled or the platform cannot do it.
+  Future<bool> openLiveContent(String notificationKey);
+
+  /// Opens the launcher activity of [packageName]. False when there is none.
+  Future<bool> openSourceApp(String packageName);
+
   /// Oldest queued events first, without removing them.
   Future<List<CaptureEvent>> peek({int max = 100});
 

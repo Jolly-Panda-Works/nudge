@@ -10,7 +10,8 @@ final class MethodChannelCapturePlatform implements CapturePlatform {
     MethodChannel? methodChannel,
     EventChannel? eventChannel,
   }) : _methods = methodChannel ?? const MethodChannel('app.nudge/capture'),
-       _events = eventChannel ?? const EventChannel('app.nudge/capture/events');
+       _events =
+           eventChannel ?? const EventChannel('app.nudge/capture/events');
 
   final MethodChannel _methods;
   final EventChannel _events;
@@ -49,6 +50,20 @@ final class MethodChannelCapturePlatform implements CapturePlatform {
 
   @override
   Future<void> requestRebind() => _methods.invokeMethod<void>('requestRebind');
+
+  @override
+  Future<bool> openLiveContent(String notificationKey) async =>
+      await _methods.invokeMethod<bool>('openLiveContent', <String, Object?>{
+        'key': notificationKey,
+      }) ??
+      false;
+
+  @override
+  Future<bool> openSourceApp(String packageName) async =>
+      await _methods.invokeMethod<bool>('openSourceApp', <String, Object?>{
+        'package': packageName,
+      }) ??
+      false;
 
   @override
   Future<List<CaptureEvent>> peek({int max = 100}) async {

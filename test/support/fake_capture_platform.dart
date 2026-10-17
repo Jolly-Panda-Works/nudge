@@ -21,13 +21,17 @@ class FakeCapturePlatform implements CapturePlatform {
   int clearedQueue = 0;
   int rebindRequests = 0;
   String package = 'app.nudge.nudge';
+  final Set<String> liveKeys = <String>{};
+  final Set<String> launchablePackages = <String>{};
+  final List<String> openCalls = <String>[];
 
   void addPosted(RawNotificationPayload payload) =>
       queue.add(PostedEvent(++_seq, payload));
 
   void addRemoved(String key) => queue.add(RemovedEvent(++_seq, key));
 
-  void addSnapshot(Set<String> keys) => queue.add(SnapshotEvent(++_seq, keys));
+  void addSnapshot(Set<String> keys) =>
+      queue.add(SnapshotEvent(++_seq, keys));
 
   void addMalformed() => queue.add(MalformedEvent(++_seq));
 
@@ -63,6 +67,18 @@ class FakeCapturePlatform implements CapturePlatform {
   @override
   Future<void> requestRebind() async {
     rebindRequests++;
+  }
+
+  @override
+  Future<bool> openLiveContent(String notificationKey) async {
+    openCalls.add('live:$notificationKey');
+    return liveKeys.contains(notificationKey);
+  }
+
+  @override
+  Future<bool> openSourceApp(String packageName) async {
+    openCalls.add('app:$packageName');
+    return launchablePackages.contains(packageName);
   }
 
   @override

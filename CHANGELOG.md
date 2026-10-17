@@ -4,6 +4,15 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.7.0] - 2026-10-18
+### Added
+- M2 section 2: source navigation. `SourceNavigator` opens the original of a notification in a fixed order: the live notification action, then the source app's launch intent, then an explicit "unavailable" result. No deep link is invented and no `PendingIntent` is stored.
+- Kotlin: `ContentIntentRegistry.send` and `openLauncher`, and the channel methods `openLiveContent` and `openSourceApp`. A cancelled intent is dropped and reported as not opened.
+- `CapturePlatform.openLiveContent` and `openSourceApp` (method channel, no-op and fake implementations).
+- Tests for the fallback order with a fake platform.
+### Known limitations
+- No button calls it yet (screens arrive in section 3). Not compiled, tested or run: this version was written without a Flutter toolchain, so CI is the first check. Not tested on a device.
+
 ## [0.6.0] - 2026-10-16
 ### Added
 - M2 section 1: tasks and reminders storage. `TaskItem`, `TaskDraft`, `TaskRepository` and `DriftTaskRepository`: create (also from a notification, with a derived or edited draft), duplicate prevention per source notification, complete, reopen, archive, restore, snooze, edit, delete, ordered lists, counts.

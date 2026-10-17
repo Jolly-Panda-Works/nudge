@@ -46,6 +46,15 @@ object CaptureChannels {
             }
             "hasLiveContentIntent" ->
                 result.success(ContentIntentRegistry.has(call.argument<String>("key") ?: ""))
+            "openLiveContent" ->
+                result.success(ContentIntentRegistry.send(call.argument<String>("key") ?: ""))
+            "openSourceApp" ->
+                result.success(
+                    ContentIntentRegistry.openLauncher(
+                        context,
+                        call.argument<String>("package") ?: "",
+                    ),
+                )
             "peekQueue" -> {
                 val max = call.argument<Int>("max") ?: 100
                 result.success(CaptureQueues.get(context).peek(max))

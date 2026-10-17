@@ -1,19 +1,14 @@
-feat: Nudge v0.6.0 - tasks and reminders storage (M2 section 1)
+feat: Nudge v0.7.0 - source navigation (M2 section 2)
 
-- TaskItem, TaskDraft and TaskRepository with a Drift implementation:
-  create (also from a notification), duplicate prevention per source
-  notification, complete, reopen, archive, restore, snooze, edit, delete,
-  ordered lists, counts
-- a task keeps a snapshot of its source (key, package, label, whether an
-  action existed) so it outlives the notification
-- Drift schema version 2 with a migration adding the tasks table
-- retention no longer deletes notifications that an open or done task
-  points to
-- AppServices exposes the task repository
-- tests: draft rules, repository behavior, retention exemption
-- docs: roadmap (M2 split into four sections), architecture, privacy,
-  changelog; STATUS.md added to the project and updated
+- SourceNavigator: open the live notification action, else the source
+  app's launch intent, else an explicit "unavailable" result
+- Kotlin: ContentIntentRegistry.send/openLauncher; channel methods
+  openLiveContent and openSourceApp; no PendingIntent is ever stored
+- CapturePlatform gains openLiveContent/openSourceApp (method channel,
+  no-op, fake); AppServices exposes the navigator
+- tests: fallback order with a fake platform
+- docs: changelog, roadmap, status
 
-Not verified on CI or a device yet.
+Written without a Flutter toolchain: not compiled, tested or run. CI first.
 
-Milestone: M2 / Section 1
+Milestone: M2 / Section 2
