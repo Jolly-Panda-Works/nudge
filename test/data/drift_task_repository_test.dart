@@ -288,36 +288,41 @@ void main() {
       expect(list.map((t) => t.id), <String>[b.id, a.id]);
     });
 
-    test('statuses can be selected and are grouped open, done, archived', () async {
-      final openTask = await tasks.create(const TaskDraft(title: 'open'));
-      final doneTask = await tasks.create(const TaskDraft(title: 'done'));
-      final archivedTask = await tasks.create(const TaskDraft(title: 'old'));
-      await tasks.markDone(doneTask.id);
-      await tasks.archive(archivedTask.id);
+    test(
+      'statuses can be selected and are grouped open, done, archived',
+      () async {
+        final openTask = await tasks.create(const TaskDraft(title: 'open'));
+        final doneTask = await tasks.create(const TaskDraft(title: 'done'));
+        final archivedTask = await tasks.create(const TaskDraft(title: 'old'));
+        await tasks.markDone(doneTask.id);
+        await tasks.archive(archivedTask.id);
 
-      expect(
-        (await tasks.watchTasks().first).map((t) => t.id),
-        <String>[openTask.id],
-      );
-      expect(
-        (await tasks
-                .watchTasks(statuses: TaskStatus.values.toSet())
-                .first)
-            .map((t) => t.id),
-        <String>[openTask.id, doneTask.id, archivedTask.id],
-      );
-    });
+        expect((await tasks.watchTasks().first).map((t) => t.id), <String>[
+          openTask.id,
+        ]);
+        expect(
+          (await tasks.watchTasks(statuses: TaskStatus.values.toSet()).first)
+              .map((t) => t.id),
+          <String>[openTask.id, doneTask.id, archivedTask.id],
+        );
+      },
+    );
 
-    test('listWithPendingReminder only returns open tasks with a time', () async {
-      final base = DateTime.utc(2026, 10, 20, 9);
-      final withDue = await tasks.create(TaskDraft(title: 'a', dueAt: base));
-      await tasks.create(const TaskDraft(title: 'no due'));
-      final doneTask = await tasks.create(TaskDraft(title: 'done', dueAt: base));
-      await tasks.markDone(doneTask.id);
+    test(
+      'listWithPendingReminder only returns open tasks with a time',
+      () async {
+        final base = DateTime.utc(2026, 10, 20, 9);
+        final withDue = await tasks.create(TaskDraft(title: 'a', dueAt: base));
+        await tasks.create(const TaskDraft(title: 'no due'));
+        final doneTask = await tasks.create(
+          TaskDraft(title: 'done', dueAt: base),
+        );
+        await tasks.markDone(doneTask.id);
 
-      final pending = await tasks.listWithPendingReminder();
-      expect(pending.map((t) => t.id), <String>[withDue.id]);
-    });
+        final pending = await tasks.listWithPendingReminder();
+        expect(pending.map((t) => t.id), <String>[withDue.id]);
+      },
+    );
 
     test('count can be limited to one status', () async {
       final a = await tasks.create(const TaskDraft(title: 'a'));
@@ -371,15 +376,18 @@ void main() {
       expect(stored.source!.packageName, 'com.chat');
     });
 
-    test('retention does not delete a notification an open task points to', () async {
-      final n = captured();
-      await notifications.ingest(n, open);
-      await tasks.createFromNotification(n);
-      final farFuture = fixedNow.add(const Duration(days: 365));
+    test(
+      'retention does not delete a notification an open task points to',
+      () async {
+        final n = captured();
+        await notifications.ingest(n, open);
+        await tasks.createFromNotification(n);
+        final farFuture = fixedNow.add(const Duration(days: 365));
 
-      expect(await notifications.purgeOlderThan(farFuture), 0);
-      expect(await notifications.findByKey(n.key), isNotNull);
-    });
+        expect(await notifications.purgeOlderThan(farFuture), 0);
+        expect(await notifications.findByKey(n.key), isNotNull);
+      },
+    );
 
     test('retention deletes it once the task is archived', () async {
       final n = captured();
