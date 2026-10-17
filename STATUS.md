@@ -1,6 +1,6 @@
 # Nudge: goal, current status and remaining work
 
-Last updated: 2026-10-16. Latest delivered version: 0.8.0.
+Last updated: 2026-10-16. Latest delivered version: 0.8.1.
 Repository: https://github.com/Jolly-Panda-Works/nudge
 
 ---
@@ -112,7 +112,7 @@ All five sections of milestone M1 (notification capture and local inbox) are **w
 - [ ] Direct integration for cross-device access; track external event IDs to prevent duplicates; show sync failures and read-only calendars.
 
 ### Project infrastructure
-- [ ] Release-signed builds (all builds are debug-signed today; needs a keystore stored as repository secrets).
+- [ ] Release-signed builds: the pipeline signs with a key from repository secrets (0.8.1) but the key has not been created or the secrets added yet, so builds are still debug-signed until then.
 - [ ] README screenshots.
 - [ ] Verify the Windows build in CI (Flutter is installed there from its git tag, which is untested).
 

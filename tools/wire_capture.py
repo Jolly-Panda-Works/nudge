@@ -17,6 +17,11 @@ are missing, so the folders do not have to be committed. The script is
 idempotent, upgrades installs wired by older versions, and fails loudly if the
 files do not look as expected.
 
+It also sets the Android application id (com.jollypanda.nudge) and the release
+signing configuration, which reads the key from NUDGE_KEYSTORE_PATH,
+NUDGE_KEYSTORE_PASSWORD, NUDGE_KEY_ALIAS and NUDGE_KEY_PASSWORD and falls back
+to the debug key when they are not set.
+
 Usage: wire_capture.py [--only android|windows]
 """
 import glob
@@ -24,6 +29,8 @@ import os
 import re
 import sys
 
+APPLICATION_ID = 'com.jollypanda.nudge'
+SIGNING_MARKER = 'nudge:signing'
 CAPTURE_MARKER = 'nudge:capture'
 SHARE_MARKER = 'nudge:share'
 
@@ -157,6 +164,69 @@ def patch_manifest() -> None:
         print('AndroidManifest.xml already wired')
 
 
+SIGNING_BLOCK = '''    // nudge:signing - release key from the environment (CI secrets); the
+    // debug key is used when no key is provided.
+    signingConfigs {
+        create("nudgeRelease") {
+            val storePath = System.getenv("NUDGE_KEYSTORE_PATH")
+            if (!storePath.isNullOrEmpty()) {
+                storeFile = file(storePath)
+                storePassword = System.getenv("NUDGE_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("NUDGE_KEY_ALIAS")
+                keyPassword = System.getenv("NUDGE_KEY_PASSWORD")
+            }
+        }
+    }
+
+'''
+
+RELEASE_SIGNING = (
+    'signingConfig = if (!System.getenv("NUDGE_KEYSTORE_PATH").isNullOrEmpty()) '
+    'signingConfigs.getByName("nudgeRelease") else signingConfigs.getByName("debug")'
+)
+
+
+def patch_gradle() -> None:
+    """Sets the application id and the release signing configuration."""
+    path = 'android/app/build.gradle.kts'
+    if not os.path.exists(path):
+        sys.exit(f'{path} not found (only the Kotlin DSL template is supported)')
+    with open(path, encoding='utf-8') as handle:
+        source = handle.read()
+    updated = source
+
+    updated, count = re.subn(
+        r'applicationId\s*=\s*"[^"]*"',
+        f'applicationId = "{APPLICATION_ID}"',
+        updated,
+        count=1,
+    )
+    if count != 1:
+        sys.exit('applicationId not found in build.gradle.kts')
+
+    if SIGNING_MARKER not in updated:
+        index = updated.find('buildTypes {')
+        if index < 0:
+            sys.exit('buildTypes block not found in build.gradle.kts')
+        line_start = updated.rfind('\n', 0, index) + 1
+        updated = updated[:line_start] + SIGNING_BLOCK + updated[line_start:]
+        updated, count = re.subn(
+            r'signingConfig\s*=\s*signingConfigs\.getByName\("debug"\)',
+            RELEASE_SIGNING,
+            updated,
+            count=1,
+        )
+        if count != 1:
+            sys.exit('release signingConfig line not found in build.gradle.kts')
+
+    if updated != source:
+        with open(path, 'w', encoding='utf-8') as handle:
+            handle.write(updated)
+        print(f'Wired {path} (application id {APPLICATION_ID}, release signing)')
+    else:
+        print('build.gradle.kts already wired')
+
+
 def brand_windows() -> None:
     main_cpp = 'windows/runner/main.cpp'
     resources = 'windows/runner/Runner.rc'
@@ -189,5 +259,6 @@ if __name__ == '__main__':
     if only in (None, 'android'):
         patch_main_activity()
         patch_manifest()
+        patch_gradle()
     if only in (None, 'windows') and (only == 'windows' or os.path.isdir('windows')):
         brand_windows()

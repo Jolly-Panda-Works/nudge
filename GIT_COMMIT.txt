@@ -1,19 +1,15 @@
-feat: Nudge v0.8.0 - task screens (M2 section 3)
+feat: Nudge v0.8.1 - application id com.jollypanda.nudge and release signing
 
-- Tasks screen (Open/Done/Archived) with complete/reopen checkbox and a
-  button to add a stand-alone task
-- Task form: title, notes, task or reminder, date and time; a reminder
-  needs a date and time
-- Task detail: mark done, reopen, snooze, archive, restore, edit, delete,
-  Open original (live action, then app, then "unavailable")
-- Notification details: Create task, Create reminder or View task, and
-  Open original
-- Export includes tasks; Settings gets "Delete all tasks"
-- tests: widget tests for the flows, export tests, in-memory task
-  repository for the test harness
-- docs: changelog, roadmap, status
+- Android application id is now com.jollypanda.nudge; wire_capture.py
+  sets it in build.gradle.kts (also on an already generated project) and
+  CI generates new projects with --org com.jollypanda
+- release signing from repository secrets (NUDGE_KEYSTORE_BASE64,
+  NUDGE_KEYSTORE_PASSWORD, NUDGE_KEY_ALIAS, optional NUDGE_KEY_PASSWORD);
+  falls back to the debug key when they are missing; release notes and
+  the build summary say which one was used
+- tools/make_keystore.sh creates the key and prints the secrets
+- .gitignore excludes keystores
+- docs: changelog, releasing, status
 
-No alerts at the reminder time yet (section 4). Written without a Flutter
-toolchain: not compiled, tested or run. CI first.
-
-Milestone: M2 / Section 3
+The old app.nudge.nudge install stays beside the new app; data is not
+moved. Not compiled or run: CI first.

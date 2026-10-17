@@ -4,6 +4,16 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.8.1] - 2026-10-18
+### Changed
+- The Android application id is now `com.jollypanda.nudge` (it was `app.nudge.nudge`). `tools/wire_capture.py` sets it in `build.gradle.kts` even on an already generated project, and CI generates new projects with `--org com.jollypanda`. This is a different app to Android: the old install stays next to it and its data is not moved.
+- Release signing: the Android build reads a release key from repository secrets (`NUDGE_KEYSTORE_BASE64`, `NUDGE_KEYSTORE_PASSWORD`, `NUDGE_KEY_ALIAS`, optionally `NUDGE_KEY_PASSWORD`) and signs the APKs with it. Without the secrets it falls back to the debug key and says so in the release notes. The build summary shows the signing certificate.
+### Added
+- `tools/make_keystore.sh` creates the key and prints the secrets to add.
+- `.gitignore` excludes `*.jks`, `*.keystore` and `key.properties`.
+### Known limitations
+- Not compiled or run: the Gradle patch was only tried on a sample of the Flutter template.
+
 ## [0.8.0] - 2026-10-18
 ### Added
 - M2 section 3: task screens. A Tasks screen (Open, Done, Archived) with a checkbox to complete or reopen, a form to create or edit a task or reminder (title, notes, kind, date, time), and a task detail with Mark done, Reopen, Snooze, Archive, Restore, Edit and Delete.

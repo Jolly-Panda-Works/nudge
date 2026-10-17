@@ -108,6 +108,8 @@ jobs:
   android:
     needs: version
     runs-on: ubuntu-24.04
+    outputs:
+      signed: ${{ steps.key.outputs.signed }}
     env:
       VERSION: ${{ needs.version.outputs.version }}
       BUILD_NAME: ${{ needs.version.outputs.build_name }}
@@ -129,10 +131,36 @@ jobs:
         run: |
           if [ ! -f android/app/build.gradle.kts ] && [ ! -f android/app/build.gradle ]; then
             echo "Generating the Android project (it is not committed)."
-            flutter create . --platforms=android --project-name nudge --org app.nudge
+            flutter create . --platforms=android --project-name nudge --org com.jollypanda
             rm -f test/widget_test.dart
           fi
           python3 tools/wire_capture.py --only android
+      # The release key lives in repository secrets (see docs/RELEASING.md).
+      # Without them the APKs are signed with the debug key.
+      - name: Prepare the signing key
+        id: key
+        env:
+          KEYSTORE_B64: ${{ secrets.NUDGE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.NUDGE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.NUDGE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.NUDGE_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ] && [ -n "$KEYSTORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ]; then
+            echo "::add-mask::$KEYSTORE_PASSWORD"
+            echo "::add-mask::${KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/nudge-release.jks"
+            {
+              echo "NUDGE_KEYSTORE_PATH=$RUNNER_TEMP/nudge-release.jks"
+              echo "NUDGE_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "NUDGE_KEY_ALIAS=$KEY_ALIAS"
+              echo "NUDGE_KEY_PASSWORD=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+            } >> "$GITHUB_ENV"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+            echo "Signing with the release key." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No release key in the repository secrets; signing with the debug key."
+          fi
       # A release build, split per CPU architecture: a debug APK carries every
       # architecture, debug tooling and unoptimized code, which is why it is
       # around 140 MB. Without a keystore it is signed with the debug key.
@@ -150,6 +178,11 @@ jobs:
           cp "$out/app-arm64-v8a-release.apk" "dist/${ASSET_BASE}_android-arm64-v8a.apk"
           cp "$out/app-armeabi-v7a-release.apk" "dist/${ASSET_BASE}_android-armeabi-v7a.apk"
           ls -l dist
+      - name: Show the signing certificate
+        continue-on-error: true
+        run: |
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs "dist/${ASSET_BASE}_android-arm64-v8a.apk" | grep -E "Signer #1 certificate (DN|SHA-256)" | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: nudge-android
@@ -183,7 +216,7 @@ jobs:
         run: |
           if [ ! -f windows/CMakeLists.txt ]; then
             echo "Generating the Windows project (it is not committed)."
-            flutter create . --platforms=windows --project-name nudge --org app.nudge
+            flutter create . --platforms=windows --project-name nudge --org com.jollypanda
             rm -f test/widget_test.dart
           fi
           PY=$(command -v python3 || command -v python)
@@ -223,6 +256,7 @@ jobs:
       VERSION: ${{ needs.version.outputs.version }}
       RELEASE_TAG: ${{ needs.version.outputs.release_tag }}
       WINDOWS_RESULT: ${{ needs.windows.result }}
+      SIGNED: ${{ needs.android.outputs.signed }}
       KIND: ${{ needs.version.outputs.kind }}
     steps:
       - uses: actions/download-artifact@v4
@@ -235,7 +269,12 @@ jobs:
           set -euo pipefail
           (cd dist && sha256sum * > SHA256SUMS.txt)
 
-          notes="Build of ${GITHUB_SHA::7}. Signed with the debug key, for testing only. Install the arm64-v8a APK on any recent phone; armeabi-v7a is for old 32-bit devices."
+          if [ "$SIGNED" = "true" ]; then
+            signing="Signed with the Nudge release key."
+          else
+            signing="Signed with the debug key, for testing only."
+          fi
+          notes="Build of ${GITHUB_SHA::7}. $signing Install the arm64-v8a APK on any recent phone; armeabi-v7a is for old 32-bit devices."
           if [ "$WINDOWS_RESULT" != "success" ]; then
             notes="$notes The Windows build did not succeed in this run, so there is no Windows file."
           fi
