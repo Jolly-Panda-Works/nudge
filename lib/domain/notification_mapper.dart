@@ -9,7 +9,7 @@ import 'source_ref.dart';
 /// Maps native payloads to domain objects. Pure and deterministic given a clock.
 final class NotificationMapper {
   NotificationMapper({DateTime Function()? clock})
-      : _clock = clock ?? DateTime.now;
+    : _clock = clock ?? DateTime.now;
 
   final DateTime Function() _clock;
 

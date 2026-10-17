@@ -115,7 +115,9 @@ void main() {
       'app:com.chat',
     ]);
     expect(
-      find.text('The original is not available. The saved content is kept here.'),
+      find.text(
+        'The original is not available. The saved content is kept here.',
+      ),
       findsOneWidget,
     );
   });
