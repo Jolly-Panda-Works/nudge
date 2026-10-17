@@ -1,6 +1,6 @@
 # Roadmap
 
-Where Nudge stands and what is left. Last updated: 2026-10-15 (version 0.5.5).
+Where Nudge stands and what is left. Last updated: 2026-10-16 (version 0.6.0).
 
 **How to read the status**
 
@@ -13,7 +13,7 @@ Where Nudge stands and what is left. Last updated: 2026-10-15 (version 0.5.5).
 | Milestone | Scope | Progress |
 |---|---|---|
 | M1 | Android notification capture and local inbox | All 5 sections done in code; device verification and 4 open items remain |
-| M2 | Task conversion and source navigation | Not started |
+| M2 | Task conversion and source navigation | In progress: section 1 of 4 done in code (task storage) |
 | M3 | Calendar UI with Persian (Jalali, RTL) support | Not started |
 | M4 | Android Calendar Provider integration | Not started |
 | M5 | Windows build and secure synchronization | Not started |
@@ -38,6 +38,7 @@ Today the app captures notifications on Android, stores them locally, shows them
 | 0.5.3 | 2026-10-14 | Workflows rewritten: a release per push to `main`, builds independent of tests, version built into the app |
 | 0.5.4 | 2026-10-14 | CI generates the Android and Windows projects when missing; one-time workflows and Dependabot removed; lock file restored |
 | 0.5.5 | 2026-10-15 | Fix for the first Android compile (nested comment openers in two Kotlin files), guard test, setup-java v5 |
+| 0.6.0 | 2026-10-16 | M2 section 1: tasks and reminders storage (Drift schema version 2), duplicate prevention, status changes, snooze, retention exemption |
 
 ## M1: Notification capture and local inbox
 
@@ -97,20 +98,41 @@ Today the app captures notifications on Android, stores them locally, shows them
 - [ ] Verify on devices: sharing from several apps, the file picker, delete, retention
 - [ ] Windows export location and behavior (written to Documents/Nudge, unverified)
 - [ ] Export of tasks and calendar data (arrives with M2 and M3)
-- [ ] Retention must not delete notifications linked to tasks (M2)
+- [x] Retention does not delete notifications linked to tasks (0.6.0)
 
 M1 is complete when capture and the UI are verified on a physical device and the open items above (background ingestion, redacted content, restart and OEM behavior) are resolved or consciously deferred.
 
-## M2: Task conversion and source navigation (not started)
-- [ ] Convert an inbox notification into a task or timed reminder, preserving the source notification ID
-- [ ] Edit title, notes, due date, time and destination calendar
-- [ ] "Open original" on notification details and linked task details
-- [ ] Three-step fallback: live content action, then launch intent of the source app, then a clear "unavailable" state with saved content kept
-- [ ] Complete, snooze and archive tasks; prevent duplicate tasks per notification
-- [ ] App-owned tasks stay independent of external calendar events
-- [ ] Retention purge must not delete notifications linked to tasks
-- [ ] Source navigation tested independently for each supported app
-- [ ] Tests for task-source relationships and fallback navigation
+## M2: Task conversion and source navigation (in progress)
+
+### Section 1: tasks and reminders storage (done in code, 0.6.0)
+- [x] Task model: title, notes, kind (task or reminder), status (open, done, archived), due time, snooze time, optional destination calendar id
+- [x] Source reference kept as a snapshot (notification key, package, app label, whether an action existed), so a task still knows its source after the notification is deleted or purged
+- [x] Create a task from a notification, with a title and notes derived from it, or with a draft the user edited
+- [x] Duplicate prevention: one task per source notification unless the earlier one is archived
+- [x] Complete, reopen, archive, restore, snooze, edit, delete; changes that do not apply are no-ops
+- [x] Ordering: open tasks by reminder time, then newest; then done; then archived
+- [x] Retention never deletes a notification that an open or done task points to
+- [x] Database migration from schema version 1 to 2 (adds the tasks table)
+- [x] App-owned tasks are independent of external calendar events
+- [x] Unit tests for the draft rules and the repository on in-memory SQLite
+- [ ] The migration has not been exercised on a database created by an older version
+
+### Section 2: source navigation (not started)
+- [ ] Kotlin side: open the original notification action while it is still live, otherwise the source app's launch intent
+- [ ] Dart side: a service that tries both in order and reports "unavailable" with the saved content kept
+- [ ] Tests for the fallback order with a fake platform
+- [ ] Tested on a device for each supported app
+
+### Section 3: screens (not started)
+- [ ] "Create task" and "Create reminder" from a notification, with an editable form (title, notes, due date and time, destination calendar)
+- [ ] Task list and task details with complete, snooze, archive and delete
+- [ ] A visible "Open original" action on notification details and on task details
+- [ ] Tasks included in export and in "delete all"
+
+### Section 4: reminder delivery (not started)
+- [ ] Alert at the reminder time (scheduled with the system alarm service), including after a restart
+- [ ] Notification permission and exact-alarm handling on newer Android versions
+- [ ] Snooze from the alert itself
 
 ## M3: Calendar UI with Persian date support (not started)
 - [ ] Evaluate calendar libraries (gestures, customization, performance, accessibility, license) and choose one, or build custom

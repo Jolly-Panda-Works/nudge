@@ -43,6 +43,9 @@ Android (Kotlin)                          Flutter / Dart
 ### Current limitation
 The queue is drained only while the Flutter side is running. Notifications that arrive while the app is closed wait in the queue (at most 1000 events) until the app is opened. Ingestion with a headless Flutter engine is on the [roadmap](../ROADMAP.md).
 
+## Tasks and reminders
+Tasks are app-owned: they never depend on an external calendar event. `TaskRepository` (implemented by `DriftTaskRepository`) creates tasks, from scratch or from a notification, and applies the status changes (done, reopen, archive, restore, snooze, edit, delete). A notification can have at most one task that is not archived. Each task stores a snapshot of its source (notification key, package, app label, whether a content action existed) instead of depending on the notification row, so it still knows where it came from after the notification is deleted. `purgeOlderThan` skips notifications that an open or done task points to. The optional `calendarId` only names the calendar the task should be shown in.
+
 ## Source navigation (design; implemented in M2)
 `SourceRef` stores the notification key, package name and whether a content action existed. A `PendingIntent` is never serialized. Opening the source tries, in order: the live content action while it is still usable; a supported launch intent for the source app; a clear "unavailable" state with the saved content preserved. The manifest declares a `<queries>` entry for launcher apps so labels and launch intents can be resolved without the broad `QUERY_ALL_PACKAGES` permission.
 
@@ -52,6 +55,7 @@ The queue is drained only while the Flutter side is running. Notifications that 
 | `notifications` | captured notifications, primary key = notification key, index on (package, content hash) |
 | `source_rules` | package names for the allowlist/blocklist |
 | `app_settings` | key/value settings: filter mode, ongoing and group-summary toggles, retention days |
+| `tasks` | tasks and reminders with a snapshot of their source notification (schema version 2) |
 
 Generated Drift code (`*.g.dart`) is not committed; `build_runner` creates it locally and in CI.
 

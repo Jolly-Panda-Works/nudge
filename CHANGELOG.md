@@ -4,6 +4,18 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.6.0] - 2026-10-16
+### Added
+- M2 section 1: tasks and reminders storage. `TaskItem`, `TaskDraft`, `TaskRepository` and `DriftTaskRepository`: create (also from a notification, with a derived or edited draft), duplicate prevention per source notification, complete, reopen, archive, restore, snooze, edit, delete, ordered lists, counts.
+- A task keeps a snapshot of its source (notification key, package, app label, whether an action existed), so it survives the deletion of the notification.
+- Drift schema version 2 with a migration that adds the `tasks` table.
+- Tests for the draft rules and for the repository on in-memory SQLite.
+### Changed
+- Retention (`purgeOlderThan`) no longer deletes notifications that an open or done task points to.
+- `AppServices` now exposes the task repository.
+### Known limitations
+- No screens yet for tasks. The migration from version 1 has not been exercised on a real older database.
+
 ## [0.5.5] - 2026-10-15
 ### Fixed
 - The first Android build failed to compile: two Kotlin comments contained `/*` (a MIME type and a file pattern). Block comments nest in Kotlin, so they never closed. The comments are reworded and a test now checks that block comments in the Kotlin sources are balanced, so this fails in seconds instead of after a five-minute Gradle build.

@@ -8,8 +8,10 @@ import 'data/database/app_database.dart';
 import 'data/database/open_connection.dart';
 import 'data/drift_capture_settings_repository.dart';
 import 'data/drift_notification_repository.dart';
+import 'data/drift_task_repository.dart';
 import 'domain/capture_settings_repository.dart';
 import 'domain/notification_repository.dart';
+import 'domain/task_repository.dart';
 import 'platform/capture_platform.dart';
 import 'platform/capture_platform_factory.dart';
 import 'platform/data_exporter.dart';
@@ -20,6 +22,7 @@ final class AppServices {
     required this.platform,
     required this.notifications,
     required this.settings,
+    required this.tasks,
     required this.ingestor,
     required this.exporter,
     TextImporter? importer,
@@ -42,6 +45,7 @@ final class AppServices {
       platform: platform,
       notifications: notifications,
       settings: settings,
+      tasks: DriftTaskRepository(database),
       ingestor: CaptureIngestor(
         platform: platform,
         notifications: notifications,
@@ -55,6 +59,7 @@ final class AppServices {
   final CapturePlatform platform;
   final NotificationRepository notifications;
   final CaptureSettingsRepository settings;
+  final TaskRepository tasks;
   final CaptureIngestor ingestor;
   final DataExporter exporter;
   final TextImporter importer;
@@ -66,12 +71,9 @@ final class AppServices {
   Future<void> start() async {
     statusController.start();
     unawaited(
-      retention.apply().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Retention is retried on the next start or when the setting changes.
-        },
-      ),
+      retention.apply().then<void>((_) {}, onError: (Object _) {
+        // Retention is retried on the next start or when the setting changes.
+      }),
     );
     await ingestor.start();
   }

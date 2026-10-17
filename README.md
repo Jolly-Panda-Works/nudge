@@ -22,7 +22,7 @@ It combines an inbox of accessible Android notifications, one-tap conversion to 
 | Deduplication | Handle updates, re-posts, removals, redacted content | Implemented in domain code, covered by unit tests |
 | Local storage | On-device database, retention purge, delete all | Implemented (Drift/SQLite), covered by unit tests |
 | Source filters | Allowlist / blocklist of source apps | Rules stored; UI planned |
-| Tasks & reminders | Convert a notification into a task, snooze, archive | Planned (M2) |
+| Tasks & reminders | Convert a notification into a task, snooze, archive | Storage implemented (M2 section 1); screens and alerts planned |
 | Open original | Open the source notification, else the app, else show "unavailable" | Planned (M2) |
 | Calendar UI | Month / week / day / agenda, Jalali dates, RTL, light and dark | Planned (M3) |
 | Android calendars | Read/write via Android Calendar Provider | Planned (M4) |

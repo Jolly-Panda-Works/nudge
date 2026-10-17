@@ -4,6 +4,7 @@ import '../domain/captured_notification.dart';
 import '../domain/ingest_policy.dart';
 import '../domain/notification_repository.dart';
 import '../domain/source_app.dart';
+import '../domain/task.dart';
 import 'database/app_database.dart';
 import 'notification_row_mapper.dart';
 
@@ -18,10 +19,9 @@ final class DriftNotificationRepository implements NotificationRepository {
 
   @override
   Future<CapturedNotification?> findByKey(String notificationKey) async {
-    final row =
-        await (_db.select(_db.notifications)
-              ..where((t) => t.notificationKey.equals(notificationKey)))
-            .getSingleOrNull();
+    final row = await (_db.select(
+      _db.notifications,
+    )..where((t) => t.notificationKey.equals(notificationKey))).getSingleOrNull();
     return row == null ? null : notificationFromRow(row);
   }
 
@@ -73,7 +73,10 @@ final class DriftNotificationRepository implements NotificationRepository {
               .into(_db.notifications)
               .insert(notificationToCompanion(incoming));
         case IngestDecision.update:
-          final updated = existing!.applyUpdateFrom(incoming, _clock().toUtc());
+          final updated = existing!.applyUpdateFrom(
+            incoming,
+            _clock().toUtc(),
+          );
           await (_db.update(_db.notifications)
                 ..where((t) => t.notificationKey.equals(updated.key)))
               .write(notificationToCompanion(updated));
@@ -127,12 +130,23 @@ final class DriftNotificationRepository implements NotificationRepository {
     );
   }
 
+  /// Deletes entries not updated since [cutoff], except notifications that an
+  /// open or done task points to (archived tasks keep a snapshot of their
+  /// source, so they do not protect anything).
   @override
   Future<int> purgeOlderThan(DateTime cutoff) {
+    final linked = _db.selectOnly(_db.tasks)
+      ..addColumns([_db.tasks.sourceKey])
+      ..where(
+        _db.tasks.sourceKey.isNotNull() &
+            _db.tasks.status.equalsValue(TaskStatus.archived).not(),
+      );
     return (_db.delete(_db.notifications)..where(
-          (t) => t.lastUpdatedAtMs.isSmallerThanValue(
-            cutoff.toUtc().millisecondsSinceEpoch,
-          ),
+          (t) =>
+              t.lastUpdatedAtMs.isSmallerThanValue(
+                cutoff.toUtc().millisecondsSinceEpoch,
+              ) &
+              t.notificationKey.isNotInQuery(linked),
         ))
         .go();
   }
@@ -166,15 +180,14 @@ final class DriftNotificationRepository implements NotificationRepository {
       if (packageName == null) continue;
       labels[packageName] = row.read(labelColumn) ?? labels[packageName];
     }
-    final apps =
-        [
-          for (final entry in labels.entries)
-            SourceApp(packageName: entry.key, label: entry.value),
-        ]..sort(
-          (a, b) => a.displayName.toLowerCase().compareTo(
-            b.displayName.toLowerCase(),
-          ),
-        );
+    final apps = [
+      for (final entry in labels.entries)
+        SourceApp(packageName: entry.key, label: entry.value),
+    ]..sort(
+        (a, b) => a.displayName.toLowerCase().compareTo(
+          b.displayName.toLowerCase(),
+        ),
+      );
     return apps;
   }
 
