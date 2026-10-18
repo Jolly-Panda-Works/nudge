@@ -43,7 +43,8 @@ final class AppServices {
            RetentionService(notifications: notifications, settings: settings),
        sourceNavigator = sourceNavigator ?? SourceNavigator(platform),
        reminderPlatform = reminderPlatform ?? const NoopReminderPlatform(),
-       statusController = statusController ?? CaptureStatusController(platform) {
+       statusController =
+           statusController ?? CaptureStatusController(platform) {
     this.reminderScheduler =
         reminderScheduler ??
         ReminderScheduler(platform: this.reminderPlatform, tasks: tasks);
@@ -90,14 +91,20 @@ final class AppServices {
   Future<void> start() async {
     statusController.start();
     unawaited(
-      retention.apply().then<void>((_) {}, onError: (Object _) {
-        // Retention is retried on the next start or when the setting changes.
-      }),
+      retention.apply().then<void>(
+        (_) {},
+        onError: (Object _) {
+          // Retention is retried on the next start or when the setting changes.
+        },
+      ),
     );
     unawaited(
-      reminderScheduler.start().then<void>((_) {}, onError: (Object _) {
-        // Alarms are set again on the next task change or start.
-      }),
+      reminderScheduler.start().then<void>(
+        (_) {},
+        onError: (Object _) {
+          // Alarms are set again on the next task change or start.
+        },
+      ),
     );
     await ingestor.start();
   }

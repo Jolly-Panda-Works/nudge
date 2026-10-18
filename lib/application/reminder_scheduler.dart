@@ -66,11 +66,7 @@ final class ReminderScheduler {
     final entries = <ReminderEntry>[
       for (final task in pending)
         if (task.remindAt != null && task.remindAt!.isAfter(now))
-          ReminderEntry(
-            taskId: task.id,
-            title: task.title,
-            at: task.remindAt!,
-          ),
+          ReminderEntry(taskId: task.id, title: task.title, at: task.remindAt!),
     ];
     await _platform.sync(entries);
   }

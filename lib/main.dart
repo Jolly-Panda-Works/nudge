@@ -18,9 +18,12 @@ void main() {
   }
   if (services != null) {
     unawaited(
-      services.start().then<void>((_) {}, onError: (Object _) {
-        // Queued events are retried on the next native signal.
-      }),
+      services.start().then<void>(
+        (_) {},
+        onError: (Object _) {
+          // Queued events are retried on the next native signal.
+        },
+      ),
     );
   }
   runApp(NudgeApp(services: services, startupError: startupError));

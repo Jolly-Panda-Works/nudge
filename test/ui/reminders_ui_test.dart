@@ -39,10 +39,7 @@ void main() {
     await harness.pump(tester);
     await openSettings(tester);
 
-    expect(
-      find.text('Blocked: reminders will not be shown'),
-      findsOneWidget,
-    );
+    expect(find.text('Blocked: reminders will not be shown'), findsOneWidget);
     await tester.tap(find.text('Reminder alerts'));
     await tester.pumpAndSettle();
 

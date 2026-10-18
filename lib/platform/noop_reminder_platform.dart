@@ -26,6 +26,5 @@ final class NoopReminderPlatform implements ReminderPlatform {
   Future<void> sync(List<ReminderEntry> entries) async {}
 
   @override
-  Future<List<ReminderSnooze>> drainSnoozes() async =>
-      const <ReminderSnooze>[];
+  Future<List<ReminderSnooze>> drainSnoozes() async => const <ReminderSnooze>[];
 }
