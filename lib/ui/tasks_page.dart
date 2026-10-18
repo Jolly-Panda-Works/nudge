@@ -78,72 +78,75 @@ class _TasksPageState extends State<TasksPage> {
         tooltip: tr('New task'),
         child: const Icon(Icons.add),
       ),
-      body: ContentWidth(child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: SingleChildScrollView(
- scrollDirection: Axis.horizontal,
- child: SegmentedButton<TaskStatus>(
-              segments: [
-                ButtonSegment<TaskStatus>(
-                  value: TaskStatus.open,
-                  label: Text(tr('Open')),
+      body: ContentWidth(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SegmentedButton<TaskStatus>(
+                  segments: [
+                    ButtonSegment<TaskStatus>(
+                      value: TaskStatus.open,
+                      label: Text(tr('Open')),
+                    ),
+                    ButtonSegment<TaskStatus>(
+                      value: TaskStatus.done,
+                      label: Text(tr('Done')),
+                    ),
+                    ButtonSegment<TaskStatus>(
+                      value: TaskStatus.archived,
+                      label: Text(tr('Archived')),
+                    ),
+                  ],
+                  selected: <TaskStatus>{_status},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (selection) =>
+                      _setStatus(selection.first),
                 ),
-                ButtonSegment<TaskStatus>(
-                  value: TaskStatus.done,
-                  label: Text(tr('Done')),
-                ),
-                ButtonSegment<TaskStatus>(
-                  value: TaskStatus.archived,
-                  label: Text(tr('Archived')),
-                ),
-              ],
-              selected: <TaskStatus>{_status},
-              showSelectedIcon: false,
-              onSelectionChanged: (selection) => _setStatus(selection.first),
+              ),
             ),
-),
-          ),
-          Expanded(
-            child: StreamBuilder<List<TaskItem>>(
-              stream: _stream,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(tr('Could not load the tasks.')),
-                        TextButton(
-                          onPressed: _retry,
-                          child: Text(tr('Retry')),
-                        ),
-                      ],
+            Expanded(
+              child: StreamBuilder<List<TaskItem>>(
+                stream: _stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(tr('Could not load the tasks.')),
+                          TextButton(
+                            onPressed: _retry,
+                            child: Text(tr('Retry')),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  final items = snapshot.data;
+                  if (items == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (items.isEmpty) {
+                    return Center(child: Text(_emptyText()));
+                  }
+                  return ListView.separated(
+                    itemCount: items.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, index) => _TaskTile(
+                      task: items[index],
+                      onTap: () => _open(items[index]),
+                      onToggle: () => _toggle(items[index]),
                     ),
                   );
-                }
-                final items = snapshot.data;
-                if (items == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (items.isEmpty) {
-                  return Center(child: Text(_emptyText()));
-                }
-                return ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, index) => _TaskTile(
-                    task: items[index],
-                    onTap: () => _open(items[index]),
-                    onToggle: () => _toggle(items[index]),
-                  ),
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
-      )),
+          ],
+        ),
+      ),
     );
   }
 }

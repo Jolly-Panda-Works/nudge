@@ -59,7 +59,11 @@ class CalendarAgendaView extends StatelessWidget {
       }
     }
     if (entries.isEmpty) {
-      return Center(child: Text(tr('Nothing planned in the next {days} days', {'days': days})));
+      return Center(
+        child: Text(
+          tr('Nothing planned in the next {days} days', {'days': days}),
+        ),
+      );
     }
     return ListView(children: entries);
   }

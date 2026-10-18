@@ -35,9 +35,9 @@ class _ImportTextDialogState extends State<ImportTextDialog> {
       return;
     }
     final title = _title.text.trim();
-    Navigator.of(context).pop(
-      ImportedText(text: text, title: title.isEmpty ? null : title),
-    );
+    Navigator.of(
+      context,
+    ).pop(ImportedText(text: text, title: title.isEmpty ? null : title));
   }
 
   @override
@@ -56,7 +56,10 @@ class _ImportTextDialogState extends State<ImportTextDialog> {
               controller: _text,
               minLines: 3,
               maxLines: 8,
-              decoration: InputDecoration(labelText: tr('Text'), errorText: _error),
+              decoration: InputDecoration(
+                labelText: tr('Text'),
+                errorText: _error,
+              ),
             ),
           ],
         ),

@@ -202,7 +202,9 @@ class CalendarWeekView extends StatelessWidget {
                                     short: true,
                                   ),
                                   style: textTheme.labelMedium?.copyWith(
-                                    color: persian && day.weekday == DateTime.friday
+                                    color:
+                                        persian &&
+                                            day.weekday == DateTime.friday
                                         ? scheme.error
                                         : scheme.onSurfaceVariant,
                                   ),

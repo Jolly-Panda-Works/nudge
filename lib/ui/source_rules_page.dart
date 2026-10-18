@@ -103,39 +103,42 @@ class _SourceRulesPageState extends State<SourceRulesPage> {
         icon: const Icon(Icons.add),
         label: Text(tr('Add by package name')),
       ),
-      body: ContentWidth(child: _failed
-          ? Center(
-              child: FilledButton(
-                onPressed: _load,
-                child: Text(tr('Retry')),
-              ),
-            )
-          : apps == null
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.only(bottom: 96),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(_explanation),
-                ),
-                if (apps.isEmpty)
+      body: ContentWidth(
+        child: _failed
+            ? Center(
+                child: FilledButton(onPressed: _load, child: Text(tr('Retry'))),
+              )
+            : apps == null
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                padding: const EdgeInsets.only(bottom: 96),
+                children: [
                   Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text(
-                      tr('No apps yet. Apps appear here after they post a '
-                      'notification, or add one by package name.'),
+                    padding: const EdgeInsets.all(16),
+                    child: Text(_explanation),
+                  ),
+                  if (apps.isEmpty)
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        tr(
+                          'No apps yet. Apps appear here after they post a '
+                          'notification, or add one by package name.',
+                        ),
+                      ),
                     ),
-                  ),
-                for (final app in apps)
-                  SwitchListTile(
-                    title: Text(app.displayName),
-                    subtitle: app.label == null ? null : Text(app.packageName),
-                    value: _selected.contains(app.packageName),
-                    onChanged: (value) => _toggle(app, selected: value),
-                  ),
-              ],
-            )),
+                  for (final app in apps)
+                    SwitchListTile(
+                      title: Text(app.displayName),
+                      subtitle: app.label == null
+                          ? null
+                          : Text(app.packageName),
+                      value: _selected.contains(app.packageName),
+                      onChanged: (value) => _toggle(app, selected: value),
+                    ),
+                ],
+              ),
+      ),
     );
   }
 }
@@ -160,7 +163,9 @@ class _AddPackageDialogState extends State<_AddPackageDialog> {
   void _submit() {
     final value = _controller.text.trim();
     if (!_SourceRulesPageState._packagePattern.hasMatch(value)) {
-      setState(() => _error = tr('Enter a package name such as com.example.app'));
+      setState(
+        () => _error = tr('Enter a package name such as com.example.app'),
+      );
       return;
     }
     Navigator.of(context).pop(value);

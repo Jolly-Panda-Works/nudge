@@ -46,7 +46,9 @@ class _CalendarDayViewState extends State<CalendarDayView> {
     final scheme = Theme.of(context).colorScheme;
     final byHour = <int, List<TaskItem>>{};
     for (final task in widget.tasks) {
-      byHour.putIfAbsent(task.remindAt!.toLocal().hour, () => <TaskItem>[]).add(task);
+      byHour
+          .putIfAbsent(task.remindAt!.toLocal().hour, () => <TaskItem>[])
+          .add(task);
     }
     return ListView.builder(
       controller: _controller,

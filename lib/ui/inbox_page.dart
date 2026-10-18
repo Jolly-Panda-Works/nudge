@@ -29,9 +29,8 @@ class _InboxPageState extends State<InboxPage> {
   bool _showRemoved = false;
   late Stream<List<CapturedNotification>> _stream = _openStream();
 
-  Stream<List<CapturedNotification>> _openStream() => widget.services
-      .notifications
-      .watchInbox(includeRemoved: _showRemoved);
+  Stream<List<CapturedNotification>> _openStream() =>
+      widget.services.notifications.watchInbox(includeRemoved: _showRemoved);
 
   @override
   void initState() {
@@ -128,68 +127,73 @@ class _InboxPageState extends State<InboxPage> {
         tooltip: tr('Import text'),
         child: const Icon(Icons.add),
       ),
-      body: ContentWidth(child: Column(
-        children: [
-          ListenableBuilder(
-            listenable: controller,
-            builder: (context, _) => _AccessBanner(
-              services: widget.services,
-              supported: controller.isSupported,
-              status: controller.status,
+      body: ContentWidth(
+        child: Column(
+          children: [
+            ListenableBuilder(
+              listenable: controller,
+              builder: (context, _) => _AccessBanner(
+                services: widget.services,
+                supported: controller.isSupported,
+                status: controller.status,
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: SingleChildScrollView(
- scrollDirection: Axis.horizontal,
- child: SegmentedButton<bool>(
-              segments: [
-                ButtonSegment<bool>(value: false, label: Text(tr('Active'))),
-                ButtonSegment<bool>(value: true, label: Text(tr('All'))),
-              ],
-              selected: <bool>{_showRemoved},
-              showSelectedIcon: false,
-              onSelectionChanged: (selection) =>
-                  _setFilter(showRemoved: selection.first),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SegmentedButton<bool>(
+                  segments: [
+                    ButtonSegment<bool>(
+                      value: false,
+                      label: Text(tr('Active')),
+                    ),
+                    ButtonSegment<bool>(value: true, label: Text(tr('All'))),
+                  ],
+                  selected: <bool>{_showRemoved},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (selection) =>
+                      _setFilter(showRemoved: selection.first),
+                ),
+              ),
             ),
-),
-          ),
-          Expanded(
-            child: StreamBuilder<List<CapturedNotification>>(
-              stream: _stream,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return _ErrorState(onRetry: _retry);
-                }
-                final items = snapshot.data;
-                if (items == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (items.isEmpty) {
-                  return ListenableBuilder(
-                    listenable: controller,
-                    builder: (context, _) => _EmptyState(
-                      supported: controller.isSupported,
-                      accessGranted:
-                          controller.status?.accessGranted ?? false,
+            Expanded(
+              child: StreamBuilder<List<CapturedNotification>>(
+                stream: _stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return _ErrorState(onRetry: _retry);
+                  }
+                  final items = snapshot.data;
+                  if (items == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (items.isEmpty) {
+                    return ListenableBuilder(
+                      listenable: controller,
+                      builder: (context, _) => _EmptyState(
+                        supported: controller.isSupported,
+                        accessGranted:
+                            controller.status?.accessGranted ?? false,
+                      ),
+                    );
+                  }
+                  final now = DateTime.now();
+                  return ListView.separated(
+                    itemCount: items.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, index) => _NotificationTile(
+                      notification: items[index],
+                      now: now,
+                      onTap: () => _openDetail(items[index]),
                     ),
                   );
-                }
-                final now = DateTime.now();
-                return ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, index) => _NotificationTile(
-                    notification: items[index],
-                    now: now,
-                    onTap: () => _openDetail(items[index]),
-                  ),
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
-      )),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -208,7 +212,8 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appName = notification.appLabel ?? notification.packageName;
-    final title = notification.title ??
+    final title =
+        notification.title ??
         (notification.isRedacted ? tr('Content hidden') : tr('(no title)'));
     final removed = notification.status == NotificationStatus.removed;
     final snippet = notification.text;
@@ -273,10 +278,14 @@ class _AccessBanner extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               needsAccess
-                  ? tr('Nudge cannot capture notifications until you enable '
-                      'Notification Access for it.')
-                  : tr('Notification access is on, but the listener is not '
-                      'running. Try reconnecting.'),
+                  ? tr(
+                      'Nudge cannot capture notifications until you enable '
+                      'Notification Access for it.',
+                    )
+                  : tr(
+                      'Notification access is on, but the listener is not '
+                      'running. Try reconnecting.',
+                    ),
             ),
             const SizedBox(height: 8),
             Align(
