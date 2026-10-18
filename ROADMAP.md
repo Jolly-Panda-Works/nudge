@@ -14,7 +14,7 @@ Where Nudge stands and what is left. Last updated: 2026-10-16 (version 0.6.0).
 |---|---|---|
 | M1 | Android notification capture and local inbox | All 5 sections done in code; device verification and 4 open items remain |
 | M2 | Task conversion and source navigation | All 4 sections done in code; nothing compiled or verified on a device yet |
-| M3 | Calendar UI with Persian (Jalali, RTL) support | Not started |
+| M3 | Calendar UI with Persian (Jalali, RTL) support | In progress: section 1 (date math and month layout) done in code |
 | M4 | Android Calendar Provider integration | Not started |
 | M5 | Windows build and secure synchronization | Not started |
 | M6 | Optional direct Google Calendar API integration | Not started |
@@ -139,10 +139,20 @@ M1 is complete when capture and the UI are verified on a physical device and the
 - [ ] Verify on devices, including Samsung battery restrictions and Android 14 exact-alarm defaults
 - [ ] A "Done" button on the alert and a choice of snooze lengths
 
-## M3: Calendar UI with Persian date support (not started)
-- [ ] Evaluate calendar libraries (gestures, customization, performance, accessibility, license) and choose one, or build custom
-- [ ] Month, week, day and agenda views
-- [ ] Persian right-to-left UI and Jalali dates, with correct Gregorian conversion for external APIs
+## M3: Calendar UI with Persian date support (in progress)
+Decision and layers: see [docs/CALENDAR.md](docs/CALENDAR.md).
+
+### Section 1: date math and month layout (done in code, 0.10.0; not compiled or run yet)
+- [x] Decision: custom widgets, no calendar library (recorded in docs/CALENDAR.md)
+- [x] Jalali and Gregorian calendar systems with exact conversion (Jalali years 1178 to 1632), checked against an independent library for every supported day
+- [x] Month grid with Saturday-first Jalali weeks and Monday-first Gregorian weeks, 4 to 6 weeks, neighbouring days marked
+- [x] Persian and English month and weekday names, Persian digits
+- [x] Unit tests for the conversions, leap years, month lengths and grids
+- [ ] Not yet compiled or run (the Dart port was written without a Flutter toolchain)
+
+### Remaining in M3
+- [ ] Month, week, day and agenda views (section 2 onward)
+- [ ] Persian right-to-left UI and Jalali dates in the screens (the date math is done; the screens are not)
 - [ ] Calendar colors and visibility toggles; event indicators in month view
 - [ ] Tappable dates with an agenda for the selected day
 - [ ] Fast task and reminder creation

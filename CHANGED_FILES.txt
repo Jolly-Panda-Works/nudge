@@ -1,0 +1,19 @@
+Files in this zip (changed since 0.9.0), 0.10.0:
+  CHANGELOG.md
+  GIT_COMMIT.txt
+  ROADMAP.md
+  STATUS.md
+  VERSIONS.md
+  docs/CALENDAR.md
+  docs/DEVELOPMENT.md
+  lib/app_info.dart
+  lib/domain/calendar/calendar_date.dart
+  lib/domain/calendar/calendar_names.dart
+  lib/domain/calendar/calendar_system.dart
+  lib/domain/calendar/gregorian_calendar.dart
+  lib/domain/calendar/jalali_calendar.dart
+  lib/domain/calendar/month_grid.dart
+  pubspec.yaml
+  test/domain/calendar/jalali_calendar_test.dart
+  test/domain/calendar/month_grid_test.dart
+Deleted: none

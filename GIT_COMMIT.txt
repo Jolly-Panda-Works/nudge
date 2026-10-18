@@ -1,21 +1,18 @@
-feat: Nudge v0.9.0 - reminder alerts (M2 section 4)
+feat: Nudge v0.10.0 - calendar date math and month layout (M3 section 1)
 
-- Alerts at the reminder time through the Android alarm service, with a
-  Snooze 10 min button; alarms are set again after a restart or update,
-  and a reminder missed while the phone was off is shown at start-up
-- ReminderScheduler keeps alarms in step with open tasks and applies
-  snoozes done from an alert while the app was closed
-- Kotlin app.nudge.reminders: store, scheduler (exact when allowed,
-  otherwise inexact), notifier + channel, alarm/snooze/boot receivers,
-  method channel
-- Settings > Reminders: alerts and exact-timing state with links to the
-  system screens; notification permission asked when a reminder is saved
-- wire_capture.py: permissions, receivers, reminder channel in an already
-  wired MainActivity
-- tests: scheduler, settings and permission flows (fake platform);
-  taller widget-test window
-- docs: changelog, roadmap, status, privacy, development checklist
+- lib/domain/calendar: JalaliCalendar and GregorianCalendar behind a
+  CalendarSystem interface; exact conversion for Jalali years 1178-1632
+  (Gregorian 1799-2254)
+- MonthGrid: weeks of a month, Saturday-first for Jalali and Monday-first
+  for Gregorian, 4 to 6 weeks, neighbouring days marked
+- CalendarNames: Persian and English month and weekday names, Persian digits
+- the algorithm was compared with an independent library for every
+  supported day (zero differences) before it was ported; the Dart tests
+  repeat the round trip and check known dates, leap years, month
+  lengths, validity and grids
+- docs/CALENDAR.md: custom widgets instead of a library, layers, rules
+- docs: changelog, roadmap, status, development (changed-files zips)
 
-Not compiled, tested or run: CI first. Windows has no alerts.
+No screen uses it yet. Not compiled or run: CI first.
 
-Milestone: M2 / Section 4
+Milestone: M3 / Section 1

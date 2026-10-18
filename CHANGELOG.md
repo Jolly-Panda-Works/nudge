@@ -4,6 +4,14 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.10.0] - 2026-10-18
+### Added
+- M3 section 1: calendar date math and month layout, in `lib/domain/calendar/`. `JalaliCalendar` and `GregorianCalendar` (behind a `CalendarSystem` interface) convert exactly between Jalali and Gregorian dates; `MonthGrid` lays a month out in weeks (Saturday first for Jalali, Monday first for Gregorian, 4 to 6 weeks, neighbouring days marked); `CalendarNames` has Persian and English month and weekday names and Persian digits.
+- Jalali years 1178 to 1632 are supported (Gregorian 1799 to 2254). The algorithm (a port of `jalaali-js`) was compared with an independent library for every day in that range before it was ported to Dart, with zero differences. The Dart tests repeat the round trip over the same range.
+- `docs/CALENDAR.md`: the decision to build custom calendar widgets instead of using a library, the layers, and the rules (stored data never depends on the calendar system; external calendars always get Gregorian dates).
+### Known limitations
+- No screen uses the calendar yet (views start in section 2). Not compiled, tested or run: the Dart code was written without a Flutter toolchain, so CI is the first check.
+
 ## [0.9.0] - 2026-10-18
 ### Added
 - M2 section 4: reminder alerts. A reminder (or any open task with a date) alerts at its time through the Android alarm service, with a Snooze 10 min button. Alarms are set again after a restart or an app update; a reminder that came due while the phone was off is shown at start-up.

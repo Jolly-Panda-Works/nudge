@@ -30,6 +30,8 @@ python3 tools/wire_capture.py
 ```
 
 ## Applying a delivered zip
+From version 0.10.0 a zip contains only the files that changed since the previous delivery, plus `CHANGED_FILES.txt` (the list) and `GIT_COMMIT.txt`. Copy it over the repository, keeping the folder structure; nothing is deleted unless `CHANGED_FILES.txt` says "deleted". The rest of this section describes the older whole-project zips.
+
 Delivered zips contain the whole project except the generated `android/` and `windows/` folders (apart from the committed Kotlin sources). Replacing the repository contents with a zip is therefore safe: CI regenerates the platform folders. Files that no longer exist in the zip are deleted by that replacement, which is how obsolete files disappear. If you only copy the zip over the repository instead, delete such files manually; the release notes of each zip list them.
 
 ## Workflows
