@@ -20,6 +20,7 @@ class TaskFormPage extends StatefulWidget {
     this.notification,
     this.task,
     this.initialKind = TaskKind.task,
+    this.initialDate,
     super.key,
   });
 
@@ -27,6 +28,9 @@ class TaskFormPage extends StatefulWidget {
   final CapturedNotification? notification;
   final TaskItem? task;
   final TaskKind initialKind;
+
+  /// The day a new stand-alone task starts on (the time defaults to 09:00).
+  final DateTime? initialDate;
 
   @override
   State<TaskFormPage> createState() => _TaskFormPageState();
@@ -68,6 +72,8 @@ class _TaskFormPageState extends State<TaskFormPage> {
       _title = TextEditingController();
       _notes = TextEditingController();
       _kind = widget.initialKind;
+      final day = widget.initialDate;
+      if (day != null) _date = DateTime(day.year, day.month, day.day);
     }
   }
 

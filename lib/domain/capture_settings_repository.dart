@@ -21,5 +21,11 @@ abstract interface class CaptureSettingsRepository {
   /// Null means "keep until deleted manually".
   Future<int?> getRetentionDays();
 
+  /// The calendar system shown in the calendar: `jalali` (default) or
+  /// `gregorian`.
+  Future<String> getCalendarSystemId();
+
+  Future<void> setCalendarSystemId(String id);
+
   Future<void> setRetentionDays(int? days);
 }

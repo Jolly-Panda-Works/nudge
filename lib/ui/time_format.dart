@@ -57,3 +57,6 @@ String formatDue(DateTime time) {
   return '${local.year}-${_two(local.month)}-${_two(local.day)} '
       '${_clock(local)}';
 }
+
+/// Hour and minute in local time: 09:00.
+String formatTimeOfDay(DateTime time) => _clock(time.toLocal());

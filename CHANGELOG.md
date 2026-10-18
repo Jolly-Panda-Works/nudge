@@ -4,6 +4,15 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.11.0] - 2026-10-18
+### Added
+- M3 section 2: a month view (`CalendarPage`), opened from the calendar icon in the inbox. Jalali is shown right to left, Saturday first, with Persian month and weekday names and Persian digits; Gregorian is shown left to right, Monday first. A button switches between them and the choice is remembered (settings key `calendar_system`).
+- Tasks and reminders appear as dots on their day (up to three). Tapping a day shows its agenda below with the date in both calendars; tapping an item opens the task. The `+` button creates a task on the selected day. Arrows or swiping change the month, Today returns to the current day.
+- `CalendarSystems` (registry), `groupTasksByDay` (tasks by local day of their reminder time), `formatTimeOfDay`, and `TaskFormPage.initialDate`.
+- Tests: the page with a fixed clock (Persian text, right-to-left order, navigation, switching and saving, agenda, creating a task), `groupTasksByDay`, and the new setting in the Drift repository.
+### Known limitations
+- Not compiled, tested or run: CI is the first check. Not looked at on a device: layout, gestures and TalkBack are unreviewed. Only the month view exists; week, day, agenda, colours and external events come later. The rest of the app text is still English.
+
 ## [0.10.0] - 2026-10-18
 ### Added
 - M3 section 1: calendar date math and month layout, in `lib/domain/calendar/`. `JalaliCalendar` and `GregorianCalendar` (behind a `CalendarSystem` interface) convert exactly between Jalali and Gregorian dates; `MonthGrid` lays a month out in weeks (Saturday first for Jalali, Monday first for Gregorian, 4 to 6 weeks, neighbouring days marked); `CalendarNames` has Persian and English month and weekday names and Persian digits.

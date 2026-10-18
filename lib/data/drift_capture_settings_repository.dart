@@ -15,6 +15,7 @@ final class DriftCaptureSettingsRepository
   static const _kOngoing = 'capture_ongoing';
   static const _kGroupSummaries = 'capture_group_summaries';
   static const _kRetentionDays = 'retention_days';
+  static const _kCalendarSystem = 'calendar_system';
 
   Future<String?> _read(String name) async {
     final row = await (_db.select(
@@ -82,6 +83,16 @@ final class DriftCaptureSettingsRepository
   @override
   Future<void> setCaptureGroupSummaries({required bool value}) =>
       _write(_kGroupSummaries, value.toString());
+
+  @override
+  Future<String> getCalendarSystemId() async {
+    final raw = await _read(_kCalendarSystem);
+    return raw == 'gregorian' ? 'gregorian' : 'jalali';
+  }
+
+  @override
+  Future<void> setCalendarSystemId(String id) =>
+      _write(_kCalendarSystem, id == 'gregorian' ? 'gregorian' : 'jalali');
 
   @override
   Future<int?> getRetentionDays() async {

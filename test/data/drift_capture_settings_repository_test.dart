@@ -54,6 +54,14 @@ void main() {
     expect(await repo.getRetentionDays(), isNull);
   });
 
+  test('the calendar system defaults to Jalali and can be changed', () async {
+    expect(await repo.getCalendarSystemId(), 'jalali');
+    await repo.setCalendarSystemId('gregorian');
+    expect(await repo.getCalendarSystemId(), 'gregorian');
+    await repo.setCalendarSystemId('anything else');
+    expect(await repo.getCalendarSystemId(), 'jalali');
+  });
+
   test('listRules returns the saved apps with their labels', () async {
     await repo.addRule('com.chat', appLabel: 'Chat');
     await repo.addRule('com.mail');
@@ -63,7 +71,10 @@ void main() {
       'com.chat',
       'com.mail',
     });
-    expect(rules.firstWhere((r) => r.packageName == 'com.chat').label, 'Chat');
+    expect(
+      rules.firstWhere((r) => r.packageName == 'com.chat').label,
+      'Chat',
+    );
     expect(
       rules.firstWhere((r) => r.packageName == 'com.mail').displayName,
       'com.mail',

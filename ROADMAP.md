@@ -14,7 +14,7 @@ Where Nudge stands and what is left. Last updated: 2026-10-16 (version 0.6.0).
 |---|---|---|
 | M1 | Android notification capture and local inbox | All 5 sections done in code; device verification and 4 open items remain |
 | M2 | Task conversion and source navigation | All 4 sections done in code; nothing compiled or verified on a device yet |
-| M3 | Calendar UI with Persian (Jalali, RTL) support | In progress: section 1 (date math and month layout) done in code |
+| M3 | Calendar UI with Persian (Jalali, RTL) support | In progress: sections 1 (date math) and 2 (month view) done in code |
 | M4 | Android Calendar Provider integration | Not started |
 | M5 | Windows build and secure synchronization | Not started |
 | M6 | Optional direct Google Calendar API integration | Not started |
@@ -150,11 +150,18 @@ Decision and layers: see [docs/CALENDAR.md](docs/CALENDAR.md).
 - [x] Unit tests for the conversions, leap years, month lengths and grids
 - [ ] Not yet compiled or run (the Dart port was written without a Flutter toolchain)
 
+### Section 2: month view (done in code, 0.11.0; not compiled or run yet)
+- [x] Month view with tappable days, task and reminder dots, and an agenda for the selected day
+- [x] Right-to-left Jalali layout (Saturday first, Persian names and digits) and a left-to-right Gregorian layout, switchable and remembered
+- [x] Month navigation by arrows and swipe, a Today button, quick task creation on the selected day
+- [x] Widget tests for both calendars, navigation, the agenda, the choice being saved and creating a task
+- [ ] Visual, gesture and accessibility review on a device (no screenshots yet)
+
 ### Remaining in M3
 - [ ] Month, week, day and agenda views (section 2 onward)
 - [ ] Persian right-to-left UI and Jalali dates in the screens (the date math is done; the screens are not)
 - [ ] Calendar colors and visibility toggles; event indicators in month view
-- [ ] Tappable dates with an agenda for the selected day
+- [x] Tappable dates with an agenda for the selected day (month view)
 - [ ] Fast task and reminder creation
 - [ ] Clear distinction between external events, internal tasks and reminders
 - [ ] Localize the whole app UI (Persian, right-to-left); today all app text is English

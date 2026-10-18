@@ -1,18 +1,16 @@
-feat: Nudge v0.10.0 - calendar date math and month layout (M3 section 1)
+feat: Nudge v0.11.0 - month view (M3 section 2)
 
-- lib/domain/calendar: JalaliCalendar and GregorianCalendar behind a
-  CalendarSystem interface; exact conversion for Jalali years 1178-1632
-  (Gregorian 1799-2254)
-- MonthGrid: weeks of a month, Saturday-first for Jalali and Monday-first
-  for Gregorian, 4 to 6 weeks, neighbouring days marked
-- CalendarNames: Persian and English month and weekday names, Persian digits
-- the algorithm was compared with an independent library for every
-  supported day (zero differences) before it was ported; the Dart tests
-  repeat the round trip and check known dates, leap years, month
-  lengths, validity and grids
-- docs/CALENDAR.md: custom widgets instead of a library, layers, rules
-- docs: changelog, roadmap, status, development (changed-files zips)
+- CalendarPage: month grid with tappable days, task/reminder dots and a
+  day agenda; Jalali drawn right to left (Saturday first, Persian names
+  and digits), Gregorian left to right (Monday first); arrows, swipe,
+  Today, and a switch whose choice is saved (settings key calendar_system)
+- quick task creation on the selected day (TaskFormPage.initialDate)
+- groupTasksByDay, CalendarSystems, formatTimeOfDay
+- calendar icon in the inbox
+- tests: page with a fixed clock, grouping, saved setting
+- docs: calendar design, changelog, roadmap, status
 
-No screen uses it yet. Not compiled or run: CI first.
+Not compiled or run: CI first. Week/day views, colours and external
+events come later.
 
-Milestone: M3 / Section 1
+Milestone: M3 / Section 2

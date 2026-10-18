@@ -1,19 +1,22 @@
-Files in this zip (changed since 0.9.0), 0.10.0:
+Files in this zip (changed since 0.10.0), 0.11.0:
   CHANGELOG.md
   GIT_COMMIT.txt
   ROADMAP.md
   STATUS.md
   VERSIONS.md
   docs/CALENDAR.md
-  docs/DEVELOPMENT.md
   lib/app_info.dart
-  lib/domain/calendar/calendar_date.dart
-  lib/domain/calendar/calendar_names.dart
-  lib/domain/calendar/calendar_system.dart
-  lib/domain/calendar/gregorian_calendar.dart
-  lib/domain/calendar/jalali_calendar.dart
-  lib/domain/calendar/month_grid.dart
+  lib/application/tasks_by_day.dart
+  lib/data/drift_capture_settings_repository.dart
+  lib/domain/calendar/calendar_systems.dart
+  lib/domain/capture_settings_repository.dart
+  lib/ui/calendar_page.dart
+  lib/ui/inbox_page.dart
+  lib/ui/task_form_page.dart
+  lib/ui/time_format.dart
   pubspec.yaml
-  test/domain/calendar/jalali_calendar_test.dart
-  test/domain/calendar/month_grid_test.dart
+  test/application/tasks_by_day_test.dart
+  test/data/drift_capture_settings_repository_test.dart
+  test/support/in_memory_repositories.dart
+  test/ui/calendar_page_test.dart
 Deleted: none
