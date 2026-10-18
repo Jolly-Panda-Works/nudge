@@ -119,7 +119,11 @@ abstract final class CalendarNames {
   }
 
   /// Name of a weekday given as `DateTime.weekday` (1 = Monday ... 7 = Sunday).
-  static String weekday(int weekday, {required bool persian, bool short = false}) {
+  static String weekday(
+    int weekday, {
+    required bool persian,
+    bool short = false,
+  }) {
     if (weekday < 1 || weekday > 7) {
       throw RangeError.range(weekday, 1, 7, 'weekday');
     }

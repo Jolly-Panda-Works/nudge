@@ -20,10 +20,7 @@ void main() {
     expect(grid.weeks.first[4].date, DateTime(2026, 9, 23));
     expect(grid.weeks.first[4].calendarDate, const CalendarDate(1405, 7, 1));
     expect(grid.weeks.last.last.date, DateTime(2026, 10, 23));
-    expect(
-      grid.weeks.expand((w) => w).where((c) => c.inMonth).length,
-      30,
-    );
+    expect(grid.weeks.expand((w) => w).where((c) => c.inMonth).length, 30);
     expect(grid.weeks.first.first.inMonth, isFalse);
     expect(grid.weeks.first[4].inMonth, isTrue);
   });
@@ -47,10 +44,7 @@ void main() {
     expect(grid.weeks, hasLength(5));
     expect(grid.weeks.first.first.date, DateTime(2026, 9, 28));
     expect(grid.weeks.last.last.date, DateTime(2026, 11, 1));
-    expect(
-      grid.weeks.expand((w) => w).where((c) => c.inMonth).length,
-      31,
-    );
+    expect(grid.weeks.expand((w) => w).where((c) => c.inMonth).length, 31);
   });
 
   test('a month can take exactly 4 weeks', () {

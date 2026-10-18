@@ -117,9 +117,13 @@ class _CalendarPageState extends State<CalendarPage> {
   (int, int) _neighbour({required bool next}) {
     final system = _system!;
     if (next) {
-      return _month == system.monthsPerYear ? (_year + 1, 1) : (_year, _month + 1);
+      return _month == system.monthsPerYear
+          ? (_year + 1, 1)
+          : (_year, _month + 1);
     }
-    return _month == 1 ? (_year - 1, system.monthsPerYear) : (_year, _month - 1);
+    return _month == 1
+        ? (_year - 1, system.monthsPerYear)
+        : (_year, _month - 1);
   }
 
   bool _canGo({required bool next}) {
@@ -156,8 +160,7 @@ class _CalendarPageState extends State<CalendarPage> {
   void _openTask(TaskItem task) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) =>
-            TaskDetailPage(task: task, services: widget.services),
+        builder: (_) => TaskDetailPage(task: task, services: widget.services),
       ),
     );
   }
@@ -171,14 +174,17 @@ class _CalendarPageState extends State<CalendarPage> {
     _go(next: forward);
   }
 
-  String _num(int value) =>
-      CalendarNames.number(value, persian: _persian);
+  String _num(int value) => CalendarNames.number(value, persian: _persian);
 
   String _monthTitle() =>
       '${CalendarNames.month(_system!.id, _month, persian: _persian)} '
       '${_num(_year)}';
 
-  String _dayText(CalendarSystem system, DateTime date, {required bool persian}) {
+  String _dayText(
+    CalendarSystem system,
+    DateTime date, {
+    required bool persian,
+  }) {
     final named = system.fromDate(date);
     return '${CalendarNames.number(named.day, persian: persian)} '
         '${CalendarNames.month(system.id, named.month, persian: persian)} '
@@ -213,10 +219,7 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
       body: _failed
           ? Center(
-              child: FilledButton(
-                onPressed: _load,
-                child: const Text('Retry'),
-              ),
+              child: FilledButton(onPressed: _load, child: const Text('Retry')),
             )
           : system == null
           ? const Center(child: CircularProgressIndicator())
@@ -480,45 +483,48 @@ class _DayCell extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-              Container(
-                width: 36,
-                height: 36,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected ? scheme.primary : null,
-                  border: isToday && !isSelected
-                      ? Border.all(color: scheme.primary, width: 1.5)
-                      : null,
-                ),
-                child: Text(
-                  CalendarNames.number(cell.calendarDate.day, persian: persian),
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                Container(
+                  width: 36,
+                  height: 36,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isSelected ? scheme.primary : null,
+                    border: isToday && !isSelected
+                        ? Border.all(color: scheme.primary, width: 1.5)
+                        : null,
+                  ),
+                  child: Text(
+                    CalendarNames.number(
+                      cell.calendarDate.day,
+                      persian: persian,
+                    ),
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              SizedBox(
-                height: 6,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (var i = 0; i < dots; i++)
-                      Container(
-                        width: 5,
-                        height: 5,
-                        margin: const EdgeInsets.symmetric(horizontal: 1),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: dotColor,
+                const SizedBox(height: 2),
+                SizedBox(
+                  height: 6,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var i = 0; i < dots; i++)
+                        Container(
+                          width: 5,
+                          height: 5,
+                          margin: const EdgeInsets.symmetric(horizontal: 1),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: dotColor,
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
             ),
           ),
         ),

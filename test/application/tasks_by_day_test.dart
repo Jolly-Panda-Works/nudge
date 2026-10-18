@@ -29,8 +29,14 @@ void main() {
       task('c', dueAt: DateTime(2026, 10, 19, 23, 59)),
     ]);
 
-    expect(days.keys, <DateTime>[DateTime(2026, 10, 18), DateTime(2026, 10, 19)]);
-    expect(days[DateTime(2026, 10, 18)]!.map((t) => t.title), <String>['b', 'a']);
+    expect(days.keys, <DateTime>[
+      DateTime(2026, 10, 18),
+      DateTime(2026, 10, 19),
+    ]);
+    expect(days[DateTime(2026, 10, 18)]!.map((t) => t.title), <String>[
+      'b',
+      'a',
+    ]);
     expect(days[DateTime(2026, 10, 19)]!.single.title, 'c');
   });
 
@@ -50,7 +56,11 @@ void main() {
   test('tasks without a time and archived tasks are left out', () {
     final days = groupTasksByDay(<TaskItem>[
       task('no time'),
-      task('archived', dueAt: DateTime(2026, 10, 18, 9), status: TaskStatus.archived),
+      task(
+        'archived',
+        dueAt: DateTime(2026, 10, 18, 9),
+        status: TaskStatus.archived,
+      ),
       task('done', dueAt: DateTime(2026, 10, 18, 9), status: TaskStatus.done),
     ]);
 
@@ -64,7 +74,10 @@ void main() {
       task('a', dueAt: at),
     ]);
 
-    expect(days[DateTime(2026, 10, 18)]!.map((t) => t.title), <String>['a', 'b']);
+    expect(days[DateTime(2026, 10, 18)]!.map((t) => t.title), <String>[
+      'a',
+      'b',
+    ]);
   });
 
   test('localDay drops the time', () {
