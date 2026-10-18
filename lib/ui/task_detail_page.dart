@@ -8,7 +8,11 @@ import 'task_form_page.dart';
 import 'time_format.dart';
 
 class TaskDetailPage extends StatefulWidget {
-  const TaskDetailPage({required this.task, required this.services, super.key});
+  const TaskDetailPage({
+    required this.task,
+    required this.services,
+    super.key,
+  });
 
   final TaskItem task;
   final AppServices services;
@@ -74,8 +78,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final confirmed = await confirmAction(
       context,
       title: 'Delete task?',
-      message:
-          'The task is removed from Nudge. The notification it came '
+      message: 'The task is removed from Nudge. The notification it came '
           'from is not affected.',
       action: 'Delete',
     );
@@ -143,7 +146,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           if (remindAt == null && task.kind == TaskKind.reminder)
             const _Row(label: 'Due', value: 'Not set'),
           if (source != null)
-            _Row(label: 'From', value: source.appLabel ?? source.packageName),
+            _Row(
+              label: 'From',
+              value: source.appLabel ?? source.packageName,
+            ),
           _Row(label: 'Created', value: formatFullTimestamp(task.createdAt)),
           const SizedBox(height: 16),
           Wrap(

@@ -140,7 +140,9 @@ class InMemoryTaskRepository implements TaskRepository {
   Future<TaskItem?> reopen(String id) async {
     final t = _items[id];
     if (t == null || t.status != TaskStatus.done) return t;
-    return _store(_rebuild(t, status: TaskStatus.open, clearCompleted: true));
+    return _store(
+      _rebuild(t, status: TaskStatus.open, clearCompleted: true),
+    );
   }
 
   @override

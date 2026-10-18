@@ -4,6 +4,7 @@ Nudge handles notification text, which can be sensitive. These are the rules the
 
 ## What is collected
 - Notifications that Android delivers to Nudge after you grant **Notification Access**: source app (package and label), title, text if available, timestamp, grouping information, and whether a content action existed.
+- For reminders, the title and time of each upcoming reminder are also kept in a small file in private storage that is excluded from backups, so the alarms can be set again after a restart. It is replaced whenever the reminder list changes.
 - Tasks, reminders and calendar references you create. A task made from a notification starts with that notification's title and text, which you can edit, and keeps the source app and notification key so the original can be opened later.
 
 ## Where it is stored

@@ -33,6 +33,7 @@ APPLICATION_ID = 'com.jollypanda.nudge'
 SIGNING_MARKER = 'nudge:signing'
 CAPTURE_MARKER = 'nudge:capture'
 SHARE_MARKER = 'nudge:share'
+REMINDERS_MARKER = 'nudge:reminders'
 
 MAIN_ACTIVITY = '''package {package}
 
@@ -41,6 +42,7 @@ import android.os.Bundle
 import app.nudge.capture.CaptureChannels
 import app.nudge.capture.DocumentExporter
 import app.nudge.capture.ShareReceiver
+import app.nudge.reminders.ReminderChannels
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 
@@ -62,6 +64,7 @@ class MainActivity : FlutterActivity() {
         val messenger = flutterEngine.dartExecutor.binaryMessenger
         CaptureChannels.register(messenger, applicationContext)
         DocumentExporter.register(messenger, this)
+        ReminderChannels.register(messenger, this)
     }
 
     @Deprecated("Needed for the file picker used by data export")
@@ -93,6 +96,27 @@ QUERY = '''        <!-- nudge:capture -->
         </intent>
 '''
 
+REMINDER_PERMISSIONS = '''    <!-- nudge:reminders -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+'''
+
+REMINDER_RECEIVERS = '''        <!-- nudge:reminders -->
+        <receiver
+            android:name="app.nudge.reminders.ReminderReceiver"
+            android:exported="false" />
+        <receiver
+            android:name="app.nudge.reminders.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+'''
+
 SHARE_FILTER = '''            <!-- nudge:share -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -110,7 +134,24 @@ def patch_main_activity() -> None:
     with open(path, encoding='utf-8') as handle:
         source = handle.read()
     if 'DocumentExporter.register' in source:
-        print('MainActivity.kt already wired')
+        if 'ReminderChannels' in source:
+            print('MainActivity.kt already wired')
+            return
+        upgraded = source.replace(
+            'import app.nudge.capture.ShareReceiver\n',
+            'import app.nudge.capture.ShareReceiver\nimport app.nudge.reminders.ReminderChannels\n',
+            1,
+        ).replace(
+            '        DocumentExporter.register(messenger, this)\n',
+            '        DocumentExporter.register(messenger, this)\n'
+            '        ReminderChannels.register(messenger, this)\n',
+            1,
+        )
+        if 'ReminderChannels.register' not in upgraded:
+            sys.exit('Could not add the reminder channel to MainActivity.kt')
+        with open(path, 'w', encoding='utf-8') as handle:
+            handle.write(upgraded)
+        print(f'Added the reminder channel to {path}')
         return
     match = re.search(r'^package\s+([\w.]+)', source, re.M)
     if not match:
@@ -137,6 +178,15 @@ def patch_manifest() -> None:
                 '</manifest>', '    <queries>\n' + QUERY + '    </queries>\n</manifest>', 1)
         changed = True
 
+    if REMINDERS_MARKER not in manifest:
+        if manifest.count('</application>') != 1 or manifest.count('<application') != 1:
+            sys.exit('Expected exactly one application element in AndroidManifest.xml')
+        manifest = manifest.replace(
+            '</application>', REMINDER_RECEIVERS + '    </application>', 1)
+        manifest = manifest.replace(
+            '<application', REMINDER_PERMISSIONS + '    <application', 1)
+        changed = True
+
     if SHARE_MARKER not in manifest:
         if manifest.count('</activity>') != 1:
             sys.exit('Expected exactly one </activity> in AndroidManifest.xml')
@@ -154,7 +204,9 @@ def patch_manifest() -> None:
         manifest = branded
         changed = True
 
-    if 'NotificationCaptureService' not in manifest or 'android.intent.action.SEND' not in manifest:
+    if ('NotificationCaptureService' not in manifest
+            or 'android.intent.action.SEND' not in manifest
+            or 'ReminderReceiver' not in manifest):
         sys.exit('Manifest patch failed')
     if changed:
         with open(path, 'w', encoding='utf-8') as handle:

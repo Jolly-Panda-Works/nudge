@@ -1,15 +1,21 @@
-feat: Nudge v0.8.1 - application id com.jollypanda.nudge and release signing
+feat: Nudge v0.9.0 - reminder alerts (M2 section 4)
 
-- Android application id is now com.jollypanda.nudge; wire_capture.py
-  sets it in build.gradle.kts (also on an already generated project) and
-  CI generates new projects with --org com.jollypanda
-- release signing from repository secrets (NUDGE_KEYSTORE_BASE64,
-  NUDGE_KEYSTORE_PASSWORD, NUDGE_KEY_ALIAS, optional NUDGE_KEY_PASSWORD);
-  falls back to the debug key when they are missing; release notes and
-  the build summary say which one was used
-- tools/make_keystore.sh creates the key and prints the secrets
-- .gitignore excludes keystores
-- docs: changelog, releasing, status
+- Alerts at the reminder time through the Android alarm service, with a
+  Snooze 10 min button; alarms are set again after a restart or update,
+  and a reminder missed while the phone was off is shown at start-up
+- ReminderScheduler keeps alarms in step with open tasks and applies
+  snoozes done from an alert while the app was closed
+- Kotlin app.nudge.reminders: store, scheduler (exact when allowed,
+  otherwise inexact), notifier + channel, alarm/snooze/boot receivers,
+  method channel
+- Settings > Reminders: alerts and exact-timing state with links to the
+  system screens; notification permission asked when a reminder is saved
+- wire_capture.py: permissions, receivers, reminder channel in an already
+  wired MainActivity
+- tests: scheduler, settings and permission flows (fake platform);
+  taller widget-test window
+- docs: changelog, roadmap, status, privacy, development checklist
 
-The old app.nudge.nudge install stays beside the new app; data is not
-moved. Not compiled or run: CI first.
+Not compiled, tested or run: CI first. Windows has no alerts.
+
+Milestone: M2 / Section 4

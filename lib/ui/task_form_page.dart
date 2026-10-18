@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../app_services.dart';
@@ -123,6 +125,15 @@ class _TaskFormPageState extends State<TaskFormPage> {
     });
   }
 
+  Future<void> _askForAlerts() async {
+    try {
+      final platform = widget.services.reminderPlatform;
+      if (platform.isSupported) await platform.requestNotificationPermission();
+    } on Exception {
+      // The Settings screen explains how to allow alerts.
+    }
+  }
+
   Future<void> _save() async {
     if (_saving) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
@@ -163,6 +174,10 @@ class _TaskFormPageState extends State<TaskFormPage> {
         saved = result.task;
       } else {
         saved = await tasks.create(draft);
+      }
+      if (_kind == TaskKind.reminder) {
+        // Alerts need the notification permission (Android 13 and later).
+        unawaited(_askForAlerts());
       }
       navigator.pop(saved);
     } on Exception {
@@ -288,8 +303,8 @@ class _TaskFormPageState extends State<TaskFormPage> {
               ),
             const SizedBox(height: 8),
             Text(
-              'Reminder alerts at the chosen time arrive in a later version; '
-              'for now the time is saved and shown.',
+              'A reminder shows an alert at the chosen time, with a Snooze '
+              'button. Alerts need notifications to be allowed for Nudge.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],

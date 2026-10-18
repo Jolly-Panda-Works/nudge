@@ -72,8 +72,7 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
     final confirmed = await confirmAction(
       context,
       title: 'Delete notification?',
-      message:
-          'It will be removed from Nudge. The original notification in '
+      message: 'It will be removed from Nudge. The original notification in '
           'the source app is not affected.',
       action: 'Delete',
     );
@@ -131,9 +130,7 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
           const SizedBox(height: 24),
           _Row(
             label: 'Source',
-            value: imported
-                ? 'Shared or imported text'
-                : n.appLabel ?? n.packageName,
+            value: imported ? 'Shared or imported text' : n.appLabel ?? n.packageName,
           ),
           if (!imported) _Row(label: 'Package', value: n.packageName),
           _Row(
@@ -170,8 +167,7 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
                       icon: const Icon(Icons.task_alt),
                       label: const Text('View task'),
                     )
-                  else if (snapshot.connectionState ==
-                      ConnectionState.done) ...[
+                  else if (snapshot.connectionState == ConnectionState.done) ...[
                     FilledButton.icon(
                       onPressed: () => _createTask(TaskKind.task),
                       icon: const Icon(Icons.add_task),
@@ -214,7 +210,10 @@ class _Row extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
           ),
           Expanded(child: Text(value)),
         ],

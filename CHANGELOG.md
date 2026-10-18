@@ -4,6 +4,19 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.9.0] - 2026-10-18
+### Added
+- M2 section 4: reminder alerts. A reminder (or any open task with a date) alerts at its time through the Android alarm service, with a Snooze 10 min button. Alarms are set again after a restart or an app update; a reminder that came due while the phone was off is shown at start-up.
+- `ReminderScheduler` keeps the alarms in step with the open tasks (future times only) and applies snoozes done from an alert while the app was closed.
+- Kotlin `app.nudge.reminders`: store (private no-backup file), scheduler (exact alarm when allowed, otherwise `setAndAllowWhileIdle`), notifier with a "Reminders" channel, receivers for the alarm, Snooze and boot, and the `app.nudge/reminders` channel.
+- Settings > Reminders: whether alerts are allowed and whether timing is exact, with a link to the right system screen for each. The notification permission is asked when a reminder is saved.
+- `wire_capture.py` declares the permissions (`POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED`) and receivers, and adds the channel to an already wired `MainActivity.kt`.
+- Tests for the scheduler and the settings and permission flows with a fake platform. The widget test window is taller so long screens stay on screen.
+### Known limitations
+- Not compiled, tested or run: CI is the first check. Not tested on a device; Samsung battery restrictions and Android 14 exact-alarm defaults are unverified.
+- Windows has no reminder alerts. A snooze done from an alert shows on the task the next time the app syncs (start, resume, or a task change).
+- The alert shows only the task title. Done and other snooze lengths are not offered yet.
+
 ## [0.8.1] - 2026-10-18
 ### Changed
 - The Android application id is now `com.jollypanda.nudge` (it was `app.nudge.nudge`). `tools/wire_capture.py` sets it in `build.gradle.kts` even on an already generated project, and CI generates new projects with `--org com.jollypanda`. This is a different app to Android: the old install stays next to it and its data is not moved.

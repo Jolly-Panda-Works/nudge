@@ -13,7 +13,7 @@ Where Nudge stands and what is left. Last updated: 2026-10-16 (version 0.6.0).
 | Milestone | Scope | Progress |
 |---|---|---|
 | M1 | Android notification capture and local inbox | All 5 sections done in code; device verification and 4 open items remain |
-| M2 | Task conversion and source navigation | In progress: section 1 of 4 done in code (task storage) |
+| M2 | Task conversion and source navigation | All 4 sections done in code; nothing compiled or verified on a device yet |
 | M3 | Calendar UI with Persian (Jalali, RTL) support | Not started |
 | M4 | Android Calendar Provider integration | Not started |
 | M5 | Windows build and secure synchronization | Not started |
@@ -131,10 +131,13 @@ M1 is complete when capture and the UI are verified on a physical device and the
 - [x] Tasks included in export; a separate "Delete all tasks" in Settings
 - [ ] Verify the screens on a device
 
-### Section 4: reminder delivery (not started)
-- [ ] Alert at the reminder time (scheduled with the system alarm service), including after a restart
-- [ ] Notification permission and exact-alarm handling on newer Android versions
-- [ ] Snooze from the alert itself
+### Section 4: reminder delivery (done in code, 0.9.0; not compiled or run yet)
+- [x] Alert at the reminder time (scheduled with the system alarm service), including after a restart; a reminder that came due while the phone was off is shown at start-up
+- [x] Notification permission (asked when a reminder is saved) and exact-alarm handling: exact when allowed, otherwise a few minutes late, with Settings > Reminders explaining and linking to the right system screen
+- [x] Snooze from the alert itself (10 minutes), applied to the task the next time the app syncs
+- [x] The alarms follow the task list: done, archived, deleted, edited or snoozed tasks update them
+- [ ] Verify on devices, including Samsung battery restrictions and Android 14 exact-alarm defaults
+- [ ] A "Done" button on the alert and a choice of snooze lengths
 
 ## M3: Calendar UI with Persian date support (not started)
 - [ ] Evaluate calendar libraries (gestures, customization, performance, accessibility, license) and choose one, or build custom

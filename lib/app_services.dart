@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'application/capture_ingestor.dart';
 import 'application/capture_status_controller.dart';
+import 'application/reminder_scheduler.dart';
 import 'application/retention_service.dart';
 import 'application/source_navigator.dart';
 import 'application/text_importer.dart';
@@ -16,6 +17,9 @@ import 'domain/task_repository.dart';
 import 'platform/capture_platform.dart';
 import 'platform/capture_platform_factory.dart';
 import 'platform/data_exporter.dart';
+import 'platform/noop_reminder_platform.dart';
+import 'platform/reminder_platform.dart';
+import 'platform/reminder_platform_factory.dart';
 
 /// Wires the app together. UI code receives this instead of creating objects.
 final class AppServices {
@@ -29,6 +33,8 @@ final class AppServices {
     TextImporter? importer,
     RetentionService? retention,
     SourceNavigator? sourceNavigator,
+    ReminderPlatform? reminderPlatform,
+    ReminderScheduler? reminderScheduler,
     CaptureStatusController? statusController,
     this.database,
   }) : importer = importer ?? TextImporter(notifications: notifications),
@@ -36,11 +42,17 @@ final class AppServices {
            retention ??
            RetentionService(notifications: notifications, settings: settings),
        sourceNavigator = sourceNavigator ?? SourceNavigator(platform),
-       statusController = statusController ?? CaptureStatusController(platform);
+       reminderPlatform = reminderPlatform ?? const NoopReminderPlatform(),
+       statusController = statusController ?? CaptureStatusController(platform) {
+    this.reminderScheduler =
+        reminderScheduler ??
+        ReminderScheduler(platform: this.reminderPlatform, tasks: tasks);
+  }
 
   factory AppServices.create() {
     final database = openAppDatabase();
     final platform = createCapturePlatform();
+    final reminderPlatform = createReminderPlatform();
     final notifications = DriftNotificationRepository(database);
     final settings = DriftCaptureSettingsRepository(database);
     return AppServices(
@@ -55,6 +67,7 @@ final class AppServices {
         settings: settings,
       ),
       exporter: createDataExporter(),
+      reminderPlatform: reminderPlatform,
     );
   }
 
@@ -68,6 +81,8 @@ final class AppServices {
   final TextImporter importer;
   final RetentionService retention;
   final SourceNavigator sourceNavigator;
+  final ReminderPlatform reminderPlatform;
+  late final ReminderScheduler reminderScheduler;
   final CaptureStatusController statusController;
 
   /// Starts status tracking, applies the retention setting and drains the
@@ -75,12 +90,14 @@ final class AppServices {
   Future<void> start() async {
     statusController.start();
     unawaited(
-      retention.apply().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Retention is retried on the next start or when the setting changes.
-        },
-      ),
+      retention.apply().then<void>((_) {}, onError: (Object _) {
+        // Retention is retried on the next start or when the setting changes.
+      }),
+    );
+    unawaited(
+      reminderScheduler.start().then<void>((_) {}, onError: (Object _) {
+        // Alarms are set again on the next task change or start.
+      }),
     );
     await ingestor.start();
   }

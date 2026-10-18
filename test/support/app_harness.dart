@@ -6,6 +6,7 @@ import 'package:nudge/main.dart';
 
 import 'fake_capture_platform.dart';
 import 'fake_data_exporter.dart';
+import 'fake_reminder_platform.dart';
 import 'in_memory_repositories.dart';
 import 'in_memory_task_repository.dart';
 
@@ -15,10 +16,12 @@ final class AppHarness {
     bool accessGranted = true,
     bool connected = true,
     bool supported = true,
+    bool remindersSupported = false,
   }) : platform = (FakeCapturePlatform()
          ..accessGranted = accessGranted
          ..connected = connected
-         ..supported = supported);
+         ..supported = supported),
+       reminders = (FakeReminderPlatform()..supported = remindersSupported);
 
   final FakeCapturePlatform platform;
   final InMemoryNotificationRepository notifications =
@@ -26,6 +29,7 @@ final class AppHarness {
   final InMemorySettingsRepository settings = InMemorySettingsRepository();
   final InMemoryTaskRepository tasks = InMemoryTaskRepository();
   final FakeDataExporter exporter = FakeDataExporter();
+  final FakeReminderPlatform reminders;
 
   late final AppServices services = AppServices(
     platform: platform,
@@ -33,6 +37,7 @@ final class AppHarness {
     settings: settings,
     tasks: tasks,
     exporter: exporter,
+    reminderPlatform: reminders,
     ingestor: CaptureIngestor(
       platform: platform,
       notifications: notifications,
@@ -41,7 +46,7 @@ final class AppHarness {
   );
 
   Future<void> pump(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.physicalSize = const Size(800, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(NudgeApp(services: services));
