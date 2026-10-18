@@ -8,6 +8,7 @@ import 'dialogs.dart';
 import 'task_detail_page.dart';
 import 'task_form_page.dart';
 import 'time_format.dart';
+import '../l10n/l10n.dart';
 
 class NotificationDetailPage extends StatefulWidget {
   const NotificationDetailPage({
@@ -71,11 +72,10 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
   Future<void> _delete(BuildContext context) async {
     final confirmed = await confirmAction(
       context,
-      title: 'Delete notification?',
-      message:
-          'It will be removed from Nudge. The original notification in '
-          'the source app is not affected.',
-      action: 'Delete',
+      title: tr('Delete notification?'),
+      message: tr('It will be removed from Nudge. The original notification in '
+          'the source app is not affected.'),
+      action: tr('Delete'),
     );
     if (!confirmed || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
@@ -84,11 +84,11 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
       await services.notifications.deleteByKey(notification.key);
       navigator.pop();
       messenger.showSnackBar(
-        const SnackBar(content: Text('Notification deleted')),
+        SnackBar(content: Text(tr('Notification deleted'))),
       );
     } on Exception {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Could not delete the notification.')),
+        SnackBar(content: Text(tr('Could not delete the notification.'))),
       );
     }
   }
@@ -101,11 +101,11 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
     final titleStyle = Theme.of(context).textTheme.titleLarge;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notification details'),
+        title: Text(tr('Notification details')),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            tooltip: 'Delete notification',
+            tooltip: tr('Delete notification'),
             onPressed: () => _delete(context),
           ),
         ],
@@ -117,43 +117,41 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
             SelectableText(n.title!, style: titleStyle)
           else
             Text(
-              n.isRedacted ? 'Content hidden by Android' : '(no title)',
+              n.isRedacted ? tr('Content hidden by Android') : tr('(no title)'),
               style: titleStyle,
             ),
           const SizedBox(height: 12),
           if (n.text != null)
             SelectableText(n.text!)
           else if (n.isRedacted)
-            const Text(
-              'The system did not share this notification\'s content with '
-              'Nudge.',
+            Text(
+              tr('The system did not share this notification\'s content with '
+              'Nudge.'),
             ),
           const SizedBox(height: 24),
           _Row(
-            label: 'Source',
-            value: imported
-                ? 'Shared or imported text'
-                : n.appLabel ?? n.packageName,
+            label: tr('Source'),
+            value: imported ? tr('Shared or imported text') : n.appLabel ?? n.packageName,
           ),
-          if (!imported) _Row(label: 'Package', value: n.packageName),
+          if (!imported) _Row(label: tr('Package'), value: n.packageName),
           _Row(
-            label: imported ? 'Added' : 'Posted',
+            label: imported ? tr('Added') : tr('Posted'),
             value: formatFullTimestamp(n.postedAt),
           ),
-          _Row(label: 'First seen', value: formatFullTimestamp(n.firstSeenAt)),
+          _Row(label: tr('First seen'), value: formatFullTimestamp(n.firstSeenAt)),
           _Row(
-            label: 'Last updated',
+            label: tr('Last updated'),
             value: formatFullTimestamp(n.lastUpdatedAt),
           ),
-          _Row(label: 'Updates', value: '${n.updateCount}'),
+          _Row(label: tr('Updates'), value: tr('{count}', {'count': n.updateCount})),
           if (!imported)
-            _Row(label: 'Status', value: removed ? 'Dismissed' : 'Active'),
+            _Row(label: tr('Status'), value: removed ? tr('Dismissed') : tr('Active')),
           if (!imported)
             _Row(
-              label: 'Original action',
+              label: tr('Original action'),
               value: n.source.hasContentAction
-                  ? 'Existed when captured'
-                  : 'None when captured',
+                  ? tr('Existed when captured')
+                  : tr('None when captured'),
             ),
           const SizedBox(height: 16),
           FutureBuilder<TaskItem?>(
@@ -168,26 +166,25 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
                     FilledButton.icon(
                       onPressed: () => _viewTask(task),
                       icon: const Icon(Icons.task_alt),
-                      label: const Text('View task'),
+                      label: Text(tr('View task')),
                     )
-                  else if (snapshot.connectionState ==
-                      ConnectionState.done) ...[
+                  else if (snapshot.connectionState == ConnectionState.done) ...[
                     FilledButton.icon(
                       onPressed: () => _createTask(TaskKind.task),
                       icon: const Icon(Icons.add_task),
-                      label: const Text('Create task'),
+                      label: Text(tr('Create task')),
                     ),
                     OutlinedButton.icon(
                       onPressed: () => _createTask(TaskKind.reminder),
                       icon: const Icon(Icons.alarm_add),
-                      label: const Text('Create reminder'),
+                      label: Text(tr('Create reminder')),
                     ),
                   ],
                   if (!imported)
                     OutlinedButton.icon(
                       onPressed: _openOriginal,
                       icon: const Icon(Icons.open_in_new),
-                      label: const Text('Open original'),
+                      label: Text(tr('Open original')),
                     ),
                 ],
               );
@@ -214,7 +211,10 @@ class _Row extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
           ),
           Expanded(child: Text(value)),
         ],

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'application/capture_ingestor.dart';
 import 'application/capture_status_controller.dart';
+import 'application/language_controller.dart';
 import 'application/reminder_scheduler.dart';
 import 'application/retention_service.dart';
 import 'application/source_navigator.dart';
@@ -34,6 +35,7 @@ final class AppServices {
     RetentionService? retention,
     SourceNavigator? sourceNavigator,
     ReminderPlatform? reminderPlatform,
+    LanguageController? language,
     ReminderScheduler? reminderScheduler,
     CaptureStatusController? statusController,
     this.database,
@@ -43,8 +45,8 @@ final class AppServices {
            RetentionService(notifications: notifications, settings: settings),
        sourceNavigator = sourceNavigator ?? SourceNavigator(platform),
        reminderPlatform = reminderPlatform ?? const NoopReminderPlatform(),
-       statusController =
-           statusController ?? CaptureStatusController(platform) {
+       language = language ?? LanguageController(settings, deviceLanguage: () => 'en'),
+       statusController = statusController ?? CaptureStatusController(platform) {
     this.reminderScheduler =
         reminderScheduler ??
         ReminderScheduler(platform: this.reminderPlatform, tasks: tasks);
@@ -69,6 +71,7 @@ final class AppServices {
       ),
       exporter: createDataExporter(),
       reminderPlatform: reminderPlatform,
+      language: LanguageController(settings),
     );
   }
 
@@ -83,6 +86,7 @@ final class AppServices {
   final RetentionService retention;
   final SourceNavigator sourceNavigator;
   final ReminderPlatform reminderPlatform;
+  final LanguageController language;
   late final ReminderScheduler reminderScheduler;
   final CaptureStatusController statusController;
 
@@ -91,20 +95,14 @@ final class AppServices {
   Future<void> start() async {
     statusController.start();
     unawaited(
-      retention.apply().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Retention is retried on the next start or when the setting changes.
-        },
-      ),
+      retention.apply().then<void>((_) {}, onError: (Object _) {
+        // Retention is retried on the next start or when the setting changes.
+      }),
     );
     unawaited(
-      reminderScheduler.start().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Alarms are set again on the next task change or start.
-        },
-      ),
+      reminderScheduler.start().then<void>((_) {}, onError: (Object _) {
+        // Alarms are set again on the next task change or start.
+      }),
     );
     await ingestor.start();
   }

@@ -4,6 +4,20 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.13.0] - 2026-10-18
+### Added
+- Persian localization of the whole app (see docs/LOCALIZATION.md). Settings > Language: System default (follows the device), English or فارسی. Persian lays the whole app out right to left and uses Persian digits.
+- `tr('English text', {placeholders})` with the Persian table in `lib/l10n/fa_strings.dart` (about 200 texts); `L10n` holds the language and `LanguageController` the setting (settings key `language`).
+- Persian times and dates: relative times, Jalali dates for older times and full timestamps. English formats are unchanged.
+- Material widgets use `flutter_localizations` (English and Persian); the app declares both locales.
+- Tests: `tr` and the language rules, a check that every text passed to `tr` has a Persian entry (and no stale entries or broken placeholders), the language controller, Persian time formats, and the UI opening in Persian, switching language and showing Gregorian dates with Persian names.
+### Changed
+- Every user-visible text in `lib/ui` is now written with `tr(...)`, so `const` was removed from the widgets around them. The English text is unchanged.
+- The calendar shows Persian names and digits when the system is Jalali or the app language is Persian; the grid direction still follows the calendar system.
+- `pubspec.yaml` gains `flutter_localizations` (from the SDK), which pulls in `intl`. `pubspec.lock` is not updated in this zip: the first `flutter pub get` on CI rewrites it, and the new lock file should be copied back into the repository afterwards.
+### Known limitations
+- Not compiled, tested or run: CI is the first check. The Persian wording has not been reviewed by a native speaker. The reminder alert on the lock screen and Android's own dialogs are not covered. Changing the language returns the app to the inbox.
+
 ## [0.12.0] - 2026-10-18
 ### Added
 - M3 section 3: week, day and agenda views next to the month view, chosen with a switch above the calendar. The week view shows one row per day with its tasks and a title naming the range; tapping a date opens it in the day view. The day view lists the 24 hours with each task under its hour. The agenda lists the next 60 days that have tasks.

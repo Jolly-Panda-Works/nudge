@@ -11,6 +11,7 @@ import 'dialogs.dart';
 import 'reminder_settings_section.dart';
 import 'source_rules_page.dart';
 import 'time_format.dart';
+import '../l10n/l10n.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({required this.services, super.key});
@@ -57,19 +58,54 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   static String _modeLabel(FilterMode mode) => switch (mode) {
-    FilterMode.off => 'All apps',
-    FilterMode.allowlist => 'Only selected apps',
-    FilterMode.blocklist => 'All apps except selected',
+    FilterMode.off => tr('All apps'),
+    FilterMode.allowlist => tr('Only selected apps'),
+    FilterMode.blocklist => tr('All apps except selected'),
   };
 
   static String _retentionLabel(int? days) =>
-      days == null ? 'Forever' : '$days days';
+      days == null ? tr('Forever') : tr('{days} days', {'days': days});
+
+  static String _languageLabel(String setting) => switch (setting) {
+    'en' => 'English',
+    'fa' => 'فارسی',
+    _ => tr('System default'),
+  };
+
+  Future<void> _chooseLanguage() async {
+    final current = widget.services.language.setting;
+    final chosen = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(tr('Choose language')),
+        children: [
+          for (final option in const <String>['system', 'en', 'fa'])
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(context).pop(option),
+              child: Text(
+                _languageLabel(option),
+                style: option == current
+                    ? const TextStyle(fontWeight: FontWeight.bold)
+                    : null,
+              ),
+            ),
+        ],
+      ),
+    );
+    if (chosen == null || chosen == current) return;
+    try {
+      // Every screen is rebuilt in the new language, so nothing follows.
+      await widget.services.language.choose(chosen);
+    } on Exception {
+      if (mounted) showMessage(context, tr('Could not apply the new setting.'));
+    }
+  }
 
   Future<void> _chooseMode(FilterMode current) async {
     final chosen = await showDialog<FilterMode>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Capture mode'),
+        title: Text(tr('Capture mode')),
         children: [
           for (final mode in FilterMode.values)
             SimpleDialogOption(
@@ -95,7 +131,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final chosen = await showDialog<int>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Keep notifications for'),
+        title: Text(tr('Keep notifications for')),
         children: [
           for (final days in options)
             SimpleDialogOption(
@@ -112,7 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       await widget.services.retention.apply();
     } on Exception {
-      if (mounted) showMessage(context, 'Could not apply the new setting.');
+      if (mounted) showMessage(context, tr('Could not apply the new setting.'));
     }
     await _load();
   }
@@ -129,22 +165,18 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _openAccessSettings() async {
     final opened = await widget.services.platform.openAccessSettings();
     if (!opened && mounted) {
-      showMessage(
-        context,
-        'Could not open the settings screen on this device.',
-      );
+      showMessage(context, tr('Could not open the settings screen on this device.'));
     }
   }
 
   Future<void> _export() async {
     final confirmed = await confirmAction(
       context,
-      title: 'Export data',
-      message:
-          'The export file contains the full text of every stored '
+      title: tr('Export data'),
+      message: tr('The export file contains the full text of every stored '
           'notification, plus your tasks, and is not encrypted. Keep it '
-          'somewhere safe.',
-      action: 'Export',
+          'somewhere safe.'),
+      action: tr('Export'),
     );
     if (!confirmed || !mounted) return;
     try {
@@ -162,27 +194,30 @@ class _SettingsPageState extends State<SettingsPage> {
         content: json,
       );
       if (!mounted) return;
-      showMessage(context, switch (result.outcome) {
-        ExportOutcome.saved =>
-          result.location == null
-              ? 'Export saved'
-              : 'Exported to ${result.location}',
-        ExportOutcome.cancelled => 'Export cancelled',
-        ExportOutcome.unsupported => 'Export is not available on this platform',
-      });
+      showMessage(
+        context,
+        switch (result.outcome) {
+          ExportOutcome.saved =>
+            result.location == null
+                ? tr('Export saved')
+                : tr('Exported to {location}', {'location': result.location}),
+          ExportOutcome.cancelled => tr('Export cancelled'),
+          ExportOutcome.unsupported =>
+            tr('Export is not available on this platform'),
+        },
+      );
     } on Exception {
-      if (mounted) showMessage(context, 'Export failed.');
+      if (mounted) showMessage(context, tr('Export failed.'));
     }
   }
 
   Future<void> _deleteAll() async {
     final confirmed = await confirmAction(
       context,
-      title: 'Delete all notifications?',
-      message:
-          'This removes every stored notification and anything still '
-          'waiting to be stored. It cannot be undone. Your settings are kept.',
-      action: 'Delete',
+      title: tr('Delete all notifications?'),
+      message: tr('This removes every stored notification and anything still '
+          'waiting to be stored. It cannot be undone. Your settings are kept.'),
+      action: tr('Delete'),
     );
     if (!confirmed || !mounted) return;
     try {
@@ -191,22 +226,23 @@ class _SettingsPageState extends State<SettingsPage> {
       if (!mounted) return;
       showMessage(
         context,
-        'Deleted $deleted ${deleted == 1 ? 'notification' : 'notifications'}',
+        deleted == 1
+            ? tr('Deleted 1 notification')
+            : tr('Deleted {count} notifications', {'count': deleted}),
       );
       await _load();
     } on Exception {
-      if (mounted) showMessage(context, 'Could not delete the notifications.');
+      if (mounted) showMessage(context, tr('Could not delete the notifications.'));
     }
   }
 
   Future<void> _deleteAllTasks() async {
     final confirmed = await confirmAction(
       context,
-      title: 'Delete all tasks?',
-      message:
-          'This removes every task and reminder, including done and '
-          'archived ones. It cannot be undone. Notifications are kept.',
-      action: 'Delete',
+      title: tr('Delete all tasks?'),
+      message: tr('This removes every task and reminder, including done and '
+          'archived ones. It cannot be undone. Notifications are kept.'),
+      action: tr('Delete'),
     );
     if (!confirmed || !mounted) return;
     try {
@@ -214,10 +250,12 @@ class _SettingsPageState extends State<SettingsPage> {
       if (!mounted) return;
       showMessage(
         context,
-        'Deleted $deleted ${deleted == 1 ? 'task' : 'tasks'}',
+        deleted == 1
+            ? tr('Deleted 1 task')
+            : tr('Deleted {count} tasks', {'count': deleted}),
       );
     } on Exception {
-      if (mounted) showMessage(context, 'Could not delete the tasks.');
+      if (mounted) showMessage(context, tr('Could not delete the tasks.'));
     }
   }
 
@@ -226,53 +264,62 @@ class _SettingsPageState extends State<SettingsPage> {
     final policy = _policy;
     final controller = widget.services.statusController;
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(tr('Settings'))),
       body: _failed
           ? Center(
-              child: FilledButton(onPressed: _load, child: const Text('Retry')),
+              child: FilledButton(
+                onPressed: _load,
+                child: Text(tr('Retry')),
+              ),
             )
           : policy == null
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
-                const _SectionHeader('Notification access'),
+                ListTile(
+                  title: Text(tr('Language')),
+                  subtitle: Text(
+                    _languageLabel(widget.services.language.setting),
+                  ),
+                  trailing: const Icon(Icons.language),
+                  onTap: _chooseLanguage,
+                ),
+                _SectionHeader(tr('Notification access')),
                 ListenableBuilder(
                   listenable: controller,
                   builder: (context, _) {
                     final status = controller.status;
                     if (!controller.isSupported) {
-                      return const ListTile(
-                        title: Text('Not available on this platform'),
+                      return ListTile(
+                        title: Text(tr('Not available on this platform')),
                         subtitle: Text(
-                          'Notification capture is available on Android.',
+                          tr('Notification capture is available on Android.'),
                         ),
                       );
                     }
                     final access = status == null
-                        ? 'checking'
+                        ? tr('checking')
                         : status.accessGranted
-                        ? 'granted'
-                        : 'not granted';
+                        ? tr('granted')
+                        : tr('not granted');
                     final listener = status == null
-                        ? 'checking'
+                        ? tr('checking')
                         : status.listenerConnected
-                        ? 'connected'
-                        : 'not connected';
+                        ? tr('connected')
+                        : tr('not connected');
                     return Column(
                       children: [
                         ListTile(
-                          title: Text('Access: $access'),
-                          subtitle: Text('Listener: $listener'),
+                          title: Text(tr('Access: {state}', {'state': access})),
+                          subtitle: Text(tr('Listener: {state}', {'state': listener})),
                         ),
                         ListTile(
-                          title: const Text(
-                            'Open Notification Access settings',
-                          ),
+                          title: Text(tr('Open Notification Access settings')),
                           trailing: const Icon(Icons.open_in_new),
                           onTap: _openAccessSettings,
                         ),
                         ListTile(
-                          title: const Text('Reconnect listener'),
+                          title: Text(tr('Reconnect listener')),
                           trailing: const Icon(Icons.refresh),
                           onTap: () async {
                             await widget.services.platform.requestRebind();
@@ -284,21 +331,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 if (widget.services.reminderPlatform.isSupported) ...[
-                  const _SectionHeader('Reminders'),
+                  _SectionHeader(tr('Reminders')),
                   ReminderSettingsSection(services: widget.services),
                 ],
-                const _SectionHeader('What to capture'),
+                _SectionHeader(tr('What to capture')),
                 ListTile(
-                  title: const Text('Capture mode'),
+                  title: Text(tr('Capture mode')),
                   subtitle: Text(_modeLabel(policy.mode)),
                   onTap: () => _chooseMode(policy.mode),
                 ),
                 ListTile(
-                  title: const Text('Choose apps'),
+                  title: Text(tr('Choose apps')),
                   subtitle: Text(
                     policy.mode == FilterMode.off
-                        ? 'Not used in "All apps" mode'
-                        : '${policy.packages.length} selected',
+                        ? tr('Not used in "All apps" mode')
+                        : tr('{count} selected', {'count': policy.packages.length}),
                   ),
                   enabled: policy.mode != FilterMode.off,
                   onTap: policy.mode == FilterMode.off
@@ -306,10 +353,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       : () => _openRules(policy.mode),
                 ),
                 SwitchListTile(
-                  title: const Text('Ongoing notifications'),
-                  subtitle: const Text(
-                    'Media players, navigation and other persistent '
-                    'notifications',
+                  title: Text(tr('Ongoing notifications')),
+                  subtitle: Text(
+                    tr('Media players, navigation and other persistent '
+                    'notifications'),
                   ),
                   value: policy.captureOngoing,
                   onChanged: (value) async {
@@ -320,10 +367,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
                 SwitchListTile(
-                  title: const Text('Group summaries'),
-                  subtitle: const Text(
-                    'The combined entry apps post for a group of '
-                    'notifications',
+                  title: Text(tr('Group summaries')),
+                  subtitle: Text(
+                    tr('The combined entry apps post for a group of '
+                    'notifications'),
                   ),
                   value: policy.captureGroupSummaries,
                   onChanged: (value) async {
@@ -333,41 +380,41 @@ class _SettingsPageState extends State<SettingsPage> {
                     await _load();
                   },
                 ),
-                const _SectionHeader('Your data'),
+                _SectionHeader(tr('Your data')),
                 ListTile(
-                  title: Text('Stored notifications: $_total'),
-                  subtitle: Text('$_active active'),
+                  title: Text(tr('Stored notifications: {count}', {'count': _total})),
+                  subtitle: Text(tr('{count} active', {'count': _active})),
                 ),
                 ListTile(
-                  title: const Text('Keep notifications for'),
+                  title: Text(tr('Keep notifications for')),
                   subtitle: Text(_retentionLabel(_retentionDays)),
                   onTap: _chooseRetention,
                 ),
                 ListTile(
-                  title: const Text('Export data'),
-                  subtitle: const Text(
-                    'Save all stored notifications and tasks as a JSON file',
+                  title: Text(tr('Export data')),
+                  subtitle: Text(
+                    tr('Save all stored notifications and tasks as a JSON file'),
                   ),
                   trailing: const Icon(Icons.file_download_outlined),
                   onTap: _export,
                 ),
                 ListTile(
-                  title: const Text('Delete all notifications'),
-                  subtitle: const Text(
-                    'Removes stored notifications and anything still queued',
+                  title: Text(tr('Delete all notifications')),
+                  subtitle: Text(
+                    tr('Removes stored notifications and anything still queued'),
                   ),
                   trailing: const Icon(Icons.delete_outline),
                   onTap: _deleteAll,
                 ),
                 ListTile(
-                  title: const Text('Delete all tasks'),
-                  subtitle: const Text(
-                    'Removes every task and reminder, including done ones',
+                  title: Text(tr('Delete all tasks')),
+                  subtitle: Text(
+                    tr('Removes every task and reminder, including done ones'),
                   ),
                   trailing: const Icon(Icons.delete_outline),
                   onTap: _deleteAllTasks,
                 ),
-                const _SectionHeader('About'),
+                _SectionHeader(tr('About')),
                 const ListTile(title: Text('$appName v$appVersion')),
               ],
             ),

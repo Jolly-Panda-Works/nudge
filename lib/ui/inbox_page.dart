@@ -13,6 +13,7 @@ import 'notification_detail_page.dart';
 import 'settings_page.dart';
 import 'tasks_page.dart';
 import 'time_format.dart';
+import '../l10n/l10n.dart';
 
 class InboxPage extends StatefulWidget {
   const InboxPage({required this.services, super.key});
@@ -27,8 +28,9 @@ class _InboxPageState extends State<InboxPage> {
   bool _showRemoved = false;
   late Stream<List<CapturedNotification>> _stream = _openStream();
 
-  Stream<List<CapturedNotification>> _openStream() =>
-      widget.services.notifications.watchInbox(includeRemoved: _showRemoved);
+  Stream<List<CapturedNotification>> _openStream() => widget.services
+      .notifications
+      .watchInbox(includeRemoved: _showRemoved);
 
   @override
   void initState() {
@@ -92,7 +94,7 @@ class _InboxPageState extends State<InboxPage> {
         title: imported.title,
       );
     } on Exception {
-      if (mounted) showMessage(context, 'Could not import the text.');
+      if (mounted) showMessage(context, tr('Could not import the text.'));
     }
   }
 
@@ -105,24 +107,24 @@ class _InboxPageState extends State<InboxPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month),
-            tooltip: 'Calendar',
+            tooltip: tr('Calendar'),
             onPressed: _openCalendar,
           ),
           IconButton(
             icon: const Icon(Icons.checklist),
-            tooltip: 'Tasks',
+            tooltip: tr('Tasks'),
             onPressed: _openTasks,
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            tooltip: 'Settings',
+            tooltip: tr('Settings'),
             onPressed: _openSettings,
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _importText,
-        tooltip: 'Import text',
+        tooltip: tr('Import text'),
         child: const Icon(Icons.add),
       ),
       body: Column(
@@ -138,9 +140,9 @@ class _InboxPageState extends State<InboxPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment<bool>(value: false, label: Text('Active')),
-                ButtonSegment<bool>(value: true, label: Text('All')),
+              segments: [
+                ButtonSegment<bool>(value: false, label: Text(tr('Active'))),
+                ButtonSegment<bool>(value: true, label: Text(tr('All'))),
               ],
               selected: <bool>{_showRemoved},
               showSelectedIcon: false,
@@ -164,7 +166,8 @@ class _InboxPageState extends State<InboxPage> {
                     listenable: controller,
                     builder: (context, _) => _EmptyState(
                       supported: controller.isSupported,
-                      accessGranted: controller.status?.accessGranted ?? false,
+                      accessGranted:
+                          controller.status?.accessGranted ?? false,
                     ),
                   );
                 }
@@ -201,9 +204,8 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appName = notification.appLabel ?? notification.packageName;
-    final title =
-        notification.title ??
-        (notification.isRedacted ? 'Content hidden' : '(no title)');
+    final title = notification.title ??
+        (notification.isRedacted ? tr('Content hidden') : tr('(no title)'));
     final removed = notification.status == NotificationStatus.removed;
     final snippet = notification.text;
     return ListTile(
@@ -225,7 +227,7 @@ class _NotificationTile extends StatelessWidget {
             Text(snippet, maxLines: 2, overflow: TextOverflow.ellipsis),
         ],
       ),
-      trailing: removed ? const Chip(label: Text('Dismissed')) : null,
+      trailing: removed ? Chip(label: Text(tr('Dismissed'))) : null,
     );
   }
 }
@@ -260,17 +262,17 @@ class _AccessBanner extends StatelessWidget {
           children: [
             Text(
               needsAccess
-                  ? 'Notification access is off'
-                  : 'Listener not connected',
+                  ? tr('Notification access is off')
+                  : tr('Listener not connected'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 4),
             Text(
               needsAccess
-                  ? 'Nudge cannot capture notifications until you enable '
-                        'Notification Access for it.'
-                  : 'Notification access is on, but the listener is not '
-                        'running. Try reconnecting.',
+                  ? tr('Nudge cannot capture notifications until you enable '
+                      'Notification Access for it.')
+                  : tr('Notification access is on, but the listener is not '
+                      'running. Try reconnecting.'),
             ),
             const SizedBox(height: 8),
             Align(
@@ -284,7 +286,7 @@ class _AccessBanner extends StatelessWidget {
                   }
                   await services.statusController.refresh();
                 },
-                child: Text(needsAccess ? 'Enable' : 'Reconnect'),
+                child: Text(needsAccess ? tr('Enable') : tr('Reconnect')),
               ),
             ),
           ],
@@ -304,11 +306,11 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final String hint;
     if (!supported) {
-      hint = 'Notification capture is available on Android.';
+      hint = tr('Notification capture is available on Android.');
     } else if (!accessGranted) {
-      hint = 'Enable Notification Access to start capturing.';
+      hint = tr('Enable Notification Access to start capturing.');
     } else {
-      hint = 'New notifications from other apps will appear here.';
+      hint = tr('New notifications from other apps will appear here.');
     }
     return Center(
       child: Padding(
@@ -319,7 +321,7 @@ class _EmptyState extends StatelessWidget {
             const Icon(Icons.notifications_none, size: 48),
             const SizedBox(height: 16),
             Text(
-              'No notifications yet',
+              tr('No notifications yet'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -347,11 +349,11 @@ class _ErrorState extends StatelessWidget {
             const Icon(Icons.error_outline, size: 48),
             const SizedBox(height: 16),
             Text(
-              'Could not load notifications',
+              tr('Could not load notifications'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            FilledButton(onPressed: onRetry, child: const Text('Retry')),
+            FilledButton(onPressed: onRetry, child: Text(tr('Retry'))),
           ],
         ),
       ),

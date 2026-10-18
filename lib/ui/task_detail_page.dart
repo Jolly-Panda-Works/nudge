@@ -6,9 +6,14 @@ import '../domain/task.dart';
 import 'dialogs.dart';
 import 'task_form_page.dart';
 import 'time_format.dart';
+import '../l10n/l10n.dart';
 
 class TaskDetailPage extends StatefulWidget {
-  const TaskDetailPage({required this.task, required this.services, super.key});
+  const TaskDetailPage({
+    required this.task,
+    required this.services,
+    super.key,
+  });
 
   final TaskItem task;
   final AppServices services;
@@ -31,7 +36,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         setState(() => _task = updated);
       }
     } on Exception {
-      if (mounted) showMessage(context, 'Could not update the task.');
+      if (mounted) showMessage(context, tr('Could not update the task.'));
     }
   }
 
@@ -48,15 +53,15 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final now = DateTime.now();
     final tomorrow = DateTime(now.year, now.month, now.day + 1, 9);
     final options = <String, DateTime>{
-      'In 15 minutes': now.add(const Duration(minutes: 15)),
-      'In 1 hour': now.add(const Duration(hours: 1)),
-      'In 3 hours': now.add(const Duration(hours: 3)),
-      'Tomorrow at 09:00': tomorrow,
+      tr('In 15 minutes'): now.add(const Duration(minutes: 15)),
+      tr('In 1 hour'): now.add(const Duration(hours: 1)),
+      tr('In 3 hours'): now.add(const Duration(hours: 3)),
+      tr('Tomorrow at 09:00'): tomorrow,
     };
     final choice = await showDialog<DateTime>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Snooze until'),
+        title: Text(tr('Snooze until')),
         children: [
           for (final entry in options.entries)
             SimpleDialogOption(
@@ -73,11 +78,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Future<void> _delete() async {
     final confirmed = await confirmAction(
       context,
-      title: 'Delete task?',
-      message:
-          'The task is removed from Nudge. The notification it came '
-          'from is not affected.',
-      action: 'Delete',
+      title: tr('Delete task?'),
+      message: tr('The task is removed from Nudge. The notification it came '
+          'from is not affected.'),
+      action: tr('Delete'),
     );
     if (!confirmed || !mounted) return;
     final navigator = Navigator.of(context);
@@ -85,9 +89,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     try {
       await widget.services.tasks.delete(_task.id);
       navigator.pop();
-      messenger.showSnackBar(const SnackBar(content: Text('Task deleted')));
+      messenger.showSnackBar(SnackBar(content: Text(tr('Task deleted'))));
     } on Exception {
-      if (mounted) showMessage(context, 'Could not delete the task.');
+      if (mounted) showMessage(context, tr('Could not delete the task.'));
     }
   }
 
@@ -111,17 +115,17 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text(task.kind == TaskKind.reminder ? 'Reminder' : 'Task'),
+        title: Text(task.kind == TaskKind.reminder ? tr('Reminder') : tr('Task')),
         actions: [
           if (task.status != TaskStatus.archived)
             IconButton(
               icon: const Icon(Icons.edit_outlined),
-              tooltip: 'Edit',
+              tooltip: tr('Edit'),
               onPressed: _edit,
             ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            tooltip: 'Delete task',
+            tooltip: tr('Delete task'),
             onPressed: _delete,
           ),
         ],
@@ -135,16 +139,19 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             SelectableText(task.notes!),
           ],
           const SizedBox(height: 16),
-          _Row(label: 'Status', value: _statusLabel(task.status)),
+          _Row(label: tr('Status'), value: _statusLabel(task.status)),
           if (task.dueAt != null)
-            _Row(label: 'Due', value: formatDue(task.dueAt!)),
+            _Row(label: tr('Due'), value: formatDue(task.dueAt!)),
           if (task.snoozedUntil != null)
-            _Row(label: 'Snoozed until', value: formatDue(task.snoozedUntil!)),
+            _Row(label: tr('Snoozed until'), value: formatDue(task.snoozedUntil!)),
           if (remindAt == null && task.kind == TaskKind.reminder)
-            const _Row(label: 'Due', value: 'Not set'),
+            _Row(label: tr('Due'), value: tr('Not set')),
           if (source != null)
-            _Row(label: 'From', value: source.appLabel ?? source.packageName),
-          _Row(label: 'Created', value: formatFullTimestamp(task.createdAt)),
+            _Row(
+              label: tr('From'),
+              value: source.appLabel ?? source.packageName,
+            ),
+          _Row(label: tr('Created'), value: formatFullTimestamp(task.createdAt)),
           const SizedBox(height: 16),
           Wrap(
             spacing: 8,
@@ -154,37 +161,37 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                 FilledButton.icon(
                   onPressed: () => _apply(() => tasks.markDone(task.id)),
                   icon: const Icon(Icons.check),
-                  label: const Text('Mark done'),
+                  label: Text(tr('Mark done')),
                 ),
               if (task.status == TaskStatus.done)
                 FilledButton.icon(
                   onPressed: () => _apply(() => tasks.reopen(task.id)),
                   icon: const Icon(Icons.undo),
-                  label: const Text('Reopen'),
+                  label: Text(tr('Reopen')),
                 ),
               if (task.status == TaskStatus.open)
                 OutlinedButton.icon(
                   onPressed: _snooze,
                   icon: const Icon(Icons.snooze),
-                  label: const Text('Snooze'),
+                  label: Text(tr('Snooze')),
                 ),
               if (task.status == TaskStatus.archived)
                 OutlinedButton.icon(
                   onPressed: () => _apply(() => tasks.restore(task.id)),
                   icon: const Icon(Icons.unarchive_outlined),
-                  label: const Text('Restore'),
+                  label: Text(tr('Restore')),
                 )
               else
                 OutlinedButton.icon(
                   onPressed: () => _apply(() => tasks.archive(task.id)),
                   icon: const Icon(Icons.archive_outlined),
-                  label: const Text('Archive'),
+                  label: Text(tr('Archive')),
                 ),
               if (source != null)
                 OutlinedButton.icon(
                   onPressed: _openOriginal,
                   icon: const Icon(Icons.open_in_new),
-                  label: const Text('Open original'),
+                  label: Text(tr('Open original')),
                 ),
             ],
           ),
@@ -195,19 +202,19 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 }
 
 String _statusLabel(TaskStatus status) => switch (status) {
-  TaskStatus.open => 'Open',
-  TaskStatus.done => 'Done',
-  TaskStatus.archived => 'Archived',
+  TaskStatus.open => tr('Open'),
+  TaskStatus.done => tr('Done'),
+  TaskStatus.archived => tr('Archived'),
 };
 
 /// Plain-language result of "Open original", shared by every screen that has
 /// the action.
 String sourceOutcomeMessage(SourceOpenOutcome outcome) => switch (outcome) {
-  SourceOpenOutcome.openedOriginal => 'Opened the original notification',
+  SourceOpenOutcome.openedOriginal => tr('Opened the original notification'),
   SourceOpenOutcome.openedApp =>
-    'The notification is gone, so the app was opened instead',
+    tr('The notification is gone, so the app was opened instead'),
   SourceOpenOutcome.unavailable =>
-    'The original is not available. The saved content is kept here.',
+    tr('The original is not available. The saved content is kept here.'),
 };
 
 class _Row extends StatelessWidget {

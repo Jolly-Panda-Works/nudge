@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../domain/calendar/calendar_system.dart';
 import '../domain/task.dart';
+import '../l10n/l10n.dart';
 import 'calendar_widgets.dart';
 
 /// The days that have something to do, from [from] on, one heading per day.
@@ -58,7 +59,7 @@ class CalendarAgendaView extends StatelessWidget {
       }
     }
     if (entries.isEmpty) {
-      return Center(child: Text('Nothing planned in the next $days days'));
+      return Center(child: Text(tr('Nothing planned in the next {days} days', {'days': days})));
     }
     return ListView(children: entries);
   }

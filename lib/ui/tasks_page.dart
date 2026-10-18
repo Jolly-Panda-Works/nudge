@@ -6,6 +6,7 @@ import 'dialogs.dart';
 import 'task_detail_page.dart';
 import 'task_form_page.dart';
 import 'time_format.dart';
+import '../l10n/l10n.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({required this.services, super.key});
@@ -57,23 +58,23 @@ class _TasksPageState extends State<TasksPage> {
         await tasks.reopen(task.id);
       }
     } on Exception {
-      if (mounted) showMessage(context, 'Could not update the task.');
+      if (mounted) showMessage(context, tr('Could not update the task.'));
     }
   }
 
   String _emptyText() => switch (_status) {
-    TaskStatus.open => 'No open tasks',
-    TaskStatus.done => 'Nothing done yet',
-    TaskStatus.archived => 'Nothing archived',
+    TaskStatus.open => tr('No open tasks'),
+    TaskStatus.done => tr('Nothing done yet'),
+    TaskStatus.archived => tr('Nothing archived'),
   };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tasks')),
+      appBar: AppBar(title: Text(tr('Tasks'))),
       floatingActionButton: FloatingActionButton(
         onPressed: _add,
-        tooltip: 'New task',
+        tooltip: tr('New task'),
         child: const Icon(Icons.add),
       ),
       body: Column(
@@ -81,18 +82,18 @@ class _TasksPageState extends State<TasksPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: SegmentedButton<TaskStatus>(
-              segments: const [
+              segments: [
                 ButtonSegment<TaskStatus>(
                   value: TaskStatus.open,
-                  label: Text('Open'),
+                  label: Text(tr('Open')),
                 ),
                 ButtonSegment<TaskStatus>(
                   value: TaskStatus.done,
-                  label: Text('Done'),
+                  label: Text(tr('Done')),
                 ),
                 ButtonSegment<TaskStatus>(
                   value: TaskStatus.archived,
-                  label: Text('Archived'),
+                  label: Text(tr('Archived')),
                 ),
               ],
               selected: <TaskStatus>{_status},
@@ -109,10 +110,10 @@ class _TasksPageState extends State<TasksPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Could not load the tasks.'),
+                        Text(tr('Could not load the tasks.')),
                         TextButton(
                           onPressed: _retry,
-                          child: const Text('Retry'),
+                          child: Text(tr('Retry')),
                         ),
                       ],
                     ),
@@ -158,7 +159,7 @@ class _TaskTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final remindAt = task.remindAt;
     final parts = <String>[
-      if (task.kind == TaskKind.reminder) 'Reminder',
+      if (task.kind == TaskKind.reminder) tr('Reminder'),
       if (remindAt != null) formatDue(remindAt),
       if (task.source != null)
         task.source!.appLabel ?? task.source!.packageName,
@@ -171,7 +172,7 @@ class _TaskTile extends StatelessWidget {
           : Checkbox(
               value: done,
               onChanged: (_) => onToggle(),
-              semanticLabel: done ? 'Reopen task' : 'Mark task done',
+              semanticLabel: done ? tr('Reopen task') : tr('Mark task done'),
             ),
       title: Text(
         task.title,

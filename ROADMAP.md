@@ -174,7 +174,7 @@ Decision and layers: see [docs/CALENDAR.md](docs/CALENDAR.md).
 - [x] Tappable dates with an agenda for the selected day (month view)
 - [x] Fast task and reminder creation (the + button on the selected day)
 - [ ] Clear distinction between external events, internal tasks and reminders
-- [ ] Localize the whole app UI (Persian, right-to-left); today all app text is English
+- [x] Localize the whole app UI (Persian, right-to-left) (0.13.0: see docs/LOCALIZATION.md; Persian texts not yet reviewed by a native speaker; the reminder alert text is still English)
 - [ ] Light and dark themes; responsive Android and Windows layouts
 - [ ] Accessible typography, loading, empty and error states
 

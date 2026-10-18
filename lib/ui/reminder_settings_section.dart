@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../app_services.dart';
 import '../platform/reminder_platform.dart';
 import 'dialogs.dart';
+import '../l10n/l10n.dart';
 
 /// Shows whether reminder alerts can reach the user and how to fix it.
 /// Refreshes when the app returns from the system settings screens.
@@ -72,14 +73,14 @@ class _ReminderSettingsSectionState extends State<ReminderSettingsSection>
     // not show again; the second case needs the system settings screen.
     final opened = await _platform.openNotificationSettings();
     if (!opened && mounted) {
-      showMessage(context, 'Could not open the settings screen.');
+      showMessage(context, tr('Could not open the settings screen.'));
     }
   }
 
   Future<void> _fixExactAlarms() async {
     final opened = await _platform.openExactAlarmSettings();
     if (!opened && mounted) {
-      showMessage(context, 'Could not open the settings screen.');
+      showMessage(context, tr('Could not open the settings screen.'));
     }
   }
 
@@ -90,13 +91,13 @@ class _ReminderSettingsSectionState extends State<ReminderSettingsSection>
     return Column(
       children: [
         ListTile(
-          title: const Text('Reminder alerts'),
+          title: Text(tr('Reminder alerts')),
           subtitle: Text(
             permissions == null
-                ? 'Checking'
+                ? tr('Checking')
                 : permissions.notificationsAllowed
-                ? 'Allowed'
-                : 'Blocked: reminders will not be shown',
+                ? tr('Allowed')
+                : tr('Blocked: reminders will not be shown'),
           ),
           trailing: permissions?.notificationsAllowed ?? true
               ? null
@@ -106,13 +107,13 @@ class _ReminderSettingsSectionState extends State<ReminderSettingsSection>
               : _fixNotifications,
         ),
         ListTile(
-          title: const Text('Exact timing'),
+          title: Text(tr('Exact timing')),
           subtitle: Text(
             permissions == null
-                ? 'Checking'
+                ? tr('Checking')
                 : permissions.exactAlarmsAllowed
-                ? 'Allowed'
-                : 'Not allowed: alerts may arrive a few minutes late',
+                ? tr('Allowed')
+                : tr('Not allowed: alerts may arrive a few minutes late'),
           ),
           trailing: permissions?.exactAlarmsAllowed ?? true
               ? null

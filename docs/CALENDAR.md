@@ -32,7 +32,7 @@ This can be revisited if a package turns out to solve a concrete problem better 
 - Opened from the calendar icon in the inbox. Jalali (the default) is drawn right to left, Saturday first, with Persian names and digits and Friday in the error colour; Gregorian is left to right, Monday first. The choice is saved in the settings table (`calendar_system`).
 - Each day shows up to three dots for the open or done tasks and reminders whose reminder time (a snooze counts) falls on it. Tapping a day selects it and lists its tasks below; a day of a neighbouring month moves the view to that month. The `+` button creates a task on the selected day at 09:00 unless the time is changed.
 - Swiping or the arrows change the month; navigation stops at the supported years. If today is outside the Jalali range the view falls back to Gregorian.
-- The agenda names the selected day in both calendars. Cells have a spoken label (weekday, date, task count); the app chrome is still English until the app is localized.
+- The agenda names the selected day in both calendars. Cells have a spoken label (weekday, date, task count). Since 0.13.0 the chrome follows the app language (see LOCALIZATION.md).
 - Not done yet: week and day views, a combined agenda, calendar colours and visibility, external events, themes review, and a visual and TalkBack review on a device.
 
 ## Week, day and agenda (0.12.0)

@@ -1,18 +1,20 @@
-feat: Nudge v0.12.0 - week, day and agenda views (M3 section 3)
+feat: Nudge v0.13.0 - Persian localization (M3 section 4)
 
-- CalendarPage gets a Month/Week/Day/Agenda switch over the same tasks;
-  arrows and swipe step by a month, week or day and follow the reading
-  direction; switching views keeps the day or the month on screen
-- week view: one row per day with its tasks, title naming the range,
-  tapping a date opens the day; day view: 24 hours with each task under
-  its hour; agenda: the next 60 days that have tasks
-- shared pieces in calendar_widgets.dart (task tile, day text, headings,
-  start of week)
-- tests: new views with a fixed clock, Jalali and Gregorian weeks,
-  formatting helpers
-- docs: calendar design, changelog, roadmap, status
+- Settings > Language: system default, English or Persian; the choice is
+  stored (settings key "language") and Persian lays the whole app out
+  right to left with Persian digits
+- tr('English', {params}) with a Persian table (lib/l10n/fa_strings.dart,
+  about 200 texts); every text in lib/ui goes through tr
+- Persian times and dates (relative, Jalali, full timestamps); English
+  formats unchanged
+- flutter_localizations for Material widgets; supported locales en, fa
+- calendar: Persian names/digits for Jalali or a Persian app language
+- tests: tr and language rules, a guard that every tr() text has a
+  Persian entry, language controller, Persian time formats, UI in Persian
+- docs: LOCALIZATION.md, changelog, roadmap, status
 
-Not compiled or run: CI first. No wide Windows layout, durations or
-external events yet.
+pubspec.lock must be refreshed by the first CI run (new dependency
+flutter_localizations -> intl). Not compiled or run: CI first. Persian
+wording not reviewed by a native speaker.
 
-Milestone: M3 / Section 3
+Milestone: M3 / Section 4

@@ -25,6 +25,11 @@ abstract interface class CaptureSettingsRepository {
   /// `gregorian`.
   Future<String> getCalendarSystemId();
 
+  /// The app language: `system` (follow the device, default), `en` or `fa`.
+  Future<String> getLanguage();
+
+  Future<void> setLanguage(String language);
+
   Future<void> setCalendarSystemId(String id);
 
   Future<void> setRetentionDays(int? days);

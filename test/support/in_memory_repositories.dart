@@ -19,13 +19,12 @@ class InMemoryNotificationRepository implements NotificationRepository {
   }
 
   List<CapturedNotification> _snapshot(bool includeRemoved) {
-    final items =
-        _items
-            .where(
-              (n) => includeRemoved || n.status == NotificationStatus.active,
-            )
-            .toList()
-          ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
+    final items = _items
+        .where(
+          (n) => includeRemoved || n.status == NotificationStatus.active,
+        )
+        .toList()
+      ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
     return items;
   }
 
@@ -138,6 +137,13 @@ class InMemorySettingsRepository implements CaptureSettingsRepository {
   bool captureGroupSummaries = false;
   int? retentionDays;
   String calendarSystemId = 'jalali';
+  String language = 'en';
+
+  @override
+  Future<String> getLanguage() async => language;
+
+  @override
+  Future<void> setLanguage(String value) async => language = value;
 
   @override
   Future<String> getCalendarSystemId() async => calendarSystemId;

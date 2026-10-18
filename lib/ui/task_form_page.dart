@@ -8,6 +8,7 @@ import '../domain/task.dart';
 import '../domain/task_draft.dart';
 import 'dialogs.dart';
 import 'time_format.dart';
+import '../l10n/l10n.dart';
 
 /// Creates or edits a task or reminder. Pops with the saved [TaskItem], or
 /// null when the user leaves without saving.
@@ -145,7 +146,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final dueAt = _dueAt;
     if (_kind == TaskKind.reminder && dueAt == null) {
-      setState(() => _dueError = 'A reminder needs a date and time');
+      setState(() => _dueError = tr('A reminder needs a date and time'));
       return;
     }
     final draft = TaskDraft(
@@ -172,8 +173,8 @@ class _TaskFormPageState extends State<TaskFormPage> {
         );
         if (!result.created) {
           messenger.showSnackBar(
-            const SnackBar(
-              content: Text('This notification already has a task'),
+            SnackBar(
+              content: Text(tr('This notification already has a task')),
             ),
           );
         }
@@ -189,7 +190,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
     } on Exception {
       if (mounted) {
         setState(() => _saving = false);
-        showMessage(context, 'Could not save the task.');
+        showMessage(context, tr('Could not save the task.'));
       }
     }
   }
@@ -203,13 +204,13 @@ class _TaskFormPageState extends State<TaskFormPage> {
       appBar: AppBar(
         title: Text(
           editing
-              ? 'Edit task'
-              : (_kind == TaskKind.reminder ? 'New reminder' : 'New task'),
+              ? tr('Edit task')
+              : (_kind == TaskKind.reminder ? tr('New reminder') : tr('New task')),
         ),
         actions: [
           TextButton(
             onPressed: _saving ? null : _save,
-            child: const Text('Save'),
+            child: Text(tr('Save')),
           ),
         ],
       ),
@@ -220,21 +221,21 @@ class _TaskFormPageState extends State<TaskFormPage> {
           children: [
             TextFormField(
               controller: _title,
-              decoration: const InputDecoration(
-                labelText: 'Title',
+              decoration: InputDecoration(
+                labelText: tr('Title'),
                 border: OutlineInputBorder(),
               ),
               maxLength: TaskDraft.maxTitleLength,
               textInputAction: TextInputAction.next,
               validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Enter a title'
+                  ? tr('Enter a title')
                   : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _notes,
-              decoration: const InputDecoration(
-                labelText: 'Notes',
+              decoration: InputDecoration(
+                labelText: tr('Notes'),
                 border: OutlineInputBorder(),
                 alignLabelWithHint: true,
               ),
@@ -243,15 +244,15 @@ class _TaskFormPageState extends State<TaskFormPage> {
             ),
             const SizedBox(height: 16),
             SegmentedButton<TaskKind>(
-              segments: const [
+              segments: [
                 ButtonSegment<TaskKind>(
                   value: TaskKind.task,
-                  label: Text('Task'),
+                  label: Text(tr('Task')),
                   icon: Icon(Icons.check_circle_outline),
                 ),
                 ButtonSegment<TaskKind>(
                   value: TaskKind.reminder,
-                  label: Text('Reminder'),
+                  label: Text(tr('Reminder')),
                   icon: Icon(Icons.alarm),
                 ),
               ],
@@ -268,11 +269,10 @@ class _TaskFormPageState extends State<TaskFormPage> {
               leading: const Icon(Icons.event),
               title: Text(
                 date == null
-                    ? 'Date'
-                    : '${date.year}-${date.month.toString().padLeft(2, '0')}-'
-                          '${date.day.toString().padLeft(2, '0')}',
+                    ? tr('Date')
+                    : formatDay(date),
               ),
-              subtitle: date == null ? const Text('Not set') : null,
+              subtitle: date == null ? Text(tr('Not set')) : null,
               onTap: _pickDate,
             ),
             ListTile(
@@ -280,9 +280,10 @@ class _TaskFormPageState extends State<TaskFormPage> {
               leading: const Icon(Icons.schedule),
               title: Text(
                 time == null
-                    ? (date == null ? 'Time' : '09:00 (default)')
-                    : '${time.hour.toString().padLeft(2, '0')}:'
-                          '${time.minute.toString().padLeft(2, '0')}',
+                    ? (date == null ? tr('Time') : tr('09:00 (default)'))
+                    : formatTimeOfDay(
+                        DateTime(2000, 1, 1, time.hour, time.minute),
+                      ),
               ),
               onTap: _pickTime,
             ),
@@ -291,7 +292,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
                 alignment: AlignmentDirectional.centerStart,
                 child: TextButton(
                   onPressed: _clearDue,
-                  child: const Text('Clear date and time'),
+                  child: Text(tr('Clear date and time')),
                 ),
               ),
             if (_dueError != null)
@@ -305,12 +306,12 @@ class _TaskFormPageState extends State<TaskFormPage> {
             if (_dueAt != null)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: Text('Due ${formatDue(_dueAt!)}'),
+                child: Text(tr('Due {time}', {'time': formatDue(_dueAt!)})),
               ),
             const SizedBox(height: 8),
             Text(
-              'A reminder shows an alert at the chosen time, with a Snooze '
-              'button. Alerts need notifications to be allowed for Nudge.',
+              tr('A reminder shows an alert at the chosen time, with a Snooze '
+              'button. Alerts need notifications to be allowed for Nudge.'),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],

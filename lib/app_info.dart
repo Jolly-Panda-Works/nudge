@@ -6,5 +6,5 @@
 const String appName = 'Nudge';
 const String appVersion = String.fromEnvironment(
   'NUDGE_VERSION',
-  defaultValue: '0.12.0',
+  defaultValue: '0.13.0',
 );

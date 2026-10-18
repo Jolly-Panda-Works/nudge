@@ -1,17 +1,37 @@
-Files in this zip (changed since 0.11.0), 0.12.0:
+Files in this zip (changed since 0.12.0), 0.13.0:
   CHANGELOG.md
   GIT_COMMIT.txt
   ROADMAP.md
   STATUS.md
   VERSIONS.md
   docs/CALENDAR.md
+  docs/LOCALIZATION.md
   lib/app_info.dart
+  lib/app_services.dart
+  lib/application/language_controller.dart
+  lib/data/drift_capture_settings_repository.dart
+  lib/domain/capture_settings_repository.dart
+  lib/l10n/fa_strings.dart
+  lib/l10n/l10n.dart
+  lib/main.dart
   lib/ui/calendar_agenda_view.dart
-  lib/ui/calendar_day_view.dart
   lib/ui/calendar_page.dart
-  lib/ui/calendar_week_view.dart
-  lib/ui/calendar_widgets.dart
+  lib/ui/dialogs.dart
+  lib/ui/import_text_dialog.dart
+  lib/ui/inbox_page.dart
+  lib/ui/notification_detail_page.dart
+  lib/ui/reminder_settings_section.dart
+  lib/ui/settings_page.dart
+  lib/ui/source_rules_page.dart
+  lib/ui/task_detail_page.dart
+  lib/ui/task_form_page.dart
+  lib/ui/tasks_page.dart
+  lib/ui/time_format.dart
   pubspec.yaml
-  test/ui/calendar_views_test.dart
-  test/ui/calendar_widgets_test.dart
+  test/application/language_controller_test.dart
+  test/l10n/translations_test.dart
+  test/support/in_memory_repositories.dart
+  test/ui/language_ui_test.dart
+  test/ui/time_format_fa_test.dart
 Deleted: none
+Note: pubspec.lock is not included; the first CI run regenerates it (new dependency flutter_localizations).

@@ -6,6 +6,7 @@ import '../app_services.dart';
 import '../domain/ingest_policy.dart';
 import '../domain/shared_source.dart';
 import '../domain/source_app.dart';
+import '../l10n/l10n.dart';
 
 /// Lets the user pick the apps used by the allowlist or blocklist.
 class SourceRulesPage extends StatefulWidget {
@@ -88,22 +89,25 @@ class _SourceRulesPageState extends State<SourceRulesPage> {
   }
 
   String get _explanation => widget.mode == FilterMode.allowlist
-      ? 'Only the selected apps are captured.'
-      : 'Notifications from the selected apps are ignored.';
+      ? tr('Only the selected apps are captured.')
+      : tr('Notifications from the selected apps are ignored.');
 
   @override
   Widget build(BuildContext context) {
     final apps = _apps;
     return Scaffold(
-      appBar: AppBar(title: const Text('Choose apps')),
+      appBar: AppBar(title: Text(tr('Choose apps'))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _addByPackage,
         icon: const Icon(Icons.add),
-        label: const Text('Add by package name'),
+        label: Text(tr('Add by package name')),
       ),
       body: _failed
           ? Center(
-              child: FilledButton(onPressed: _load, child: const Text('Retry')),
+              child: FilledButton(
+                onPressed: _load,
+                child: Text(tr('Retry')),
+              ),
             )
           : apps == null
           ? const Center(child: CircularProgressIndicator())
@@ -115,11 +119,11 @@ class _SourceRulesPageState extends State<SourceRulesPage> {
                   child: Text(_explanation),
                 ),
                 if (apps.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(16),
                     child: Text(
-                      'No apps yet. Apps appear here after they post a '
-                      'notification, or add one by package name.',
+                      tr('No apps yet. Apps appear here after they post a '
+                      'notification, or add one by package name.'),
                     ),
                   ),
                 for (final app in apps)
@@ -155,7 +159,7 @@ class _AddPackageDialogState extends State<_AddPackageDialog> {
   void _submit() {
     final value = _controller.text.trim();
     if (!_SourceRulesPageState._packagePattern.hasMatch(value)) {
-      setState(() => _error = 'Enter a package name such as com.example.app');
+      setState(() => _error = tr('Enter a package name such as com.example.app'));
       return;
     }
     Navigator.of(context).pop(value);
@@ -164,12 +168,12 @@ class _AddPackageDialogState extends State<_AddPackageDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add by package name'),
+      title: Text(tr('Add by package name')),
       content: TextField(
         controller: _controller,
         autofocus: true,
         decoration: InputDecoration(
-          labelText: 'Package name',
+          labelText: tr('Package name'),
           errorText: _error,
         ),
         onSubmitted: (_) => _submit(),
@@ -177,9 +181,9 @@ class _AddPackageDialogState extends State<_AddPackageDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(tr('Cancel')),
         ),
-        FilledButton(onPressed: _submit, child: const Text('Add')),
+        FilledButton(onPressed: _submit, child: Text(tr('Add'))),
       ],
     );
   }

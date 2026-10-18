@@ -17,6 +17,7 @@ import 'calendar_widgets.dart';
 import 'dialogs.dart';
 import 'task_detail_page.dart';
 import 'task_form_page.dart';
+import '../l10n/l10n.dart';
 
 /// The ways the calendar can show time.
 enum CalendarViewMode { month, week, day, agenda }
@@ -55,7 +56,12 @@ class _CalendarPageState extends State<CalendarPage> {
     return DateTime(now.year, now.month, now.day);
   }
 
-  bool get _persian => _system?.id == 'jalali';
+  /// Persian names and digits: for Jalali dates, and whenever the app
+  /// language is Persian.
+  bool get _persian => _system?.id == 'jalali' || L10n.isPersian;
+
+  /// Jalali is laid out right to left, Gregorian left to right.
+  bool get _rtl => _system?.id == 'jalali';
 
   @override
   void initState() {
@@ -117,7 +123,7 @@ class _CalendarPageState extends State<CalendarPage> {
         _system?.id ?? next.id,
       );
     } on Exception {
-      if (mounted) showMessage(context, 'Could not save this choice.');
+      if (mounted) showMessage(context, tr('Could not save this choice.'));
     }
   }
 
@@ -239,7 +245,7 @@ class _CalendarPageState extends State<CalendarPage> {
     final velocity = details.primaryVelocity ?? 0;
     if (velocity.abs() < 200) return;
     // Dragging toward the start edge of the reading direction goes forward.
-    final forward = _persian ? velocity > 0 : velocity < 0;
+    final forward = _rtl ? velocity > 0 : velocity < 0;
     _step(next: forward);
   }
 
@@ -280,12 +286,12 @@ class _CalendarPageState extends State<CalendarPage> {
   };
 
   String _stepTooltip({required bool next}) {
-    final unit = switch (_view) {
-      CalendarViewMode.month => 'month',
-      CalendarViewMode.week || CalendarViewMode.agenda => 'week',
-      CalendarViewMode.day => 'day',
+    return switch (_view) {
+      CalendarViewMode.month => next ? tr('Next month') : tr('Previous month'),
+      CalendarViewMode.week ||
+      CalendarViewMode.agenda => next ? tr('Next week') : tr('Previous week'),
+      CalendarViewMode.day => next ? tr('Next day') : tr('Previous day'),
     };
-    return '${next ? 'Next' : 'Previous'} $unit';
   }
 
   @override
@@ -293,16 +299,16 @@ class _CalendarPageState extends State<CalendarPage> {
     final system = _system;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendar'),
+        title: Text(tr('Calendar')),
         actions: [
           IconButton(
             icon: const Icon(Icons.today),
-            tooltip: 'Today',
+            tooltip: tr('Today'),
             onPressed: system == null ? null : _goToday,
           ),
           IconButton(
             icon: const Icon(Icons.translate),
-            tooltip: _persian ? 'Show Gregorian dates' : 'Show Jalali dates',
+            tooltip: _rtl ? tr('Show Gregorian dates') : tr('Show Jalali dates'),
             onPressed: system == null ? null : _toggleSystem,
           ),
         ],
@@ -311,14 +317,14 @@ class _CalendarPageState extends State<CalendarPage> {
           ? null
           : FloatingActionButton(
               onPressed: _addTask,
-              tooltip: 'New task on the selected day',
+              tooltip: tr('New task on the selected day'),
               child: const Icon(Icons.add),
             ),
       body: _failed
           ? Center(
               child: FilledButton(
                 onPressed: _load,
-                child: const Text('Retry'),
+                child: Text(tr('Retry')),
               ),
             )
           : system == null
@@ -328,22 +334,22 @@ class _CalendarPageState extends State<CalendarPage> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: SegmentedButton<CalendarViewMode>(
-                    segments: const [
+                    segments: [
                       ButtonSegment<CalendarViewMode>(
                         value: CalendarViewMode.month,
-                        label: Text('Month'),
+                        label: Text(tr('Month')),
                       ),
                       ButtonSegment<CalendarViewMode>(
                         value: CalendarViewMode.week,
-                        label: Text('Week'),
+                        label: Text(tr('Week')),
                       ),
                       ButtonSegment<CalendarViewMode>(
                         value: CalendarViewMode.day,
-                        label: Text('Day'),
+                        label: Text(tr('Day')),
                       ),
                       ButtonSegment<CalendarViewMode>(
                         value: CalendarViewMode.agenda,
-                        label: Text('Agenda'),
+                        label: Text(tr('Agenda')),
                       ),
                     ],
                     selected: <CalendarViewMode>{_view},
@@ -354,7 +360,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
                 Expanded(
                   child: Directionality(
-                    textDirection: _persian
+                    textDirection: _rtl
                         ? TextDirection.rtl
                         : TextDirection.ltr,
                     child: StreamBuilder<List<TaskItem>>(
@@ -378,7 +384,7 @@ class _CalendarPageState extends State<CalendarPage> {
     CalendarSystem system,
     Map<DateTime, List<TaskItem>> byDay,
   ) {
-    final rtl = _persian;
+    final rtl = _rtl;
     final today = _today;
     return Column(
       children: [
@@ -530,11 +536,16 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   String _semanticLabel(CalendarSystem system, GridCell cell, int count) {
-    final weekday = CalendarNames.weekday(cell.date.weekday, persian: false);
-    final date = calendarDayText(system, cell.date, persian: false);
+    final weekday = CalendarNames.weekday(
+      cell.date.weekday,
+      persian: _persian,
+    );
+    final date = calendarDayText(system, cell.date, persian: _persian);
     final tasks = count == 0
         ? ''
-        : ', $count ${count == 1 ? 'task' : 'tasks'}';
+        : (count == 1
+              ? ', ${tr('1 task')}'
+              : ', ${tr('{count} tasks', {'count': count})}');
     return '$weekday, $date$tasks';
   }
 
@@ -553,7 +564,7 @@ class _CalendarPageState extends State<CalendarPage> {
         : calendarDayText(
             other,
             _selected,
-            persian: other.id == 'jalali',
+            persian: other.id == 'jalali' || L10n.isPersian,
           );
     final textTheme = Theme.of(context).textTheme;
     return Column(
@@ -575,7 +586,7 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
         Expanded(
           child: tasks.isEmpty
-              ? const Center(child: Text('No tasks on this day'))
+              ? Center(child: Text(tr('No tasks on this day')))
               : ListView.builder(
                   itemCount: tasks.length,
                   itemBuilder: (context, index) => CalendarTaskTile(

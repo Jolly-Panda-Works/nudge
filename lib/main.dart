@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'app_info.dart';
 import 'app_services.dart';
+import 'l10n/l10n.dart';
 import 'ui/inbox_page.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppServices? services;
   String? startupError;
@@ -17,13 +20,16 @@ void main() {
     startupError = error.runtimeType.toString();
   }
   if (services != null) {
+    // The language is read first so the first screen is already in it.
+    await services.language.load();
     unawaited(
-      services.start().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Queued events are retried on the next native signal.
-        },
-      ),
+      services.start().then<void>((_) {}, onError: (Object _) {
+        // Queued events are retried on the next native signal.
+      }),
+    );
+  } else {
+    L10n.setLanguage(
+      L10n.resolve('system', PlatformDispatcher.instance.locale.languageCode),
     );
   }
   runApp(NudgeApp(services: services, startupError: startupError));
@@ -38,6 +44,17 @@ class NudgeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final services = this.services;
+    if (services == null) return _app(null);
+    return ListenableBuilder(
+      listenable: services.language,
+      builder: (context, _) {
+        L10n.setLanguage(services.language.language);
+        return _app(services);
+      },
+    );
+  }
+
+  Widget _app(AppServices? services) {
     return MaterialApp(
       title: appName,
       theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
@@ -45,6 +62,14 @@ class NudgeApp extends StatelessWidget {
         colorSchemeSeed: Colors.indigo,
         brightness: Brightness.dark,
         useMaterial3: true,
+      ),
+      locale: Locale(L10n.language),
+      supportedLocales: const <Locale>[Locale('en'), Locale('fa')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      // A new key rebuilds every screen in the new language.
+      builder: (context, child) => KeyedSubtree(
+        key: ValueKey<String>(L10n.language),
+        child: child ?? const SizedBox.shrink(),
       ),
       home: services != null
           ? InboxPage(services: services)
@@ -55,7 +80,7 @@ class NudgeApp extends StatelessWidget {
                   children: [
                     const Text('$appName v$appVersion'),
                     if (startupError != null)
-                      Text('Startup failed: $startupError'),
+                      Text(tr('Startup failed: {error}', {'error': startupError})),
                   ],
                 ),
               ),
