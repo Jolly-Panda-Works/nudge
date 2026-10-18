@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app_services.dart';
 import '../application/source_navigator.dart';
 import '../domain/task.dart';
+import 'content_width.dart';
 import 'dialogs.dart';
 import 'task_form_page.dart';
 import 'time_format.dart';
@@ -130,7 +131,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           ),
         ],
       ),
-      body: ListView(
+      body: ContentWidth(child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           SelectableText(task.title, style: textTheme.titleLarge),
@@ -196,7 +197,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             ],
           ),
         ],
-      ),
+      )),
     );
   }
 }

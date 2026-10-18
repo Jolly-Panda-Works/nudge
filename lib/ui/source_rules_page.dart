@@ -7,6 +7,7 @@ import '../domain/ingest_policy.dart';
 import '../domain/shared_source.dart';
 import '../domain/source_app.dart';
 import '../l10n/l10n.dart';
+import 'content_width.dart';
 
 /// Lets the user pick the apps used by the allowlist or blocklist.
 class SourceRulesPage extends StatefulWidget {
@@ -102,7 +103,7 @@ class _SourceRulesPageState extends State<SourceRulesPage> {
         icon: const Icon(Icons.add),
         label: Text(tr('Add by package name')),
       ),
-      body: _failed
+      body: ContentWidth(child: _failed
           ? Center(
               child: FilledButton(
                 onPressed: _load,
@@ -134,7 +135,7 @@ class _SourceRulesPageState extends State<SourceRulesPage> {
                     onChanged: (value) => _toggle(app, selected: value),
                   ),
               ],
-            ),
+            )),
     );
   }
 }

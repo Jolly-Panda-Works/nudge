@@ -14,6 +14,7 @@ import 'calendar_agenda_view.dart';
 import 'calendar_day_view.dart';
 import 'calendar_week_view.dart';
 import 'calendar_widgets.dart';
+import 'content_width.dart';
 import 'dialogs.dart';
 import 'task_detail_page.dart';
 import 'task_form_page.dart';
@@ -333,7 +334,9 @@ class _CalendarPageState extends State<CalendarPage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                  child: SegmentedButton<CalendarViewMode>(
+                  child: SingleChildScrollView(
+ scrollDirection: Axis.horizontal,
+ child: SegmentedButton<CalendarViewMode>(
                     segments: [
                       ButtonSegment<CalendarViewMode>(
                         value: CalendarViewMode.month,
@@ -357,6 +360,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     onSelectionChanged: (selection) =>
                         _setView(selection.first),
                   ),
+),
                 ),
                 Expanded(
                   child: Directionality(
@@ -463,9 +467,7 @@ class _CalendarPageState extends State<CalendarPage> {
   ) {
     final grid = MonthGrid.build(system: system, year: _year, month: _month);
     final scheme = Theme.of(context).colorScheme;
-    return Column(
-      children: [
-        Padding(
+    final weekdayRow = Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
             children: [
@@ -488,10 +490,8 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
             ],
           ),
-        ),
-        Expanded(
-          flex: 3,
-          child: Padding(
+        );
+    final cells = Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Column(
               children: [
@@ -527,11 +527,35 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
               ],
             ),
-          ),
-        ),
-        const Divider(height: 1),
-        Expanded(flex: 2, child: _dayAgenda(context, system, byDay)),
-      ],
+          );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final agenda = _dayAgenda(context, system, byDay);
+        if (constraints.maxWidth >= wideBreakpoint) {
+          // Wide windows: the month on one side, the day's list on the other.
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 3,
+                child: Column(
+                  children: [weekdayRow, Expanded(child: cells)],
+                ),
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(flex: 2, child: agenda),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            weekdayRow,
+            Expanded(flex: 3, child: cells),
+            const Divider(height: 1),
+            Expanded(flex: 2, child: agenda),
+          ],
+        );
+      },
     );
   }
 

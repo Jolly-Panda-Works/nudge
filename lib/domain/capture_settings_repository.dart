@@ -28,6 +28,11 @@ abstract interface class CaptureSettingsRepository {
   /// The app language: `system` (follow the device, default), `en` or `fa`.
   Future<String> getLanguage();
 
+  /// The theme: `system` (follow the device, default), `light` or `dark`.
+  Future<String> getThemeMode();
+
+  Future<void> setThemeMode(String mode);
+
   Future<void> setLanguage(String language);
 
   Future<void> setCalendarSystemId(String id);

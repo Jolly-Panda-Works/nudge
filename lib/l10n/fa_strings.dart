@@ -406,4 +406,12 @@ const Map<String, String> faStrings = <String, String>{
       '۱ وظیفه',
   '{count} tasks':
       '{count} وظیفه',
+  'Theme':
+      'تم',
+  'Light':
+      'روشن',
+  'Dark':
+      'تیره',
+  'Choose theme':
+      'انتخاب تم',
 };

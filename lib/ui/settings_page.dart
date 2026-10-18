@@ -7,6 +7,7 @@ import '../app_services.dart';
 import '../domain/ingest_policy.dart';
 import '../domain/notification_export.dart';
 import '../platform/data_exporter.dart';
+import 'content_width.dart';
 import 'dialogs.dart';
 import 'reminder_settings_section.dart';
 import 'source_rules_page.dart';
@@ -65,6 +66,41 @@ class _SettingsPageState extends State<SettingsPage> {
 
   static String _retentionLabel(int? days) =>
       days == null ? tr('Forever') : tr('{days} days', {'days': days});
+
+  static String _themeLabel(String setting) => switch (setting) {
+    'light' => tr('Light'),
+    'dark' => tr('Dark'),
+    _ => tr('System default'),
+  };
+
+  Future<void> _chooseTheme() async {
+    final current = widget.services.theme.setting;
+    final chosen = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(tr('Choose theme')),
+        children: [
+          for (final option in const <String>['system', 'light', 'dark'])
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(context).pop(option),
+              child: Text(
+                _themeLabel(option),
+                style: option == current
+                    ? const TextStyle(fontWeight: FontWeight.bold)
+                    : null,
+              ),
+            ),
+        ],
+      ),
+    );
+    if (chosen == null || chosen == current) return;
+    try {
+      await widget.services.theme.choose(chosen);
+      if (mounted) setState(() {});
+    } on Exception {
+      if (mounted) showMessage(context, tr('Could not apply the new setting.'));
+    }
+  }
 
   static String _languageLabel(String setting) => switch (setting) {
     'en' => 'English',
@@ -265,7 +301,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final controller = widget.services.statusController;
     return Scaffold(
       appBar: AppBar(title: Text(tr('Settings'))),
-      body: _failed
+      body: ContentWidth(child: _failed
           ? Center(
               child: FilledButton(
                 onPressed: _load,
@@ -283,6 +319,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   trailing: const Icon(Icons.language),
                   onTap: _chooseLanguage,
+                ),
+                ListTile(
+                  title: Text(tr('Theme')),
+                  subtitle: Text(
+                    _themeLabel(widget.services.theme.setting),
+                  ),
+                  trailing: const Icon(Icons.brightness_6),
+                  onTap: _chooseTheme,
                 ),
                 _SectionHeader(tr('Notification access')),
                 ListenableBuilder(
@@ -417,7 +461,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _SectionHeader(tr('About')),
                 const ListTile(title: Text('$appName v$appVersion')),
               ],
-            ),
+            )),
     );
   }
 }

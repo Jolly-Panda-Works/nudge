@@ -80,4 +80,24 @@ void main() {
       reason: 'year ${now.year} in Persian digits',
     );
   });
+
+  testWidgets('choosing the dark theme in Settings applies it', (tester) async {
+    final harness = AppHarness();
+    await harness.pump(tester);
+
+    await tester.tap(find.byIcon(Icons.settings));
+    await tester.pumpAndSettle();
+    expect(find.text('Theme'), findsOneWidget);
+    await tester.tap(find.text('Theme'));
+    await tester.pumpAndSettle();
+    expect(find.text('Choose theme'), findsOneWidget);
+    await tester.tap(find.text('Dark'));
+    await tester.pumpAndSettle();
+
+    expect(harness.settings.themeMode, 'dark');
+    final context = tester.element(find.byType(Scaffold).first);
+    expect(Theme.of(context).brightness, Brightness.dark);
+    // The settings screen stays open and shows the choice.
+    expect(find.text('Dark'), findsOneWidget);
+  });
 }

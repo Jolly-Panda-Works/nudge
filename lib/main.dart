@@ -22,6 +22,7 @@ Future<void> main() async {
   if (services != null) {
     // The language is read first so the first screen is already in it.
     await services.language.load();
+    await services.theme.load();
     unawaited(
       services.start().then<void>((_) {}, onError: (Object _) {
         // Queued events are retried on the next native signal.
@@ -44,17 +45,20 @@ class NudgeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final services = this.services;
-    if (services == null) return _app(null);
+    if (services == null) return _app(null, ThemeMode.system);
     return ListenableBuilder(
-      listenable: services.language,
+      listenable: Listenable.merge(<Listenable>[
+        services.language,
+        services.theme,
+      ]),
       builder: (context, _) {
         L10n.setLanguage(services.language.language);
-        return _app(services);
+        return _app(services, services.theme.mode);
       },
     );
   }
 
-  Widget _app(AppServices? services) {
+  Widget _app(AppServices? services, ThemeMode themeMode) {
     return MaterialApp(
       title: appName,
       theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
@@ -63,6 +67,7 @@ class NudgeApp extends StatelessWidget {
         brightness: Brightness.dark,
         useMaterial3: true,
       ),
+      themeMode: themeMode,
       locale: Locale(L10n.language),
       supportedLocales: const <Locale>[Locale('en'), Locale('fa')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

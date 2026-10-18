@@ -5,6 +5,7 @@ import 'application/capture_status_controller.dart';
 import 'application/language_controller.dart';
 import 'application/reminder_scheduler.dart';
 import 'application/retention_service.dart';
+import 'application/theme_controller.dart';
 import 'application/source_navigator.dart';
 import 'application/text_importer.dart';
 import 'data/database/app_database.dart';
@@ -36,6 +37,7 @@ final class AppServices {
     SourceNavigator? sourceNavigator,
     ReminderPlatform? reminderPlatform,
     LanguageController? language,
+    ThemeController? theme,
     ReminderScheduler? reminderScheduler,
     CaptureStatusController? statusController,
     this.database,
@@ -46,6 +48,7 @@ final class AppServices {
        sourceNavigator = sourceNavigator ?? SourceNavigator(platform),
        reminderPlatform = reminderPlatform ?? const NoopReminderPlatform(),
        language = language ?? LanguageController(settings, deviceLanguage: () => 'en'),
+       theme = theme ?? ThemeController(settings),
        statusController = statusController ?? CaptureStatusController(platform) {
     this.reminderScheduler =
         reminderScheduler ??
@@ -87,6 +90,7 @@ final class AppServices {
   final SourceNavigator sourceNavigator;
   final ReminderPlatform reminderPlatform;
   final LanguageController language;
+  final ThemeController theme;
   late final ReminderScheduler reminderScheduler;
   final CaptureStatusController statusController;
 

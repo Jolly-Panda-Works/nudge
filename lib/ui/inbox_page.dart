@@ -7,6 +7,7 @@ import '../app_services.dart';
 import '../application/capture_status_controller.dart';
 import '../domain/captured_notification.dart';
 import 'calendar_page.dart';
+import 'content_width.dart';
 import 'dialogs.dart';
 import 'import_text_dialog.dart';
 import 'notification_detail_page.dart';
@@ -127,7 +128,7 @@ class _InboxPageState extends State<InboxPage> {
         tooltip: tr('Import text'),
         child: const Icon(Icons.add),
       ),
-      body: Column(
+      body: ContentWidth(child: Column(
         children: [
           ListenableBuilder(
             listenable: controller,
@@ -139,7 +140,9 @@ class _InboxPageState extends State<InboxPage> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: SegmentedButton<bool>(
+            child: SingleChildScrollView(
+ scrollDirection: Axis.horizontal,
+ child: SegmentedButton<bool>(
               segments: [
                 ButtonSegment<bool>(value: false, label: Text(tr('Active'))),
                 ButtonSegment<bool>(value: true, label: Text(tr('All'))),
@@ -149,6 +152,7 @@ class _InboxPageState extends State<InboxPage> {
               onSelectionChanged: (selection) =>
                   _setFilter(showRemoved: selection.first),
             ),
+),
           ),
           Expanded(
             child: StreamBuilder<List<CapturedNotification>>(
@@ -185,7 +189,7 @@ class _InboxPageState extends State<InboxPage> {
             ),
           ),
         ],
-      ),
+      )),
     );
   }
 }

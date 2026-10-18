@@ -6,6 +6,7 @@ import '../app_services.dart';
 import '../domain/captured_notification.dart';
 import '../domain/task.dart';
 import '../domain/task_draft.dart';
+import 'content_width.dart';
 import 'dialogs.dart';
 import 'time_format.dart';
 import '../l10n/l10n.dart';
@@ -214,7 +215,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
           ),
         ],
       ),
-      body: Form(
+      body: ContentWidth(child: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -243,7 +244,9 @@ class _TaskFormPageState extends State<TaskFormPage> {
               maxLines: 8,
             ),
             const SizedBox(height: 16),
-            SegmentedButton<TaskKind>(
+            SingleChildScrollView(
+ scrollDirection: Axis.horizontal,
+ child: SegmentedButton<TaskKind>(
               segments: [
                 ButtonSegment<TaskKind>(
                   value: TaskKind.task,
@@ -263,6 +266,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
                 _dueError = null;
               }),
             ),
+),
             const SizedBox(height: 8),
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -316,7 +320,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 }

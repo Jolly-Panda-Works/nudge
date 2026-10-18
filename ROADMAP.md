@@ -14,7 +14,7 @@ Where Nudge stands and what is left. Last updated: 2026-10-16 (version 0.6.0).
 |---|---|---|
 | M1 | Android notification capture and local inbox | All 5 sections done in code; device verification and 4 open items remain |
 | M2 | Task conversion and source navigation | All 4 sections done in code; nothing compiled or verified on a device yet |
-| M3 | Calendar UI with Persian (Jalali, RTL) support | In progress: sections 1 (date math), 2 (month view) and 3 (week, day, agenda) done in code |
+| M3 | Calendar UI with Persian (Jalali, RTL) support | In progress: sections 1 (date math), 2 (month view), 3 (week, day, agenda), 4 (Persian) and 5 (themes, wide layouts) done in code |
 | M4 | Android Calendar Provider integration | Not started |
 | M5 | Windows build and secure synchronization | Not started |
 | M6 | Optional direct Google Calendar API integration | Not started |
@@ -167,6 +167,13 @@ Decision and layers: see [docs/CALENDAR.md](docs/CALENDAR.md).
 - [ ] Wide layout for Windows (week as seven columns, month and agenda side by side)
 - [ ] Time grid with task durations (tasks have a time but no length yet)
 
+### Section 5: themes, wide layouts and accessibility (done in code, 0.14.0; not compiled or run yet)
+- [x] Theme setting: system, light or dark, stored and applied at once
+- [x] Wide layouts: month and day list side by side, week as seven columns, other screens centred at a readable width
+- [x] Large-text widget tests for the calendar views, Settings and Tasks; segmented buttons scroll instead of overflowing
+- [ ] TalkBack, contrast and Windows Narrator review on devices
+- [ ] Two-pane inbox, keyboard shortcuts and hover states for Windows
+
 ### Remaining in M3
 - [x] Month, week, day and agenda views
 - [x] Persian right-to-left UI and Jalali dates in the calendar screens (the rest of the app is not localized yet)
@@ -175,8 +182,8 @@ Decision and layers: see [docs/CALENDAR.md](docs/CALENDAR.md).
 - [x] Fast task and reminder creation (the + button on the selected day)
 - [ ] Clear distinction between external events, internal tasks and reminders
 - [x] Localize the whole app UI (Persian, right-to-left) (0.13.0: see docs/LOCALIZATION.md; Persian texts not yet reviewed by a native speaker; the reminder alert text is still English)
-- [ ] Light and dark themes; responsive Android and Windows layouts
-- [ ] Accessible typography, loading, empty and error states
+- [x] Light and dark themes (Settings > Theme); responsive wide layouts (0.14.0, see docs/UI.md; not yet seen on a device)
+- [ ] Accessible typography, loading, empty and error states: large-text tests and labels are done; a TalkBack and contrast review on a device is not
 
 ## M4: Android Calendar Provider (not started)
 - [ ] Discover readable and writable calendars; show names, accounts, colors and write capability

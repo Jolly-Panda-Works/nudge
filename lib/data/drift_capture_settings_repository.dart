@@ -17,6 +17,7 @@ final class DriftCaptureSettingsRepository
   static const _kRetentionDays = 'retention_days';
   static const _kCalendarSystem = 'calendar_system';
   static const _kLanguage = 'language';
+  static const _kThemeMode = 'theme_mode';
 
   Future<String?> _read(String name) async {
     final row = await (_db.select(
@@ -84,6 +85,18 @@ final class DriftCaptureSettingsRepository
   @override
   Future<void> setCaptureGroupSummaries({required bool value}) =>
       _write(_kGroupSummaries, value.toString());
+
+  @override
+  Future<String> getThemeMode() async {
+    final raw = await _read(_kThemeMode);
+    return raw == 'light' || raw == 'dark' ? raw! : 'system';
+  }
+
+  @override
+  Future<void> setThemeMode(String mode) => _write(
+    _kThemeMode,
+    mode == 'light' || mode == 'dark' ? mode : 'system',
+  );
 
   @override
   Future<String> getLanguage() async {

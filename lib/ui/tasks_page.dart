@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app_services.dart';
 import '../domain/task.dart';
+import 'content_width.dart';
 import 'dialogs.dart';
 import 'task_detail_page.dart';
 import 'task_form_page.dart';
@@ -77,11 +78,13 @@ class _TasksPageState extends State<TasksPage> {
         tooltip: tr('New task'),
         child: const Icon(Icons.add),
       ),
-      body: Column(
+      body: ContentWidth(child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: SegmentedButton<TaskStatus>(
+            child: SingleChildScrollView(
+ scrollDirection: Axis.horizontal,
+ child: SegmentedButton<TaskStatus>(
               segments: [
                 ButtonSegment<TaskStatus>(
                   value: TaskStatus.open,
@@ -100,6 +103,7 @@ class _TasksPageState extends State<TasksPage> {
               showSelectedIcon: false,
               onSelectionChanged: (selection) => _setStatus(selection.first),
             ),
+),
           ),
           Expanded(
             child: StreamBuilder<List<TaskItem>>(
@@ -139,7 +143,7 @@ class _TasksPageState extends State<TasksPage> {
             ),
           ),
         ],
-      ),
+      )),
     );
   }
 }

@@ -4,6 +4,7 @@ import '../app_services.dart';
 import '../domain/captured_notification.dart';
 import '../domain/shared_source.dart';
 import '../domain/task.dart';
+import 'content_width.dart';
 import 'dialogs.dart';
 import 'task_detail_page.dart';
 import 'task_form_page.dart';
@@ -110,7 +111,7 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
           ),
         ],
       ),
-      body: ListView(
+      body: ContentWidth(child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           if (n.title != null)
@@ -191,7 +192,7 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
             },
           ),
         ],
-      ),
+      )),
     );
   }
 }

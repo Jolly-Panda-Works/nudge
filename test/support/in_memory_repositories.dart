@@ -138,6 +138,13 @@ class InMemorySettingsRepository implements CaptureSettingsRepository {
   int? retentionDays;
   String calendarSystemId = 'jalali';
   String language = 'en';
+  String themeMode = 'system';
+
+  @override
+  Future<String> getThemeMode() async => themeMode;
+
+  @override
+  Future<void> setThemeMode(String mode) async => themeMode = mode;
 
   @override
   Future<String> getLanguage() async => language;

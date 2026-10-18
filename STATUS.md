@@ -1,6 +1,6 @@
 # Nudge: goal, current status and remaining work
 
-Last updated: 2026-10-18. Latest delivered version: 0.13.0.
+Last updated: 2026-10-18. Latest delivered version: 0.14.0.
 Repository: https://github.com/Jolly-Panda-Works/nudge
 
 ---

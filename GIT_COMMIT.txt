@@ -1,20 +1,14 @@
-feat: Nudge v0.13.0 - Persian localization (M3 section 4)
+feat: Nudge v0.14.0 - themes, wide layouts, large-text tests (M3 section 5)
 
-- Settings > Language: system default, English or Persian; the choice is
-  stored (settings key "language") and Persian lays the whole app out
-  right to left with Persian digits
-- tr('English', {params}) with a Persian table (lib/l10n/fa_strings.dart,
-  about 200 texts); every text in lib/ui goes through tr
-- Persian times and dates (relative, Jalali, full timestamps); English
-  formats unchanged
-- flutter_localizations for Material widgets; supported locales en, fa
-- calendar: Persian names/digits for Jalali or a Persian app language
-- tests: tr and language rules, a guard that every tr() text has a
-  Persian entry, language controller, Persian time formats, UI in Persian
-- docs: LOCALIZATION.md, changelog, roadmap, status
+- Settings > Theme: system, light or dark (settings key theme_mode),
+  applied at once (ThemeController)
+- wide layouts from 840 px: month and day list side by side, week as
+  seven columns; other screens centred at most 720 px wide (ContentWidth)
+- segmented buttons scroll sideways instead of overflowing at large text
+- tests: theme controller and setting, layouts at the breakpoint, the
+  calendar views at double text size and Settings/Tasks at 1.5x
+- docs: UI.md, changelog, roadmap, status
 
-pubspec.lock must be refreshed by the first CI run (new dependency
-flutter_localizations -> intl). Not compiled or run: CI first. Persian
-wording not reviewed by a native speaker.
+Not compiled or run: CI first. No TalkBack/Narrator/contrast review yet.
 
-Milestone: M3 / Section 4
+Milestone: M3 / Section 5

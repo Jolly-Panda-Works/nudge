@@ -4,6 +4,16 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.14.0] - 2026-10-18
+### Added
+- M3 section 5: Settings > Theme (System default, Light, Dark), stored in the settings table (`theme_mode`) and applied at once. `ThemeController`.
+- Wide layouts (from 840 px): the month and the selected day's list side by side, the week as seven columns. On other screens the content is centred and at most 720 px wide (`ContentWidth`).
+- Large-text tests: the four calendar views at double text size and Settings and Tasks at 1.5 times, failing on any overflow. Segmented buttons (view switch, inbox filter, task status, task kind) scroll sideways instead of overflowing.
+- Tests for the theme controller and the theme setting, and for the layouts switching at the breakpoint.
+- `docs/UI.md`: themes, layouts and the accessibility checklist.
+### Known limitations
+- Not compiled, tested or run: CI is the first check. Nothing was seen on a device or checked with TalkBack or Narrator; contrast of the dot colours and dimmed days is unchecked. No two-pane inbox, keyboard shortcuts or hover states yet.
+
 ## [0.13.0] - 2026-10-18
 ### Added
 - Persian localization of the whole app (see docs/LOCALIZATION.md). Settings > Language: System default (follows the device), English or فارسی. Persian lays the whole app out right to left and uses Persian digits.
