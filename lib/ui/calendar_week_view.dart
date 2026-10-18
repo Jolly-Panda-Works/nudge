@@ -1,0 +1,137 @@
+import 'package:flutter/material.dart';
+
+import '../domain/calendar/calendar_names.dart';
+import '../domain/calendar/calendar_system.dart';
+import '../domain/task.dart';
+import 'calendar_widgets.dart';
+
+/// The seven days of one week, one row per day, with that day's tasks under
+/// its date. Tapping a date opens that day in the day view.
+class CalendarWeekView extends StatelessWidget {
+  const CalendarWeekView({
+    required this.system,
+    required this.weekStart,
+    required this.byDay,
+    required this.selected,
+    required this.today,
+    required this.persian,
+    required this.onOpenDay,
+    required this.onOpenTask,
+    super.key,
+  });
+
+  final CalendarSystem system;
+
+  /// The first day of the week (local midnight).
+  final DateTime weekStart;
+  final Map<DateTime, List<TaskItem>> byDay;
+  final DateTime selected;
+  final DateTime today;
+  final bool persian;
+  final ValueChanged<DateTime> onOpenDay;
+  final ValueChanged<TaskItem> onOpenTask;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      children: [
+        for (var i = 0; i < 7; i++)
+          Builder(
+            builder: (context) {
+              final day = DateTime(
+                weekStart.year,
+                weekStart.month,
+                weekStart.day + i,
+              );
+              final named = system.fromDate(day);
+              final tasks = byDay[day] ?? const <TaskItem>[];
+              final isToday = day == today;
+              final isSelected = day == selected;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: Material(
+                  color: isSelected
+                      ? scheme.primaryContainer.withValues(alpha: 0.5)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        key: ValueKey<String>(
+                          'day-${day.year}-${day.month}-${day.day}',
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => onOpenDay(day),
+                        child: SizedBox(
+                          width: 64,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Column(
+                              children: [
+                                Text(
+                                  CalendarNames.weekday(
+                                    day.weekday,
+                                    persian: persian,
+                                    short: true,
+                                  ),
+                                  style: textTheme.labelMedium?.copyWith(
+                                    color: persian && day.weekday == DateTime.friday
+                                        ? scheme.error
+                                        : scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  width: 36,
+                                  height: 36,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: isToday
+                                        ? Border.all(
+                                            color: scheme.primary,
+                                            width: 1.5,
+                                          )
+                                        : null,
+                                  ),
+                                  child: Text(
+                                    CalendarNames.number(
+                                      named.day,
+                                      persian: persian,
+                                    ),
+                                    style: textTheme.titleSmall,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: tasks.isEmpty
+                            ? const SizedBox(height: 56)
+                            : Column(
+                                children: [
+                                  for (final task in tasks)
+                                    CalendarTaskTile(
+                                      task: task,
+                                      persian: persian,
+                                      onTap: () => onOpenTask(task),
+                                    ),
+                                ],
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+}

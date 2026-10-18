@@ -16,7 +16,8 @@ This can be revisited if a package turns out to solve a concrete problem better 
 | Month layout | `lib/domain/calendar/month_grid.dart` | Written, with tests |
 | Names and digits (Persian and English) | `lib/domain/calendar/calendar_names.dart` | Written, with tests |
 | Month view with a day agenda (`lib/ui/calendar_page.dart`), task dots, Jalali/Gregorian switch | Written with widget tests |
-| Week, day and full agenda views, colors and visibility, themes | `lib/ui/...` | Not started |
+| Week, day and agenda views (`calendar_week_view.dart`, `calendar_day_view.dart`, `calendar_agenda_view.dart`, `calendar_widgets.dart`) | Written with widget tests |
+| Colors and visibility, external events, wide Windows layout, themes review | `lib/ui/...` | Not started |
 | Localization of the whole app | | Not started |
 
 ## Rules
@@ -33,3 +34,11 @@ This can be revisited if a package turns out to solve a concrete problem better 
 - Swiping or the arrows change the month; navigation stops at the supported years. If today is outside the Jalali range the view falls back to Gregorian.
 - The agenda names the selected day in both calendars. Cells have a spoken label (weekday, date, task count); the app chrome is still English until the app is localized.
 - Not done yet: week and day views, a combined agenda, calendar colours and visibility, external events, themes review, and a visual and TalkBack review on a device.
+
+## Week, day and agenda (0.12.0)
+- A switch above the calendar chooses Month, Week, Day or Agenda. They share the selected day, the calendar system and the task stream; the arrows (and swiping) step by a month, a week (week and agenda) or a day.
+- Leaving the month view keeps the month that was on screen: if the selected day is in another month, the first day of the shown month (or today, if it is in it) is used.
+- **Week:** one row per day with that day's tasks; the week starts on Saturday for Jalali and Monday for Gregorian, and the title names the range ("۲۵ مهر – ۱ آبان ۱۴۰۵"). Tapping a date opens it in the day view.
+- **Day:** 24 hourly rows, each task under the hour it is due; it opens scrolled to about 07:00. Tasks have a time but no length, so there are no duration blocks yet.
+- **Agenda:** the next 60 days that have tasks, one heading per day.
+- Not done: a wide layout for Windows, a real time grid with durations, colours and visibility (they need external calendars).

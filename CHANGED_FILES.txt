@@ -1,4 +1,4 @@
-Files in this zip (changed since 0.10.0), 0.11.0:
+Files in this zip (changed since 0.11.0), 0.12.0:
   CHANGELOG.md
   GIT_COMMIT.txt
   ROADMAP.md
@@ -6,17 +6,12 @@ Files in this zip (changed since 0.10.0), 0.11.0:
   VERSIONS.md
   docs/CALENDAR.md
   lib/app_info.dart
-  lib/application/tasks_by_day.dart
-  lib/data/drift_capture_settings_repository.dart
-  lib/domain/calendar/calendar_systems.dart
-  lib/domain/capture_settings_repository.dart
+  lib/ui/calendar_agenda_view.dart
+  lib/ui/calendar_day_view.dart
   lib/ui/calendar_page.dart
-  lib/ui/inbox_page.dart
-  lib/ui/task_form_page.dart
-  lib/ui/time_format.dart
+  lib/ui/calendar_week_view.dart
+  lib/ui/calendar_widgets.dart
   pubspec.yaml
-  test/application/tasks_by_day_test.dart
-  test/data/drift_capture_settings_repository_test.dart
-  test/support/in_memory_repositories.dart
-  test/ui/calendar_page_test.dart
+  test/ui/calendar_views_test.dart
+  test/ui/calendar_widgets_test.dart
 Deleted: none

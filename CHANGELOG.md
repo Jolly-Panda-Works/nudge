@@ -4,6 +4,17 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.12.0] - 2026-10-18
+### Added
+- M3 section 3: week, day and agenda views next to the month view, chosen with a switch above the calendar. The week view shows one row per day with its tasks and a title naming the range; tapping a date opens it in the day view. The day view lists the 24 hours with each task under its hour. The agenda lists the next 60 days that have tasks.
+- The arrows and swiping step by a month, a week or a day depending on the view; Previous/Next tooltips say which. Switching views keeps the day (or the month that was on screen).
+- `calendar_widgets.dart` (shared task tile, `calendarDayText`, `calendarHeading`, `startOfWeek`) and the three view files.
+- Tests: the new views with a fixed clock (Jalali and Gregorian weeks, day view, agenda, empty agenda, carrying the day between views) and the formatting helpers.
+### Changed
+- `CalendarPage` was reorganized around a view mode; the month view looks and behaves as in 0.11.0, and the app bar title is now "Calendar" with the month shown above the grid.
+### Known limitations
+- Not compiled, tested or run: CI is the first check; nothing was seen on a device. No wide layout for Windows yet, no durations or time grid, and calendar colours and visibility wait for external calendars (M4).
+
 ## [0.11.0] - 2026-10-18
 ### Added
 - M3 section 2: a month view (`CalendarPage`), opened from the calendar icon in the inbox. Jalali is shown right to left, Saturday first, with Persian month and weekday names and Persian digits; Gregorian is shown left to right, Monday first. A button switches between them and the choice is remembered (settings key `calendar_system`).

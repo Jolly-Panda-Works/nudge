@@ -14,7 +14,7 @@ Where Nudge stands and what is left. Last updated: 2026-10-16 (version 0.6.0).
 |---|---|---|
 | M1 | Android notification capture and local inbox | All 5 sections done in code; device verification and 4 open items remain |
 | M2 | Task conversion and source navigation | All 4 sections done in code; nothing compiled or verified on a device yet |
-| M3 | Calendar UI with Persian (Jalali, RTL) support | In progress: sections 1 (date math) and 2 (month view) done in code |
+| M3 | Calendar UI with Persian (Jalali, RTL) support | In progress: sections 1 (date math), 2 (month view) and 3 (week, day, agenda) done in code |
 | M4 | Android Calendar Provider integration | Not started |
 | M5 | Windows build and secure synchronization | Not started |
 | M6 | Optional direct Google Calendar API integration | Not started |
@@ -157,12 +157,22 @@ Decision and layers: see [docs/CALENDAR.md](docs/CALENDAR.md).
 - [x] Widget tests for both calendars, navigation, the agenda, the choice being saved and creating a task
 - [ ] Visual, gesture and accessibility review on a device (no screenshots yet)
 
+### Section 3: week, day and agenda views (done in code, 0.12.0; not compiled or run yet)
+- [x] A switch between Month, Week, Day and Agenda over the same tasks and reminders
+- [x] Week view: one row per day (the seven days of the week, Saturday first for Jalali), tasks under their date; tapping a date opens that day
+- [x] Day view: 24 hours, each task under the hour it is due, opening near 07:00
+- [x] Agenda: the next 60 days that have tasks, one heading per day
+- [x] Previous/next steps a month, a week or a day depending on the view; swipe works in every view and follows the reading direction
+- [x] Widget tests for the week title, steps, Gregorian week, day view, agenda, empty agenda and carrying the day between views
+- [ ] Wide layout for Windows (week as seven columns, month and agenda side by side)
+- [ ] Time grid with task durations (tasks have a time but no length yet)
+
 ### Remaining in M3
-- [ ] Month, week, day and agenda views (section 2 onward)
-- [ ] Persian right-to-left UI and Jalali dates in the screens (the date math is done; the screens are not)
-- [ ] Calendar colors and visibility toggles; event indicators in month view
+- [x] Month, week, day and agenda views
+- [x] Persian right-to-left UI and Jalali dates in the calendar screens (the rest of the app is not localized yet)
+- [ ] Calendar colors and visibility toggles (needs external calendars, M4)
 - [x] Tappable dates with an agenda for the selected day (month view)
-- [ ] Fast task and reminder creation
+- [x] Fast task and reminder creation (the + button on the selected day)
 - [ ] Clear distinction between external events, internal tasks and reminders
 - [ ] Localize the whole app UI (Persian, right-to-left); today all app text is English
 - [ ] Light and dark themes; responsive Android and Windows layouts
