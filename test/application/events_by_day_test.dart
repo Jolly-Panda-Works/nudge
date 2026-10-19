@@ -104,9 +104,11 @@ void main() {
       ),
     ]);
 
-    expect(
-      days[DateTime(2026, 10, 18)]!.map((e) => e.title),
-      <String>['D', 'C', 'A', 'B'],
-    );
+    expect(days[DateTime(2026, 10, 18)]!.map((e) => e.title), <String>[
+      'D',
+      'C',
+      'A',
+      'B',
+    ]);
   });
 }

@@ -108,7 +108,8 @@ class _CalendarDayViewState extends State<CalendarDayView> {
               Expanded(
                 child: Column(
                   children: [
-                    for (final event in eventsByHour[hour] ?? const <ExternalEvent>[])
+                    for (final event
+                        in eventsByHour[hour] ?? const <ExternalEvent>[])
                       CalendarEventTile(
                         event: event,
                         persian: widget.persian,

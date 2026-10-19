@@ -67,8 +67,7 @@ class CalendarWeekView extends StatelessWidget {
                   );
                   final named = system.fromDate(day);
                   final tasks = byDay[day] ?? const <TaskItem>[];
-                  final events =
-                      eventsByDay[day] ?? const <ExternalEvent>[];
+                  final events = eventsByDay[day] ?? const <ExternalEvent>[];
                   final isToday = day == today;
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -185,8 +184,7 @@ class CalendarWeekView extends StatelessWidget {
               );
               final named = system.fromDate(day);
               final tasks = byDay[day] ?? const <TaskItem>[];
-                  final events =
-                      eventsByDay[day] ?? const <ExternalEvent>[];
+              final events = eventsByDay[day] ?? const <ExternalEvent>[];
               final isToday = day == today;
               final isSelected = day == selected;
               return Padding(
@@ -218,7 +216,9 @@ class CalendarWeekView extends StatelessWidget {
                                     short: true,
                                   ),
                                   style: textTheme.labelMedium?.copyWith(
-                                    color: persian && day.weekday == DateTime.friday
+                                    color:
+                                        persian &&
+                                            day.weekday == DateTime.friday
                                         ? scheme.error
                                         : scheme.onSurfaceVariant,
                                   ),

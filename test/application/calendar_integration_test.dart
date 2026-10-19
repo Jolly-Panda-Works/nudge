@@ -114,10 +114,7 @@ void main() {
     platform.granted = allowed;
     settings.calendarIntegration = true;
     settings.defaultCalendarId = '2';
-    platform.calendars = [
-      calendar('1'),
-      calendar('2', name: 'Work'),
-    ];
+    platform.calendars = [calendar('1'), calendar('2', name: 'Work')];
 
     expect((await integration.load()).defaultId, '2');
   });
@@ -300,10 +297,7 @@ void main() {
       platform.calendars = [calendar('1')];
       platform.eventsFail = true;
 
-      expect(
-        integration.events(from: from, to: to),
-        throwsA(isA<Exception>()),
-      );
+      expect(integration.events(from: from, to: to), throwsA(isA<Exception>()));
     });
 
     test('opening an event goes to the platform', () async {

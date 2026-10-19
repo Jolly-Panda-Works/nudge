@@ -60,7 +60,9 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
       return calendars;
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
+        error.code == 'permission_denied'
+            ? 'permission_denied'
+            : 'query_failed',
       );
     }
   }
@@ -112,7 +114,9 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
       return events;
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
+        error.code == 'permission_denied'
+            ? 'permission_denied'
+            : 'query_failed',
       );
     }
   }
