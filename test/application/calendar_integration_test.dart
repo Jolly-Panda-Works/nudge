@@ -114,10 +114,7 @@ void main() {
     platform.granted = allowed;
     settings.calendarIntegration = true;
     settings.defaultCalendarId = '2';
-    platform.calendars = [
-      calendar('1'),
-      calendar('2', name: 'Work'),
-    ];
+    platform.calendars = [calendar('1'), calendar('2', name: 'Work')];
 
     expect((await integration.load()).defaultId, '2');
   });

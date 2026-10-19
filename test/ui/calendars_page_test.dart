@@ -69,8 +69,10 @@ void main() {
 
     expect(harness.deviceCalendars.permissionRequests, 0);
     expect(harness.deviceCalendars.listCalls, 0);
-    expect(tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
-        isFalse);
+    expect(
+      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+      isFalse,
+    );
   });
 
   testWidgets('turning it on asks, then lists the calendars', (tester) async {

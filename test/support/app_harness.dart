@@ -24,7 +24,8 @@ final class AppHarness {
          ..connected = connected
          ..supported = supported),
        reminders = (FakeReminderPlatform()..supported = remindersSupported),
-       deviceCalendars = (FakeCalendarPlatform()..supported = calendarsSupported);
+       deviceCalendars = (FakeCalendarPlatform()
+         ..supported = calendarsSupported);
 
   final FakeCapturePlatform platform;
   final InMemoryNotificationRepository notifications =

@@ -125,10 +125,8 @@ final class DriftCaptureSettingsRepository
   }
 
   @override
-  Future<void> setThemeMode(String mode) => _write(
-    _kThemeMode,
-    mode == 'light' || mode == 'dark' ? mode : 'system',
-  );
+  Future<void> setThemeMode(String mode) =>
+      _write(_kThemeMode, mode == 'light' || mode == 'dark' ? mode : 'system');
 
   @override
   Future<String> getLanguage() async {
