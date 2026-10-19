@@ -18,6 +18,9 @@ final class DriftCaptureSettingsRepository
   static const _kCalendarSystem = 'calendar_system';
   static const _kLanguage = 'language';
   static const _kThemeMode = 'theme_mode';
+  static const _kCalendarOn = 'calendar_integration';
+  static const _kCalendarVisible = 'calendar_visible_ids';
+  static const _kCalendarDefault = 'calendar_default_id';
 
   Future<String?> _read(String name) async {
     final row = await (_db.select(
@@ -87,14 +90,45 @@ final class DriftCaptureSettingsRepository
       _write(_kGroupSummaries, value.toString());
 
   @override
+  Future<bool> getCalendarIntegrationEnabled() async =>
+      (await _read(_kCalendarOn)) == '1';
+
+  @override
+  Future<void> setCalendarIntegrationEnabled({required bool enabled}) =>
+      _write(_kCalendarOn, enabled ? '1' : '0');
+
+  @override
+  Future<Set<String>?> getVisibleCalendarIds() async {
+    final raw = await _read(_kCalendarVisible);
+    if (raw == null) return null;
+    return raw.isEmpty ? <String>{} : raw.split(',').toSet();
+  }
+
+  @override
+  Future<void> setVisibleCalendarIds(Set<String> ids) =>
+      _write(_kCalendarVisible, (ids.toList()..sort()).join(','));
+
+  @override
+  Future<String?> getDefaultCalendarId() async {
+    final raw = await _read(_kCalendarDefault);
+    return (raw == null || raw.isEmpty) ? null : raw;
+  }
+
+  @override
+  Future<void> setDefaultCalendarId(String? id) =>
+      _write(_kCalendarDefault, id ?? '');
+
+  @override
   Future<String> getThemeMode() async {
     final raw = await _read(_kThemeMode);
     return raw == 'light' || raw == 'dark' ? raw! : 'system';
   }
 
   @override
-  Future<void> setThemeMode(String mode) =>
-      _write(_kThemeMode, mode == 'light' || mode == 'dark' ? mode : 'system');
+  Future<void> setThemeMode(String mode) => _write(
+    _kThemeMode,
+    mode == 'light' || mode == 'dark' ? mode : 'system',
+  );
 
   @override
   Future<String> getLanguage() async {

@@ -77,3 +77,10 @@ If something does not match, note the Android version, the device manufacturer a
 3. Repeat with the app swiped away from recents, and after restarting the phone with a reminder set for later (it should still alert; one that came due while the phone was off should appear after start-up).
 4. Settings > Reminders: after you turn notifications off for Nudge it should say "Blocked" and open the right system screen. On Android 14 exact timing is "Not allowed" until you allow it; then reminders should arrive within seconds of the chosen time.
 5. Mark a task done, archive it or delete it before its time: no alert should appear.
+
+## Trying device calendars on a phone
+1. Settings > Calendars: the switch is off and no permission was asked. Turn it on: the system dialog appears; allow it.
+2. The calendars of your accounts (Google, Samsung...) are listed by account with their colours; read-only ones (holidays, subscribed) are marked. Compare with the phone's own calendar app.
+3. Hide one calendar, leave the screen and return: the choice is kept. Choose the calendar for new events; a read-only one is not offered.
+4. Turn the switch off: the list disappears. Refuse the permission once: the screen says so and "Open settings" opens the app's system settings. Take the permission away while the integration is on: a warning appears.
+5. Report: Android version, phone brand, which account types appeared, and anything missing compared with the calendar app.

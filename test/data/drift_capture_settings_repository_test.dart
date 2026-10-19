@@ -62,6 +62,27 @@ void main() {
     expect(await repo.getCalendarSystemId(), 'jalali');
   });
 
+  test('the calendar choices are stored', () async {
+    expect(await repo.getCalendarIntegrationEnabled(), isFalse);
+    expect(await repo.getVisibleCalendarIds(), isNull);
+    expect(await repo.getDefaultCalendarId(), isNull);
+
+    await repo.setCalendarIntegrationEnabled(enabled: true);
+    await repo.setVisibleCalendarIds(<String>{'3', '1'});
+    await repo.setDefaultCalendarId('3');
+
+    expect(await repo.getCalendarIntegrationEnabled(), isTrue);
+    expect(await repo.getVisibleCalendarIds(), <String>{'1', '3'});
+    expect(await repo.getDefaultCalendarId(), '3');
+
+    await repo.setVisibleCalendarIds(<String>{});
+    expect(await repo.getVisibleCalendarIds(), isEmpty);
+    await repo.setDefaultCalendarId(null);
+    expect(await repo.getDefaultCalendarId(), isNull);
+    await repo.setCalendarIntegrationEnabled(enabled: false);
+    expect(await repo.getCalendarIntegrationEnabled(), isFalse);
+  });
+
   test('listRules returns the saved apps with their labels', () async {
     await repo.addRule('com.chat', appLabel: 'Chat');
     await repo.addRule('com.mail');
@@ -71,7 +92,10 @@ void main() {
       'com.chat',
       'com.mail',
     });
-    expect(rules.firstWhere((r) => r.packageName == 'com.chat').label, 'Chat');
+    expect(
+      rules.firstWhere((r) => r.packageName == 'com.chat').label,
+      'Chat',
+    );
     expect(
       rules.firstWhere((r) => r.packageName == 'com.mail').displayName,
       'com.mail',

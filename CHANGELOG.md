@@ -4,6 +4,17 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.15.0] - 2026-10-18
+### Added
+- M4 section 1: device calendars. Settings > Calendars has a switch "Show device calendars" (off by default). Turning it on asks for the calendar permission (only then); the screen lists every calendar the Android Calendar Provider exposes, grouped by account, with colour and read-only marks, lets the user choose which are shown and which writable one new events go to, and explains a refused or revoked permission with a link to the system settings.
+- Kotlin `app.nudge.calendars.CalendarChannels` (permissions, list of calendars through `CalendarContract`); `wire_capture.py` declares `READ_CALENDAR` and `WRITE_CALENDAR` and registers the channel (also in an already wired `MainActivity.kt`).
+- `CalendarPlatform` (method channel, no-op, fake), `CalendarIntegration` (rules for visibility, the default calendar and the permission flow), `ExternalCalendar`.
+- Settings keys `calendar_integration`, `calendar_visible_ids`, `calendar_default_id`.
+- Tests: the permission flow, visibility and default rules, the method channel parsing, the Drift settings, and the screen (refused, granted, revoked, grouping, choices).
+- `docs/CALENDAR_INTEGRATION.md`; Persian texts for the new screen.
+### Known limitations
+- Events are not read or shown yet (section 2), and nothing is written to the calendars (section 3). Not compiled, tested or run: CI is the first check. Google and Samsung accounts have not been checked on devices. The permission answer is noticed when the app returns to the front, not through a callback.
+
 ## [0.14.0] - 2026-10-18
 ### Added
 - M3 section 5: Settings > Theme (System default, Light, Dark), stored in the settings table (`theme_mode`) and applied at once. `ThemeController`.

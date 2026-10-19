@@ -5,6 +5,7 @@ import 'package:nudge/application/capture_ingestor.dart';
 import 'package:nudge/main.dart';
 
 import 'fake_capture_platform.dart';
+import 'fake_calendar_platform.dart';
 import 'fake_data_exporter.dart';
 import 'fake_reminder_platform.dart';
 import 'in_memory_repositories.dart';
@@ -17,11 +18,13 @@ final class AppHarness {
     bool connected = true,
     bool supported = true,
     bool remindersSupported = false,
+    bool calendarsSupported = false,
   }) : platform = (FakeCapturePlatform()
          ..accessGranted = accessGranted
          ..connected = connected
          ..supported = supported),
-       reminders = (FakeReminderPlatform()..supported = remindersSupported);
+       reminders = (FakeReminderPlatform()..supported = remindersSupported),
+       deviceCalendars = (FakeCalendarPlatform()..supported = calendarsSupported);
 
   final FakeCapturePlatform platform;
   final InMemoryNotificationRepository notifications =
@@ -30,6 +33,7 @@ final class AppHarness {
   final InMemoryTaskRepository tasks = InMemoryTaskRepository();
   final FakeDataExporter exporter = FakeDataExporter();
   final FakeReminderPlatform reminders;
+  final FakeCalendarPlatform deviceCalendars;
 
   late final AppServices services = AppServices(
     platform: platform,
@@ -38,6 +42,7 @@ final class AppHarness {
     tasks: tasks,
     exporter: exporter,
     reminderPlatform: reminders,
+    calendarPlatform: deviceCalendars,
     ingestor: CaptureIngestor(
       platform: platform,
       notifications: notifications,

@@ -1,30 +1,32 @@
-Files in this zip (changed since 0.13.0), 0.14.0:
+Files in this zip (changed since 0.14.0), 0.15.0:
   CHANGELOG.md
   GIT_COMMIT.txt
   ROADMAP.md
   STATUS.md
   VERSIONS.md
-  docs/UI.md
+  android/app/src/main/kotlin/app/nudge/calendars/CalendarChannels.kt
+  docs/CALENDAR_INTEGRATION.md
+  docs/DEVELOPMENT.md
   lib/app_info.dart
   lib/app_services.dart
-  lib/application/theme_controller.dart
+  lib/application/calendar_integration.dart
   lib/data/drift_capture_settings_repository.dart
   lib/domain/capture_settings_repository.dart
+  lib/domain/external_calendar.dart
   lib/l10n/fa_strings.dart
-  lib/main.dart
-  lib/ui/calendar_page.dart
-  lib/ui/calendar_week_view.dart
-  lib/ui/content_width.dart
-  lib/ui/inbox_page.dart
-  lib/ui/notification_detail_page.dart
+  lib/platform/calendar_platform.dart
+  lib/platform/calendar_platform_factory.dart
+  lib/platform/method_channel_calendar_platform.dart
+  lib/platform/noop_calendar_platform.dart
+  lib/ui/calendars_page.dart
   lib/ui/settings_page.dart
-  lib/ui/source_rules_page.dart
-  lib/ui/task_detail_page.dart
-  lib/ui/task_form_page.dart
-  lib/ui/tasks_page.dart
   pubspec.yaml
-  test/application/theme_controller_test.dart
+  test/application/calendar_integration_test.dart
+  test/data/drift_capture_settings_repository_test.dart
+  test/platform/method_channel_calendar_platform_test.dart
+  test/support/app_harness.dart
+  test/support/fake_calendar_platform.dart
   test/support/in_memory_repositories.dart
-  test/ui/language_ui_test.dart
-  test/ui/responsive_test.dart
+  test/ui/calendars_page_test.dart
+  tools/wire_capture.py
 Deleted: none

@@ -31,6 +31,22 @@ abstract interface class CaptureSettingsRepository {
   /// The theme: `system` (follow the device, default), `light` or `dark`.
   Future<String> getThemeMode();
 
+  /// Whether the user turned on showing the device's calendars.
+  Future<bool> getCalendarIntegrationEnabled();
+
+  Future<void> setCalendarIntegrationEnabled({required bool enabled});
+
+  /// The calendars the user chose to show, or null when no choice was made
+  /// yet (then the ones the device's calendar app shows are used).
+  Future<Set<String>?> getVisibleCalendarIds();
+
+  Future<void> setVisibleCalendarIds(Set<String> ids);
+
+  /// The calendar new events are saved to, or null when none was chosen.
+  Future<String?> getDefaultCalendarId();
+
+  Future<void> setDefaultCalendarId(String? id);
+
   Future<void> setThemeMode(String mode);
 
   Future<void> setLanguage(String language);

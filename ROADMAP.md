@@ -185,12 +185,19 @@ Decision and layers: see [docs/CALENDAR.md](docs/CALENDAR.md).
 - [x] Light and dark themes (Settings > Theme); responsive wide layouts (0.14.0, see docs/UI.md; not yet seen on a device)
 - [ ] Accessible typography, loading, empty and error states: large-text tests and labels are done; a TalkBack and contrast review on a device is not
 
-## M4: Android Calendar Provider (not started)
-- [ ] Discover readable and writable calendars; show names, accounts, colors and write capability
-- [ ] Request calendar permissions only when the user enables the integration
-- [ ] Let users choose calendars for display and for event creation
-- [ ] Provider abstraction with tests for provider behavior
+## M4: Android Calendar Provider (in progress)
+Design and status: [docs/CALENDAR_INTEGRATION.md](docs/CALENDAR_INTEGRATION.md).
+
+### Section 1: discovery, permission and choices (done in code, 0.15.0; not compiled or run yet)
+- [x] Discover readable and writable calendars; show names, accounts, colors and write capability
+- [x] Request calendar permissions only when the user enables the integration
+- [x] Let users choose calendars for display and for event creation (stored)
+- [x] Provider abstraction with tests for provider behavior (platform bridge parsing, permission flow, visibility and default rules)
 - [ ] Verify Google and Samsung account availability on physical devices
+
+### Next sections
+- [ ] Section 2: show the visible calendars' events in the month, week, day and agenda views, clearly different from tasks and reminders
+- [ ] Section 3: create, edit and delete events in the chosen calendar; link tasks to events without duplicates; handle read-only calendars and sync failures
 
 ## M5: Windows build and secure synchronization (not started)
 - [x] Windows release build runs in CI (the app is still a placeholder)

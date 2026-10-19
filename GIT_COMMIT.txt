@@ -1,14 +1,20 @@
-feat: Nudge v0.14.0 - themes, wide layouts, large-text tests (M3 section 5)
+feat: Nudge v0.15.0 - device calendars: discovery and choices (M4 section 1)
 
-- Settings > Theme: system, light or dark (settings key theme_mode),
-  applied at once (ThemeController)
-- wide layouts from 840 px: month and day list side by side, week as
-  seven columns; other screens centred at most 720 px wide (ContentWidth)
-- segmented buttons scroll sideways instead of overflowing at large text
-- tests: theme controller and setting, layouts at the breakpoint, the
-  calendar views at double text size and Settings/Tasks at 1.5x
-- docs: UI.md, changelog, roadmap, status
+- Settings > Calendars: switch "Show device calendars" (off by default);
+  the calendar permission is requested only when it is turned on
+- lists the calendars of the Android Calendar Provider grouped by
+  account, with colour and read-only marks; the user chooses which are
+  shown and which writable calendar new events go to (stored)
+- refused or revoked permission explained, with a link to system settings
+- Kotlin CalendarChannels (permissions, CalendarContract query);
+  wire_capture.py declares READ/WRITE_CALENDAR and registers the channel
+- CalendarPlatform (method channel, no-op, fake), CalendarIntegration,
+  ExternalCalendar
+- tests: permission flow, visibility/default rules, channel parsing,
+  settings storage, the screen
+- docs: CALENDAR_INTEGRATION.md, roadmap, status, development checklist,
+  Persian texts
 
-Not compiled or run: CI first. No TalkBack/Narrator/contrast review yet.
+Events are not read or shown yet. Not compiled or run: CI first.
 
-Milestone: M3 / Section 5
+Milestone: M4 / Section 1

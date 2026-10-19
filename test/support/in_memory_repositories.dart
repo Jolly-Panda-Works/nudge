@@ -19,13 +19,12 @@ class InMemoryNotificationRepository implements NotificationRepository {
   }
 
   List<CapturedNotification> _snapshot(bool includeRemoved) {
-    final items =
-        _items
-            .where(
-              (n) => includeRemoved || n.status == NotificationStatus.active,
-            )
-            .toList()
-          ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
+    final items = _items
+        .where(
+          (n) => includeRemoved || n.status == NotificationStatus.active,
+        )
+        .toList()
+      ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
     return items;
   }
 
@@ -140,6 +139,30 @@ class InMemorySettingsRepository implements CaptureSettingsRepository {
   String calendarSystemId = 'jalali';
   String language = 'en';
   String themeMode = 'system';
+  bool calendarIntegration = false;
+  Set<String>? visibleCalendarIds;
+  String? defaultCalendarId;
+
+  @override
+  Future<bool> getCalendarIntegrationEnabled() async => calendarIntegration;
+
+  @override
+  Future<void> setCalendarIntegrationEnabled({required bool enabled}) async =>
+      calendarIntegration = enabled;
+
+  @override
+  Future<Set<String>?> getVisibleCalendarIds() async => visibleCalendarIds;
+
+  @override
+  Future<void> setVisibleCalendarIds(Set<String> ids) async =>
+      visibleCalendarIds = Set<String>.of(ids);
+
+  @override
+  Future<String?> getDefaultCalendarId() async => defaultCalendarId;
+
+  @override
+  Future<void> setDefaultCalendarId(String? id) async =>
+      defaultCalendarId = id;
 
   @override
   Future<String> getThemeMode() async => themeMode;

@@ -3,7 +3,7 @@ description: Nudge - unified notifications inbox, tasks and calendar (Android + 
 publish_to: 'none'
 repository: https://github.com/Jolly-Panda-Works/nudge
 issue_tracker: https://github.com/Jolly-Panda-Works/nudge/issues
-version: 0.14.0+23
+version: 0.15.0+24
 
 environment:
   sdk: '>=3.9.0 <4.0.0'
