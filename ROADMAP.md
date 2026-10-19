@@ -196,7 +196,14 @@ Design and status: [docs/CALENDAR_INTEGRATION.md](docs/CALENDAR_INTEGRATION.md).
 - [ ] Verify Google and Samsung account availability on physical devices
 
 ### Next sections
-- [ ] Section 2: show the visible calendars' events in the month, week, day and agenda views, clearly different from tasks and reminders
+### Section 2: events in the calendar views (done in code, 0.16.0; not compiled or run yet)
+- [x] Read the events (recurring ones expanded) of the shown calendars for the range on screen
+- [x] Show them in the month (square markers), week, day (all-day block, hour rows) and agenda views, clearly different from tasks and reminders (calendar icon and colour, calendar name)
+- [x] Tap an event for its details and open it in the device's calendar app
+- [x] Provider failures are shown without breaking tasks; nothing is read while the integration is off
+- [ ] Verify on devices: recurring events, all-day events across time zones, large calendars
+
+### Next
 - [ ] Section 3: create, edit and delete events in the chosen calendar; link tasks to events without duplicates; handle read-only calendars and sync failures
 
 ## M5: Windows build and secure synchronization (not started)

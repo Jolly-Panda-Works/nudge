@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 
 import '../domain/external_calendar.dart';
+import '../domain/external_event.dart';
 import 'calendar_platform.dart';
 
 /// Android implementation backed by the Kotlin `CalendarChannels`.
@@ -59,10 +60,82 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
       return calendars;
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied'
-            ? 'permission_denied'
-            : 'query_failed',
+        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
       );
     }
+  }
+
+  @override
+  Future<List<ExternalEvent>> listEvents({
+    required DateTime from,
+    required DateTime to,
+    required Set<String> calendarIds,
+  }) async {
+    if (calendarIds.isEmpty) return const <ExternalEvent>[];
+    try {
+      final raw =
+          await _channel.invokeListMethod<Map<Object?, Object?>>(
+            'listEvents',
+            <String, Object?>{
+              'fromMillis': from.millisecondsSinceEpoch,
+              'toMillis': to.millisecondsSinceEpoch,
+              'calendarIds': calendarIds.toList(),
+            },
+          ) ??
+          const <Map<Object?, Object?>>[];
+      final events = <ExternalEvent>[];
+      for (final item in raw) {
+        final eventId = item['eventId'];
+        final calendarId = item['calendarId'];
+        final begin = item['beginMillis'];
+        final end = item['endMillis'];
+        if (eventId is! String ||
+            calendarId is! String ||
+            begin is! num ||
+            end is! num) {
+          continue;
+        }
+        final allDay = item['allDay'] == true;
+        final color = item['color'];
+        events.add(
+          ExternalEvent(
+            eventId: eventId,
+            calendarId: calendarId,
+            title: item['title'] as String? ?? '',
+            start: _instant(begin.toInt(), allDay: allDay),
+            end: _instant(end.toInt(), allDay: allDay),
+            allDay: allDay,
+            color: color is int ? color : null,
+          ),
+        );
+      }
+      return events;
+    } on PlatformException catch (error) {
+      throw CalendarPlatformException(
+        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
+      );
+    }
+  }
+
+  /// All-day events are stored as UTC midnights; they mean the local days
+  /// with the same year, month and day.
+  static DateTime _instant(int millis, {required bool allDay}) {
+    final utc = DateTime.fromMillisecondsSinceEpoch(millis, isUtc: true);
+    if (!allDay) return utc.toLocal();
+    return DateTime(utc.year, utc.month, utc.day);
+  }
+
+  @override
+  Future<bool> openEvent(ExternalEvent event) async {
+    // The calendar app expects all-day times as UTC midnights.
+    DateTime shown(DateTime t) =>
+        event.allDay ? DateTime.utc(t.year, t.month, t.day) : t;
+    return await _channel.invokeMethod<bool>('openEvent', <String, Object?>{
+          'eventId': event.eventId,
+          'beginMillis': shown(event.start).millisecondsSinceEpoch,
+          'endMillis': shown(event.end).millisecondsSinceEpoch,
+          'allDay': event.allDay,
+        }) ??
+        false;
   }
 }

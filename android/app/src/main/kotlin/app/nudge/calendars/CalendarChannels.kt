@@ -3,6 +3,7 @@ package app.nudge.calendars
 import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -48,6 +49,33 @@ object CalendarChannels {
                     result.error("permission_denied", "Calendar permission is not granted", null)
                 } catch (e: Exception) {
                     result.error("query_failed", "The calendars could not be read", null)
+                }
+            }
+            "listEvents" -> {
+                val from = (call.argument<Number>("fromMillis"))?.toLong()
+                val to = (call.argument<Number>("toMillis"))?.toLong()
+                val ids = call.argument<List<String>>("calendarIds")
+                if (from == null || to == null || ids == null) {
+                    result.error("bad_args", "fromMillis, toMillis and calendarIds are required", null)
+                } else {
+                    try {
+                        result.success(listEvents(context, from, to, ids))
+                    } catch (e: SecurityException) {
+                        result.error("permission_denied", "Calendar permission is not granted", null)
+                    } catch (e: Exception) {
+                        result.error("query_failed", "The events could not be read", null)
+                    }
+                }
+            }
+            "openEvent" -> {
+                val id = call.argument<String>("eventId")?.toLongOrNull()
+                val begin = (call.argument<Number>("beginMillis"))?.toLong()
+                val end = (call.argument<Number>("endMillis"))?.toLong()
+                val allDay = call.argument<Boolean>("allDay") ?: false
+                if (id == null || begin == null || end == null) {
+                    result.error("bad_args", "eventId, beginMillis and endMillis are required", null)
+                } else {
+                    result.success(openEvent(activity, id, begin, end, allDay))
                 }
             }
             else -> result.notImplemented()
@@ -119,5 +147,74 @@ object CalendarChannels {
             }
         }
         return calendars
+    }
+
+    private const val MAX_INSTANCES = 3000
+
+    /** The occurrences overlapping [from, to) in the given calendars; recurring events are expanded. */
+    private fun listEvents(
+        context: Context,
+        from: Long,
+        to: Long,
+        calendarIds: List<String>,
+    ): List<Map<String, Any?>> {
+        val events = ArrayList<Map<String, Any?>>()
+        if (calendarIds.isEmpty()) return events
+        val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+        ContentUris.appendId(builder, from)
+        ContentUris.appendId(builder, to)
+        val projection = arrayOf(
+            CalendarContract.Instances.EVENT_ID,
+            CalendarContract.Instances.CALENDAR_ID,
+            CalendarContract.Instances.TITLE,
+            CalendarContract.Instances.BEGIN,
+            CalendarContract.Instances.END,
+            CalendarContract.Instances.ALL_DAY,
+            CalendarContract.Instances.CALENDAR_COLOR,
+        )
+        val placeholders = calendarIds.joinToString(",") { "?" }
+        val cursor = context.contentResolver.query(
+            builder.build(),
+            projection,
+            CalendarContract.Instances.CALENDAR_ID + " IN (" + placeholders + ")",
+            calendarIds.toTypedArray(),
+            CalendarContract.Instances.BEGIN + " ASC",
+        ) ?: return events
+        cursor.use {
+            while (it.moveToNext() && events.size < MAX_INSTANCES) {
+                events.add(
+                    mapOf(
+                        "eventId" to it.getLong(0).toString(),
+                        "calendarId" to it.getLong(1).toString(),
+                        "title" to (it.getString(2) ?: ""),
+                        "beginMillis" to it.getLong(3),
+                        "endMillis" to it.getLong(4),
+                        "allDay" to (it.getInt(5) != 0),
+                        "color" to if (it.isNull(6)) null else it.getInt(6),
+                    ),
+                )
+            }
+        }
+        return events
+    }
+
+    private fun openEvent(
+        activity: Activity,
+        eventId: Long,
+        begin: Long,
+        end: Long,
+        allDay: Boolean,
+    ): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW)
+            .setData(ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId))
+            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, begin)
+            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, end)
+            .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, allDay)
+        return try {
+            activity.startActivity(intent)
+            true
+        } catch (e: ActivityNotFoundException) {
+            false
+        }
     }
 }

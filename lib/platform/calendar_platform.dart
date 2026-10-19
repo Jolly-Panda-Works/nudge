@@ -1,4 +1,5 @@
 import '../domain/external_calendar.dart';
+import '../domain/external_event.dart';
 
 /// Thrown when the calendars cannot be read (permission revoked, or the
 /// provider failed).
@@ -28,4 +29,16 @@ abstract interface class CalendarPlatform {
   /// Every calendar the provider exposes. Throws
   /// [CalendarPlatformException] when it cannot be read.
   Future<List<ExternalCalendar>> listCalendars();
+
+  /// The occurrences of events in the calendars [calendarIds] that overlap
+  /// [from, to). Recurring events are expanded. Throws
+  /// [CalendarPlatformException] when they cannot be read.
+  Future<List<ExternalEvent>> listEvents({
+    required DateTime from,
+    required DateTime to,
+    required Set<String> calendarIds,
+  });
+
+  /// Opens the event in the device's calendar app. False when it cannot be.
+  Future<bool> openEvent(ExternalEvent event);
 }

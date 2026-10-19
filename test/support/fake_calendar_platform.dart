@@ -1,4 +1,5 @@
 import 'package:nudge/domain/external_calendar.dart';
+import 'package:nudge/domain/external_event.dart';
 import 'package:nudge/platform/calendar_platform.dart';
 
 ExternalCalendar calendar(
@@ -23,6 +24,26 @@ ExternalCalendar calendar(
   );
 }
 
+ExternalEvent event(
+  String id, {
+  String calendarId = '1',
+  String title = 'Meeting',
+  required DateTime start,
+  DateTime? end,
+  bool allDay = false,
+  int? color,
+}) {
+  return ExternalEvent(
+    eventId: id,
+    calendarId: calendarId,
+    title: title,
+    start: start,
+    end: end ?? start.add(const Duration(hours: 1)),
+    allDay: allDay,
+    color: color,
+  );
+}
+
 /// In-memory stand-in for the device's calendar provider.
 class FakeCalendarPlatform implements CalendarPlatform {
   bool supported = true;
@@ -35,6 +56,10 @@ class FakeCalendarPlatform implements CalendarPlatform {
   int permissionRequests = 0;
   int settingsOpens = 0;
   int listCalls = 0;
+  List<ExternalEvent> events = <ExternalEvent>[];
+  bool eventsFail = false;
+  final List<Set<String>> eventQueries = <Set<String>>[];
+  final List<ExternalEvent> opened = <ExternalEvent>[];
 
   @override
   bool get isSupported => supported;
@@ -64,5 +89,28 @@ class FakeCalendarPlatform implements CalendarPlatform {
     listCalls++;
     if (listFails) throw const CalendarPlatformException('query_failed');
     return List<ExternalCalendar>.of(calendars);
+  }
+
+  @override
+  Future<List<ExternalEvent>> listEvents({
+    required DateTime from,
+    required DateTime to,
+    required Set<String> calendarIds,
+  }) async {
+    eventQueries.add(Set<String>.of(calendarIds));
+    if (eventsFail) throw const CalendarPlatformException('query_failed');
+    return <ExternalEvent>[
+      for (final e in events)
+        if (calendarIds.contains(e.calendarId) &&
+            e.start.isBefore(to) &&
+            e.end.isAfter(from))
+          e,
+    ];
+  }
+
+  @override
+  Future<bool> openEvent(ExternalEvent event) async {
+    opened.add(event);
+    return true;
   }
 }

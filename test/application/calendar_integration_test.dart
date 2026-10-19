@@ -114,7 +114,10 @@ void main() {
     platform.granted = allowed;
     settings.calendarIntegration = true;
     settings.defaultCalendarId = '2';
-    platform.calendars = [calendar('1'), calendar('2', name: 'Work')];
+    platform.calendars = [
+      calendar('1'),
+      calendar('2', name: 'Work'),
+    ];
 
     expect((await integration.load()).defaultId, '2');
   });
@@ -207,5 +210,107 @@ void main() {
     expect(calendar('1', type: 'LOCAL').accountKind, 'Device');
     expect(calendar('1', type: 'com.example').accountKind, 'com.example');
     expect(calendar('1', name: '').label, 'me@example.com');
+  });
+
+  group('events', () {
+    final from = DateTime(2026, 10, 18);
+    final to = DateTime(2026, 10, 25);
+
+    void allow() {
+      platform.granted = allowed;
+      settings.calendarIntegration = true;
+    }
+
+    test('nothing is read while the integration is off', () async {
+      platform.calendars = [calendar('1')];
+      platform.events = [event('e', start: DateTime(2026, 10, 18, 9))];
+
+      expect(await integration.events(from: from, to: to), isEmpty);
+      expect(platform.eventQueries, isEmpty);
+    });
+
+    test('nothing is read without the permission', () async {
+      settings.calendarIntegration = true;
+      platform.calendars = [calendar('1')];
+
+      expect(await integration.events(from: from, to: to), isEmpty);
+      expect(platform.eventQueries, isEmpty);
+    });
+
+    test('only the shown calendars are queried, with their names', () async {
+      allow();
+      platform.calendars = [
+        calendar('1', name: 'Personal', visible: true),
+        calendar('2', name: 'Birthdays', visible: false),
+      ];
+      platform.events = [
+        event('e1', calendarId: '1', start: DateTime(2026, 10, 18, 9)),
+        event('e2', calendarId: '2', start: DateTime(2026, 10, 18, 10)),
+      ];
+
+      final found = await integration.events(from: from, to: to);
+
+      expect(platform.eventQueries.single, <String>{'1'});
+      expect(found.map((e) => e.eventId), <String>['e1']);
+      expect(found.single.calendarLabel, 'Personal');
+    });
+
+    test('the stored choice decides which calendars are queried', () async {
+      allow();
+      settings.visibleCalendarIds = <String>{'2'};
+      platform.calendars = [calendar('1'), calendar('2', name: 'Work')];
+      platform.events = [
+        event('e1', calendarId: '1', start: DateTime(2026, 10, 18, 9)),
+        event('e2', calendarId: '2', start: DateTime(2026, 10, 18, 10)),
+      ];
+
+      final found = await integration.events(from: from, to: to);
+
+      expect(found.map((e) => e.eventId), <String>['e2']);
+    });
+
+    test('hiding every calendar reads no events', () async {
+      allow();
+      settings.visibleCalendarIds = <String>{};
+      platform.calendars = [calendar('1')];
+
+      expect(await integration.events(from: from, to: to), isEmpty);
+      expect(platform.eventQueries, isEmpty);
+    });
+
+    test('an event just outside the range is still found (padding)', () async {
+      allow();
+      platform.calendars = [calendar('1')];
+      // An all-day event stored as UTC may start a few hours before `from`.
+      platform.events = [
+        event(
+          'edge',
+          start: DateTime(2026, 10, 17, 20),
+          end: DateTime(2026, 10, 18, 2),
+        ),
+      ];
+
+      final found = await integration.events(from: from, to: to);
+
+      expect(found.map((e) => e.eventId), <String>['edge']);
+    });
+
+    test('a provider failure is thrown for the screen to show', () async {
+      allow();
+      platform.calendars = [calendar('1')];
+      platform.eventsFail = true;
+
+      expect(
+        integration.events(from: from, to: to),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('opening an event goes to the platform', () async {
+      final e = event('e1', start: DateTime(2026, 10, 18, 9));
+
+      expect(await integration.openEvent(e), isTrue);
+      expect(platform.opened, <Object>[e]);
+    });
   });
 }

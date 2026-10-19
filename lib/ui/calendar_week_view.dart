@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../domain/calendar/calendar_names.dart';
 import '../domain/calendar/calendar_system.dart';
+import '../domain/external_event.dart';
 import '../domain/task.dart';
+import 'calendar_event_tile.dart';
 import 'calendar_widgets.dart';
 import 'content_width.dart';
 
@@ -18,6 +20,8 @@ class CalendarWeekView extends StatelessWidget {
     required this.persian,
     required this.onOpenDay,
     required this.onOpenTask,
+    this.eventsByDay = const <DateTime, List<ExternalEvent>>{},
+    this.onOpenEvent,
     super.key,
   });
 
@@ -31,6 +35,8 @@ class CalendarWeekView extends StatelessWidget {
   final bool persian;
   final ValueChanged<DateTime> onOpenDay;
   final ValueChanged<TaskItem> onOpenTask;
+  final Map<DateTime, List<ExternalEvent>> eventsByDay;
+  final ValueChanged<ExternalEvent>? onOpenEvent;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +67,8 @@ class CalendarWeekView extends StatelessWidget {
                   );
                   final named = system.fromDate(day);
                   final tasks = byDay[day] ?? const <TaskItem>[];
+                  final events =
+                      eventsByDay[day] ?? const <ExternalEvent>[];
                   final isToday = day == today;
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -133,6 +141,12 @@ class CalendarWeekView extends StatelessWidget {
                           Expanded(
                             child: ListView(
                               children: [
+                                for (final event in events)
+                                  CalendarEventTile(
+                                    event: event,
+                                    persian: persian,
+                                    onTap: () => onOpenEvent?.call(event),
+                                  ),
                                 for (final task in tasks)
                                   CalendarTaskTile(
                                     task: task,
@@ -171,6 +185,8 @@ class CalendarWeekView extends StatelessWidget {
               );
               final named = system.fromDate(day);
               final tasks = byDay[day] ?? const <TaskItem>[];
+                  final events =
+                      eventsByDay[day] ?? const <ExternalEvent>[];
               final isToday = day == today;
               final isSelected = day == selected;
               return Padding(
@@ -202,9 +218,7 @@ class CalendarWeekView extends StatelessWidget {
                                     short: true,
                                   ),
                                   style: textTheme.labelMedium?.copyWith(
-                                    color:
-                                        persian &&
-                                            day.weekday == DateTime.friday
+                                    color: persian && day.weekday == DateTime.friday
                                         ? scheme.error
                                         : scheme.onSurfaceVariant,
                                   ),
@@ -237,10 +251,16 @@ class CalendarWeekView extends StatelessWidget {
                         ),
                       ),
                       Expanded(
-                        child: tasks.isEmpty
+                        child: tasks.isEmpty && events.isEmpty
                             ? const SizedBox(height: 56)
                             : Column(
                                 children: [
+                                  for (final event in events)
+                                    CalendarEventTile(
+                                      event: event,
+                                      persian: persian,
+                                      onTap: () => onOpenEvent?.call(event),
+                                    ),
                                   for (final task in tasks)
                                     CalendarTaskTile(
                                       task: task,

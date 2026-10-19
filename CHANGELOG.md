@@ -4,6 +4,18 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.16.0] - 2026-10-18
+### Added
+- M4 section 2: events of the shown device calendars appear in the month, week, day and agenda views. Recurring events are expanded by the provider; only the range on screen is read, again when the range changes and when the app returns to the front.
+- Events look different from tasks and reminders: a calendar icon in the calendar's colour with the calendar's name, and small square markers (tasks stay round dots) in the month grid. All-day events are in an "All day" block at the top of the day view; events over midnight appear on every day they cover.
+- Tapping an event shows its calendar and time, with "Open in calendar app".
+- A line explains when the provider fails; tasks keep working. Nothing is read while the integration is off or not allowed.
+- Kotlin `listEvents` (through `CalendarContract.Instances`, capped at 3000 occurrences) and `openEvent`; `ExternalEvent`, `CalendarPlatform.listEvents/openEvent`, `CalendarIntegration.events`, `groupEventsByDay`.
+- Tests: grouping by day, the service (visibility, padding, failures), the channel parsing (including all-day events and UTC midnights), and the screens with events.
+- Persian texts for the new messages.
+### Known limitations
+- Events cannot be created or edited (section 3). Not compiled, tested or run: CI is the first check. Recurring events, all-day events across time zones and large calendars have not been checked on devices.
+
 ## [0.15.0] - 2026-10-18
 ### Added
 - M4 section 1: device calendars. Settings > Calendars has a switch "Show device calendars" (off by default). Turning it on asks for the calendar permission (only then); the screen lists every calendar the Android Calendar Provider exposes, grouped by account, with colour and read-only marks, lets the user choose which are shown and which writable one new events go to, and explains a refused or revoked permission with a link to the system settings.

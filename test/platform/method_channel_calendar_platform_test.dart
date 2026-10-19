@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nudge/platform/calendar_platform.dart';
+import '../support/fake_calendar_platform.dart' show event;
 import 'package:nudge/platform/method_channel_calendar_platform.dart';
 
 void main() {
@@ -89,5 +90,90 @@ void main() {
         ),
       ),
     );
+  });
+
+  test('events are parsed; all-day events become local days', () async {
+    handle((call) async {
+      expect(call.method, 'listEvents');
+      expect(call.arguments['calendarIds'], <Object?>['1']);
+      return <Map<String, Object?>>[
+        <String, Object?>{
+          'eventId': '5',
+          'calendarId': '1',
+          'title': 'Standup',
+          'beginMillis': DateTime.utc(2026, 10, 18, 6, 30).millisecondsSinceEpoch,
+          'endMillis': DateTime.utc(2026, 10, 18, 7).millisecondsSinceEpoch,
+          'allDay': false,
+          'color': -14575885,
+        },
+        <String, Object?>{
+          'eventId': '6',
+          'calendarId': '1',
+          'title': 'Holiday',
+          'beginMillis': DateTime.utc(2026, 10, 20).millisecondsSinceEpoch,
+          'endMillis': DateTime.utc(2026, 10, 21).millisecondsSinceEpoch,
+          'allDay': true,
+        },
+        <String, Object?>{'eventId': '7'},
+      ];
+    });
+
+    final events = await platform.listEvents(
+      from: DateTime(2026, 10, 17),
+      to: DateTime(2026, 10, 25),
+      calendarIds: <String>{'1'},
+    );
+
+    expect(events, hasLength(2));
+    expect(events[0].title, 'Standup');
+    expect(events[0].allDay, isFalse);
+    expect(events[0].start, DateTime.utc(2026, 10, 18, 6, 30).toLocal());
+    expect(events[0].color, -14575885);
+    expect(events[1].allDay, isTrue);
+    expect(events[1].start, DateTime(2026, 10, 20));
+    expect(events[1].end, DateTime(2026, 10, 21));
+    expect(events[1].color, isNull);
+  });
+
+  test('no calendars means no query', () async {
+    var called = false;
+    handle((call) async {
+      called = true;
+      return <Object?>[];
+    });
+
+    final events = await platform.listEvents(
+      from: DateTime(2026, 10, 17),
+      to: DateTime(2026, 10, 25),
+      calendarIds: <String>{},
+    );
+
+    expect(events, isEmpty);
+    expect(called, isFalse);
+  });
+
+  test('opening an all-day event sends UTC midnights', () async {
+    Map<Object?, Object?>? sent;
+    handle((call) async {
+      sent = call.arguments as Map<Object?, Object?>;
+      return true;
+    });
+
+    final opened = await platform.openEvent(
+      event(
+        '6',
+        start: DateTime(2026, 10, 20),
+        end: DateTime(2026, 10, 21),
+        allDay: true,
+      ),
+    );
+
+    expect(opened, isTrue);
+    expect(sent!['eventId'], '6');
+    expect(
+      sent!['beginMillis'],
+      DateTime.utc(2026, 10, 20).millisecondsSinceEpoch,
+    );
+    expect(sent!['allDay'], isTrue);
   });
 }

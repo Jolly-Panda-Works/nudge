@@ -1,20 +1,20 @@
-feat: Nudge v0.15.0 - device calendars: discovery and choices (M4 section 1)
+feat: Nudge v0.16.0 - device events in the calendar views (M4 section 2)
 
-- Settings > Calendars: switch "Show device calendars" (off by default);
-  the calendar permission is requested only when it is turned on
-- lists the calendars of the Android Calendar Provider grouped by
-  account, with colour and read-only marks; the user chooses which are
-  shown and which writable calendar new events go to (stored)
-- refused or revoked permission explained, with a link to system settings
-- Kotlin CalendarChannels (permissions, CalendarContract query);
-  wire_capture.py declares READ/WRITE_CALENDAR and registers the channel
-- CalendarPlatform (method channel, no-op, fake), CalendarIntegration,
-  ExternalCalendar
-- tests: permission flow, visibility/default rules, channel parsing,
-  settings storage, the screen
-- docs: CALENDAR_INTEGRATION.md, roadmap, status, development checklist,
-  Persian texts
+- events of the shown device calendars appear in the month, week, day
+  and agenda views; recurring events are expanded by the provider and
+  only the range on screen is read
+- events look different from tasks: calendar icon and colour with the
+  calendar's name; square markers in the month grid (tasks are dots);
+  an All day block in the day view; events over midnight on each day
+- tap an event for its details and open it in the device's calendar app
+- provider failures are reported without breaking tasks; nothing is read
+  while the integration is off or not allowed
+- Kotlin listEvents (CalendarContract.Instances, capped) and openEvent
+- ExternalEvent, CalendarPlatform.listEvents/openEvent,
+  CalendarIntegration.events, groupEventsByDay
+- tests: grouping, service, channel parsing, screens; Persian texts
+- docs: CALENDAR_INTEGRATION.md, roadmap, status, development checklist
 
-Events are not read or shown yet. Not compiled or run: CI first.
+Read-only: no creating or editing yet. Not compiled or run: CI first.
 
-Milestone: M4 / Section 1
+Milestone: M4 / Section 2

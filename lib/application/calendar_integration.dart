@@ -1,5 +1,6 @@
 import '../domain/capture_settings_repository.dart';
 import '../domain/external_calendar.dart';
+import '../domain/external_event.dart';
 import '../platform/calendar_platform.dart';
 
 /// What happened when the user asked to turn the integration on.
@@ -97,13 +98,7 @@ final class CalendarIntegration {
         readFailed = true;
       }
     }
-    final stored = await _settings.getVisibleCalendarIds();
-    final visible = stored != null
-        ? stored.intersection(<String>{for (final c in calendars) c.id})
-        : <String>{
-            for (final c in calendars)
-              if (c.visibleInProvider) c.id,
-          };
+    final visible = await _visibleIds(calendars);
     final storedDefault = await _settings.getDefaultCalendarId();
     return CalendarState(
       supported: true,
@@ -115,6 +110,50 @@ final class CalendarIntegration {
       readFailed: readFailed,
     );
   }
+
+  /// The stored choice (only calendars that still exist), or, when nothing
+  /// was chosen, the calendars the device's calendar app shows.
+  Future<Set<String>> _visibleIds(List<ExternalCalendar> calendars) async {
+    final stored = await _settings.getVisibleCalendarIds();
+    if (stored != null) {
+      return stored.intersection(<String>{for (final c in calendars) c.id});
+    }
+    return <String>{
+      for (final c in calendars)
+        if (c.visibleInProvider) c.id,
+    };
+  }
+
+  /// The occurrences of events in the shown calendars that overlap
+  /// [from, to). Empty while the integration is off, unsupported or not
+  /// allowed. Throws [CalendarPlatformException] when the provider fails.
+  Future<List<ExternalEvent>> events({
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    if (!_platform.isSupported) return const <ExternalEvent>[];
+    if (!await _settings.getCalendarIntegrationEnabled()) {
+      return const <ExternalEvent>[];
+    }
+    if (!(await _platform.permissions()).read) return const <ExternalEvent>[];
+    final calendars = await _platform.listCalendars();
+    final visible = await _visibleIds(calendars);
+    if (visible.isEmpty) return const <ExternalEvent>[];
+    final labels = <String, String>{for (final c in calendars) c.id: c.label};
+    // A day of padding on both sides: all-day events are stored in UTC.
+    final found = await _platform.listEvents(
+      from: from.subtract(const Duration(days: 1)),
+      to: to.add(const Duration(days: 1)),
+      calendarIds: visible,
+    );
+    return <ExternalEvent>[
+      for (final event in found)
+        event.withCalendarLabel(labels[event.calendarId] ?? ''),
+    ];
+  }
+
+  /// Opens an event in the device's calendar app.
+  Future<bool> openEvent(ExternalEvent event) => _platform.openEvent(event);
 
   /// The stored default if it still exists and can be written to; otherwise
   /// the first writable calendar that is the account's own; otherwise null.

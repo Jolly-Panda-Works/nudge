@@ -1,4 +1,4 @@
-Files in this zip (changed since 0.14.0), 0.15.0:
+Files in this zip (changed since 0.15.0), 0.16.0:
   CHANGELOG.md
   GIT_COMMIT.txt
   ROADMAP.md
@@ -8,25 +8,22 @@ Files in this zip (changed since 0.14.0), 0.15.0:
   docs/CALENDAR_INTEGRATION.md
   docs/DEVELOPMENT.md
   lib/app_info.dart
-  lib/app_services.dart
   lib/application/calendar_integration.dart
-  lib/data/drift_capture_settings_repository.dart
-  lib/domain/capture_settings_repository.dart
-  lib/domain/external_calendar.dart
+  lib/application/events_by_day.dart
+  lib/domain/external_event.dart
   lib/l10n/fa_strings.dart
   lib/platform/calendar_platform.dart
-  lib/platform/calendar_platform_factory.dart
   lib/platform/method_channel_calendar_platform.dart
   lib/platform/noop_calendar_platform.dart
-  lib/ui/calendars_page.dart
-  lib/ui/settings_page.dart
+  lib/ui/calendar_agenda_view.dart
+  lib/ui/calendar_day_view.dart
+  lib/ui/calendar_event_tile.dart
+  lib/ui/calendar_page.dart
+  lib/ui/calendar_week_view.dart
   pubspec.yaml
   test/application/calendar_integration_test.dart
-  test/data/drift_capture_settings_repository_test.dart
+  test/application/events_by_day_test.dart
   test/platform/method_channel_calendar_platform_test.dart
-  test/support/app_harness.dart
   test/support/fake_calendar_platform.dart
-  test/support/in_memory_repositories.dart
-  test/ui/calendars_page_test.dart
-  tools/wire_capture.py
+  test/ui/calendar_events_test.dart
 Deleted: none

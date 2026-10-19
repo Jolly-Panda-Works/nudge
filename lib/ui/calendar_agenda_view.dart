@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../domain/calendar/calendar_system.dart';
+import '../domain/external_event.dart';
 import '../domain/task.dart';
 import '../l10n/l10n.dart';
+import 'calendar_event_tile.dart';
 import 'calendar_widgets.dart';
 
 /// The days that have something to do, from [from] on, one heading per day.
@@ -14,6 +16,8 @@ class CalendarAgendaView extends StatelessWidget {
     required this.persian,
     required this.onOpenTask,
     this.days = defaultDays,
+    this.eventsByDay = const <DateTime, List<ExternalEvent>>{},
+    this.onOpenEvent,
     super.key,
   });
 
@@ -29,6 +33,8 @@ class CalendarAgendaView extends StatelessWidget {
 
   /// How many days from [from] are looked at.
   final int days;
+  final Map<DateTime, List<ExternalEvent>> eventsByDay;
+  final ValueChanged<ExternalEvent>? onOpenEvent;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +43,9 @@ class CalendarAgendaView extends StatelessWidget {
     final entries = <Widget>[];
     for (var i = 0; i < days; i++) {
       final day = DateTime(from.year, from.month, from.day + i);
-      final tasks = byDay[day];
-      if (tasks == null || tasks.isEmpty) continue;
+      final tasks = byDay[day] ?? const <TaskItem>[];
+      final events = eventsByDay[day] ?? const <ExternalEvent>[];
+      if (tasks.isEmpty && events.isEmpty) continue;
       entries.add(
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
@@ -48,6 +55,15 @@ class CalendarAgendaView extends StatelessWidget {
           ),
         ),
       );
+      for (final event in events) {
+        entries.add(
+          CalendarEventTile(
+            event: event,
+            persian: persian,
+            onTap: () => onOpenEvent?.call(event),
+          ),
+        );
+      }
       for (final task in tasks) {
         entries.add(
           CalendarTaskTile(
@@ -59,11 +75,7 @@ class CalendarAgendaView extends StatelessWidget {
       }
     }
     if (entries.isEmpty) {
-      return Center(
-        child: Text(
-          tr('Nothing planned in the next {days} days', {'days': days}),
-        ),
-      );
+      return Center(child: Text(tr('Nothing planned in the next {days} days', {'days': days})));
     }
     return ListView(children: entries);
   }
