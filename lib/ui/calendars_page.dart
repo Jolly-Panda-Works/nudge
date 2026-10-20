@@ -171,10 +171,7 @@ class _CalendarsPageState extends State<CalendarsPage>
       body: ContentWidth(
         child: _failed
             ? Center(
-                child: FilledButton(
-                  onPressed: _load,
-                  child: Text(tr('Retry')),
-                ),
+                child: FilledButton(onPressed: _load, child: Text(tr('Retry'))),
               )
             : state == null
             ? const Center(child: CircularProgressIndicator())
@@ -239,10 +236,7 @@ class _CalendarsPageState extends State<CalendarsPage>
         children.add(
           ListTile(
             title: Text(tr('The calendars could not be read.')),
-            trailing: TextButton(
-              onPressed: _load,
-              child: Text(tr('Retry')),
-            ),
+            trailing: TextButton(onPressed: _load, child: Text(tr('Retry'))),
           ),
         );
       } else if (state.calendars.isEmpty) {

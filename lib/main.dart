@@ -24,9 +24,12 @@ Future<void> main() async {
     await services.language.load();
     await services.theme.load();
     unawaited(
-      services.start().then<void>((_) {}, onError: (Object _) {
-        // Queued events are retried on the next native signal.
-      }),
+      services.start().then<void>(
+        (_) {},
+        onError: (Object _) {
+          // Queued events are retried on the next native signal.
+        },
+      ),
     );
   } else {
     L10n.setLanguage(
@@ -85,7 +88,9 @@ class NudgeApp extends StatelessWidget {
                   children: [
                     const Text('$appName v$appVersion'),
                     if (startupError != null)
-                      Text(tr('Startup failed: {error}', {'error': startupError})),
+                      Text(
+                        tr('Startup failed: {error}', {'error': startupError}),
+                      ),
                   ],
                 ),
               ),
