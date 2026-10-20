@@ -220,7 +220,7 @@ jobs:
               echo
             } | tee -a "$GITHUB_STEP_SUMMARY"
           done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: nudge-android
           path: dist/*.apk
@@ -269,7 +269,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
           Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "dist/$($env:ASSET_BASE)_windows-x64.zip"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: nudge-windows
           path: dist/*.zip
