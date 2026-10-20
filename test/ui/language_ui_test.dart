@@ -44,7 +44,7 @@ void main() {
     expect(find.text('Language'), findsNothing);
 
     // The screen underneath is in Persian too.
-    await tester.pageBack();
+    tester.state<NavigatorState>(find.byType(Navigator).first).pop();
     await tester.pumpAndSettle();
     expect(find.text('هنوز اعلانی نیست'), findsOneWidget);
     expect(find.text('No notifications yet'), findsNothing);

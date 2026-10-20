@@ -1,18 +1,14 @@
-fix: Nudge v0.16.1 - failures from the first CI run
+fix: Nudge v0.16.2 - installable updates (stable debug key), last failing test
 
-- notification details: setState returned a Future when a task was
-  created, so saving a task or reminder failed (and "View task" did not
-  appear)
-- language change now rebuilds the open screens in place (the previous
-  key trick was ignored: the Navigator is kept by a global key)
-- analyzer: unnecessary this., unnecessary dart:ui import, braces on
-  long one-line ifs
-- tests: the in-memory task stream no longer hangs on cancel (the
-  reminder scheduler test timed out); language dialog and settings
-  language tests corrected; large-text tests scroll the view switch
-  into reach so Day and Agenda are really exercised
-- the unfinished M4 section 3 work was taken out of this version
+- CI: builds without a release key use one shared debug key kept in the
+  Actions cache, so each build installs over the previous one (before,
+  every run created a new key and Android refused updates)
+- CI: print the wired AndroidManifest.xml and describe every APK
+  (package, SDK levels, ABIs, size) in the run summary
+- language test: pop the navigator instead of pageBack(), which found no
+  back button on the test platform
+- docs: what to do when the APK will not install
 
-Format findings are handled by the Format workflow on main.
+CI of 0.16.1: analysis clean, formatting clean, 320 tests passed.
 
 Milestone: stabilisation

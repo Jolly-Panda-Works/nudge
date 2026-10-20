@@ -4,6 +4,15 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.16.2] - 2026-10-20
+### Fixed
+- The last failing test: the language test went back with `pageBack()`, which could not find a back button on the test platform. It now pops the navigator directly. The CI run of 0.16.1 had 320 tests passing, analysis clean and formatting clean.
+- Updating the app failed to install ("package conflicts with an existing package"): CI made a new debug key on every run and Android refuses an update signed with a different key. Builds without a release key now use one shared debug key kept in the Actions cache, so a build installs over the previous one. The first build after this change still has a new key: uninstall the old Nudge once. If the cache is ever cleared, the key changes again.
+### Added
+- CI prints the final `AndroidManifest.xml` after wiring and a description of each APK (package, SDK levels, ABIs, size) in the run summary, to make install problems easier to diagnose.
+### Known limitations
+- Release-signed builds still need the keystore secrets (see docs/RELEASING.md). Nothing in this version was seen on a device yet.
+
 ## [0.16.1] - 2026-10-19
 Fixes from the first CI run of 0.16.0 (the analysis and test log).
 ### Fixed

@@ -1,20 +1,10 @@
-Files in this zip (changed since 0.16.0), 0.16.1:
+Files in this zip (changed since 0.16.1), 0.16.2:
+  .github/workflows/ci.yml
   CHANGELOG.md
   GIT_COMMIT.txt
   VERSIONS.md
-  docs/LOCALIZATION.md
+  docs/RELEASING.md
   lib/app_info.dart
-  lib/app_services.dart
-  lib/application/language_controller.dart
-  lib/main.dart
-  lib/ui/calendars_page.dart
-  lib/ui/inbox_page.dart
-  lib/ui/notification_detail_page.dart
-  lib/ui/settings_page.dart
-  lib/ui/task_detail_page.dart
-  lib/ui/task_form_page.dart
   pubspec.yaml
-  test/support/in_memory_task_repository.dart
   test/ui/language_ui_test.dart
-  test/ui/responsive_test.dart
 Deleted: none

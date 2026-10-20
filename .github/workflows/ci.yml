@@ -135,6 +135,16 @@ jobs:
             rm -f test/widget_test.dart
           fi
           python3 tools/wire_capture.py --only android
+          echo "---- AndroidManifest.xml after wiring ----"
+          cat android/app/src/main/AndroidManifest.xml
+      # A debug key that survives between runs, so that every build can be
+      # installed over the previous one. Without it CI makes a new debug key
+      # on each run and Android refuses the update ("package conflicts").
+      - name: Restore the debug key
+        uses: actions/cache@v4
+        with:
+          path: ~/.nudge-debug-key
+          key: nudge-debug-key-v1
       # The release key lives in repository secrets (see docs/RELEASING.md).
       # Without them the APKs are signed with the debug key.
       - name: Prepare the signing key
@@ -158,8 +168,24 @@ jobs:
             echo "signed=true" >> "$GITHUB_OUTPUT"
             echo "Signing with the release key." >> "$GITHUB_STEP_SUMMARY"
           else
+            # No release key: use the debug key kept in the cache (created on
+            # the first run). It is not secret; it only keeps updates working.
+            if [ ! -f "$HOME/.nudge-debug-key/debug.jks" ]; then
+              mkdir -p "$HOME/.nudge-debug-key"
+              keytool -genkeypair -keystore "$HOME/.nudge-debug-key/debug.jks" \
+                -storetype PKCS12 -alias nudge-debug -keyalg RSA -keysize 2048 \
+                -validity 10000 -storepass nudgedebug -keypass nudgedebug \
+                -dname "CN=Nudge debug, O=Jolly Panda Works"
+              echo "Created a new debug key (the cache had none)." >> "$GITHUB_STEP_SUMMARY"
+            fi
+            {
+              echo "NUDGE_KEYSTORE_PATH=$HOME/.nudge-debug-key/debug.jks"
+              echo "NUDGE_KEYSTORE_PASSWORD=nudgedebug"
+              echo "NUDGE_KEY_ALIAS=nudge-debug"
+              echo "NUDGE_KEY_PASSWORD=nudgedebug"
+            } >> "$GITHUB_ENV"
             echo "signed=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::No release key in the repository secrets; signing with the debug key."
+            echo "::warning::No release key in the repository secrets; signing with the shared debug key."
           fi
       # A release build, split per CPU architecture: a debug APK carries every
       # architecture, debug tooling and unoptimized code, which is why it is
@@ -183,6 +209,17 @@ jobs:
         run: |
           apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           "$apksigner" verify --print-certs "dist/${ASSET_BASE}_android-arm64-v8a.apk" | grep -E "Signer #1 certificate (DN|SHA-256)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Describe the APKs
+        continue-on-error: true
+        run: |
+          aapt2=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          for apk in dist/*.apk; do
+            {
+              echo "### $(basename "$apk") ($(du -h "$apk" | cut -f1))"
+              "$aapt2" dump badging "$apk" | grep -E "^(package:|sdkVersion|targetSdkVersion|native-code)" || true
+              echo
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: nudge-android
@@ -272,7 +309,7 @@ jobs:
           if [ "$SIGNED" = "true" ]; then
             signing="Signed with the Nudge release key."
           else
-            signing="Signed with the debug key, for testing only."
+            signing="Signed with a shared debug key, for testing only (updates install over each other)."
           fi
           notes="Build of ${GITHUB_SHA::7}. $signing Install the arm64-v8a APK on any recent phone; armeabi-v7a is for old 32-bit devices."
           if [ "$WINDOWS_RESULT" != "success" ]; then

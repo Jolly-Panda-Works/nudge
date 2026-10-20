@@ -27,3 +27,11 @@ The version is built into the app: CI passes `--build-name`, `--build-number` an
 1. Merge what you want to ship to `main` and wait for it to build.
 2. Create the tag `vX.Y.Z` on that commit: `git tag v0.6.0 && git push origin v0.6.0`, or on GitHub: Releases > Draft a new release > choose or create the tag > Publish. CI then builds that commit and attaches the files to the release.
 3. Add a `## [X.Y.Z]` section to `CHANGELOG.md` for the notes you want to keep with the repository.
+
+## If the APK will not install
+Android says what is wrong; the exact message decides:
+- **"App not installed as package conflicts with an existing package"** (or "signatures do not match"): an older Nudge is installed that was signed with another key. Uninstall it (Settings > Apps > Nudge) and install again. Builds made before 0.16.2 each had a different key; from 0.16.2 on they share one (kept in the Actions cache) so updates work. A release key from the secrets (see Signing above) is the permanent fix.
+- **"App not compatible" or "There was a problem parsing the package"**: use the `arm64-v8a` file; `armeabi-v7a` is only for old 32-bit phones and many new phones cannot run it.
+- **"Blocked by Play Protect"**: tap "More details" > "Install anyway". The app is signed with a debug key, so Play Protect does not know it.
+- **The Settings switch for Notification Access is grey** after installing: Android 13 and later restrict sideloaded apps; open Settings > Apps > Nudge > the three dots > "Allow restricted settings".
+The Android job summary lists each APK's package name, version, SDK levels and ABIs, and its log prints the final manifest.
