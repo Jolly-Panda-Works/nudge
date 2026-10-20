@@ -136,7 +136,9 @@ class _TaskFormPageState extends State<TaskFormPage> {
   Future<void> _askForAlerts() async {
     try {
       final platform = widget.services.reminderPlatform;
-      if (platform.isSupported) await platform.requestNotificationPermission();
+      if (platform.isSupported) {
+        await platform.requestNotificationPermission();
+      }
     } on Exception {
       // The Settings screen explains how to allow alerts.
     }
@@ -174,7 +176,9 @@ class _TaskFormPageState extends State<TaskFormPage> {
         );
         if (!result.created) {
           messenger.showSnackBar(
-            SnackBar(content: Text(tr('This notification already has a task'))),
+            SnackBar(
+              content: Text(tr('This notification already has a task')),
+            ),
           );
         }
         saved = result.task;
@@ -204,9 +208,7 @@ class _TaskFormPageState extends State<TaskFormPage> {
         title: Text(
           editing
               ? tr('Edit task')
-              : (_kind == TaskKind.reminder
-                    ? tr('New reminder')
-                    : tr('New task')),
+              : (_kind == TaskKind.reminder ? tr('New reminder') : tr('New task')),
         ),
         actions: [
           TextButton(
@@ -215,114 +217,112 @@ class _TaskFormPageState extends State<TaskFormPage> {
           ),
         ],
       ),
-      body: ContentWidth(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              TextFormField(
-                controller: _title,
-                decoration: InputDecoration(
-                  labelText: tr('Title'),
-                  border: OutlineInputBorder(),
-                ),
-                maxLength: TaskDraft.maxTitleLength,
-                textInputAction: TextInputAction.next,
-                validator: (value) => (value == null || value.trim().isEmpty)
-                    ? tr('Enter a title')
-                    : null,
+      body: ContentWidth(child: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            TextFormField(
+              controller: _title,
+              decoration: InputDecoration(
+                labelText: tr('Title'),
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _notes,
-                decoration: InputDecoration(
-                  labelText: tr('Notes'),
-                  border: OutlineInputBorder(),
-                  alignLabelWithHint: true,
-                ),
-                minLines: 3,
-                maxLines: 8,
+              maxLength: TaskDraft.maxTitleLength,
+              textInputAction: TextInputAction.next,
+              validator: (value) => (value == null || value.trim().isEmpty)
+                  ? tr('Enter a title')
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _notes,
+              decoration: InputDecoration(
+                labelText: tr('Notes'),
+                border: OutlineInputBorder(),
+                alignLabelWithHint: true,
               ),
-              const SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SegmentedButton<TaskKind>(
-                  segments: [
-                    ButtonSegment<TaskKind>(
-                      value: TaskKind.task,
-                      label: Text(tr('Task')),
-                      icon: Icon(Icons.check_circle_outline),
-                    ),
-                    ButtonSegment<TaskKind>(
-                      value: TaskKind.reminder,
-                      label: Text(tr('Reminder')),
-                      icon: Icon(Icons.alarm),
-                    ),
-                  ],
-                  selected: <TaskKind>{_kind},
-                  showSelectedIcon: false,
-                  onSelectionChanged: (selection) => setState(() {
-                    _kind = selection.first;
-                    _dueError = null;
-                  }),
+              minLines: 3,
+              maxLines: 8,
+            ),
+            const SizedBox(height: 16),
+            SingleChildScrollView(
+ scrollDirection: Axis.horizontal,
+ child: SegmentedButton<TaskKind>(
+              segments: [
+                ButtonSegment<TaskKind>(
+                  value: TaskKind.task,
+                  label: Text(tr('Task')),
+                  icon: Icon(Icons.check_circle_outline),
+                ),
+                ButtonSegment<TaskKind>(
+                  value: TaskKind.reminder,
+                  label: Text(tr('Reminder')),
+                  icon: Icon(Icons.alarm),
+                ),
+              ],
+              selected: <TaskKind>{_kind},
+              showSelectedIcon: false,
+              onSelectionChanged: (selection) => setState(() {
+                _kind = selection.first;
+                _dueError = null;
+              }),
+            ),
+),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.event),
+              title: Text(
+                date == null
+                    ? tr('Date')
+                    : formatDay(date),
+              ),
+              subtitle: date == null ? Text(tr('Not set')) : null,
+              onTap: _pickDate,
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.schedule),
+              title: Text(
+                time == null
+                    ? (date == null ? tr('Time') : tr('09:00 (default)'))
+                    : formatTimeOfDay(
+                        DateTime(2000, 1, 1, time.hour, time.minute),
+                      ),
+              ),
+              onTap: _pickTime,
+            ),
+            if (date != null)
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton(
+                  onPressed: _clearDue,
+                  child: Text(tr('Clear date and time')),
                 ),
               ),
-              const SizedBox(height: 8),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.event),
-                title: Text(date == null ? tr('Date') : formatDay(date)),
-                subtitle: date == null ? Text(tr('Not set')) : null,
-                onTap: _pickDate,
+            if (_dueError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  _dueError!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
               ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.schedule),
-                title: Text(
-                  time == null
-                      ? (date == null ? tr('Time') : tr('09:00 (default)'))
-                      : formatTimeOfDay(
-                          DateTime(2000, 1, 1, time.hour, time.minute),
-                        ),
-                ),
-                onTap: _pickTime,
+            if (_dueAt != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(tr('Due {time}', {'time': formatDue(_dueAt!)})),
               ),
-              if (date != null)
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: TextButton(
-                    onPressed: _clearDue,
-                    child: Text(tr('Clear date and time')),
-                  ),
-                ),
-              if (_dueError != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    _dueError!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                ),
-              if (_dueAt != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(tr('Due {time}', {'time': formatDue(_dueAt!)})),
-                ),
-              const SizedBox(height: 8),
-              Text(
-                tr(
-                  'A reminder shows an alert at the chosen time, with a Snooze '
-                  'button. Alerts need notifications to be allowed for Nudge.',
-                ),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
+            const SizedBox(height: 8),
+            Text(
+              tr('A reminder shows an alert at the chosen time, with a Snooze '
+              'button. Alerts need notifications to be allowed for Nudge.'),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
         ),
-      ),
+      )),
     );
   }
 }

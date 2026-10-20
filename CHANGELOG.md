@@ -4,6 +4,19 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.16.1] - 2026-10-19
+Fixes from the first CI run of 0.16.0 (the analysis and test log).
+### Fixed
+- Creating a task from a notification failed with "setState() callback argument returned a Future" (notification details). It also broke the "View task" button after saving.
+- Changing the language did not rebuild the screens that were already open (the rebuild key was ignored because the Navigator is kept by a global key). The app now marks every open widget for rebuilding, so the Settings screen and the screens underneath change language in place.
+- Three analyzer findings: an unnecessary `this.`, an unnecessary `dart:ui` import and long one-line `if` statements (braces added).
+### Changed
+- Test support: the in-memory task repository's change stream is a plain controller, so cancelling a subscription no longer waits for the next change (the reminder scheduler test timed out after 30 seconds because of that).
+- Tests: the language dialog test counts both tiles that start as "System default"; the settings language test now expects the open screen to change in place; the large-text tests now scroll the view switch into reach before tapping (Day and Agenda were not really being tested).
+- The unfinished work on creating and editing events (M4 section 3) was taken out of this version so the code stays at the state CI has compiled; it will come back separately.
+### Not changed
+- Code formatting: the Format workflow fixes it on `main`; the format step in CI only reports.
+
 ## [0.16.0] - 2026-10-18
 ### Added
 - M4 section 2: events of the shown device calendars appear in the month, week, day and agenda views. Recurring events are expanded by the provider; only the range on screen is read, again when the range changes and when the app returns to the front.

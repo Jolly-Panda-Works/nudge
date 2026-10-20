@@ -34,6 +34,9 @@ Future<AppHarness> openCalendar(WidgetTester tester) async {
 }
 
 Future<void> choose(WidgetTester tester, String view) async {
+  // The view switch scrolls sideways on a narrow screen.
+  await tester.ensureVisible(find.text(view));
+  await tester.pumpAndSettle();
   await tester.tap(find.text(view));
   await tester.pumpAndSettle();
 }

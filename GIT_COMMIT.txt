@@ -1,20 +1,18 @@
-feat: Nudge v0.16.0 - device events in the calendar views (M4 section 2)
+fix: Nudge v0.16.1 - failures from the first CI run
 
-- events of the shown device calendars appear in the month, week, day
-  and agenda views; recurring events are expanded by the provider and
-  only the range on screen is read
-- events look different from tasks: calendar icon and colour with the
-  calendar's name; square markers in the month grid (tasks are dots);
-  an All day block in the day view; events over midnight on each day
-- tap an event for its details and open it in the device's calendar app
-- provider failures are reported without breaking tasks; nothing is read
-  while the integration is off or not allowed
-- Kotlin listEvents (CalendarContract.Instances, capped) and openEvent
-- ExternalEvent, CalendarPlatform.listEvents/openEvent,
-  CalendarIntegration.events, groupEventsByDay
-- tests: grouping, service, channel parsing, screens; Persian texts
-- docs: CALENDAR_INTEGRATION.md, roadmap, status, development checklist
+- notification details: setState returned a Future when a task was
+  created, so saving a task or reminder failed (and "View task" did not
+  appear)
+- language change now rebuilds the open screens in place (the previous
+  key trick was ignored: the Navigator is kept by a global key)
+- analyzer: unnecessary this., unnecessary dart:ui import, braces on
+  long one-line ifs
+- tests: the in-memory task stream no longer hangs on cancel (the
+  reminder scheduler test timed out); language dialog and settings
+  language tests corrected; large-text tests scroll the view switch
+  into reach so Day and Agenda are really exercised
+- the unfinished M4 section 3 work was taken out of this version
 
-Read-only: no creating or editing yet. Not compiled or run: CI first.
+Format findings are handled by the Format workflow on main.
 
-Milestone: M4 / Section 2
+Milestone: stabilisation

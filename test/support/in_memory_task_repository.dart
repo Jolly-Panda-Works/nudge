@@ -140,7 +140,9 @@ class InMemoryTaskRepository implements TaskRepository {
   Future<TaskItem?> reopen(String id) async {
     final t = _items[id];
     if (t == null || t.status != TaskStatus.done) return t;
-    return _store(_rebuild(t, status: TaskStatus.open, clearCompleted: true));
+    return _store(
+      _rebuild(t, status: TaskStatus.open, clearCompleted: true),
+    );
   }
 
   @override
@@ -201,11 +203,21 @@ class InMemoryTaskRepository implements TaskRepository {
   @override
   Stream<List<TaskItem>> watchTasks({
     Set<TaskStatus> statuses = const <TaskStatus>{TaskStatus.open},
-  }) async* {
-    yield _sorted(statuses);
-    await for (final _ in _changes.stream) {
-      yield _sorted(statuses);
-    }
+  }) {
+    // A plain controller (not an async* generator): cancelling the
+    // subscription completes at once instead of waiting for the next change.
+    late final StreamController<List<TaskItem>> controller;
+    StreamSubscription<void>? changes;
+    controller = StreamController<List<TaskItem>>(
+      onListen: () {
+        controller.add(_sorted(statuses));
+        changes = _changes.stream.listen(
+          (_) => controller.add(_sorted(statuses)),
+        );
+      },
+      onCancel: () => changes?.cancel(),
+    );
+    return controller.stream;
   }
 
   @override

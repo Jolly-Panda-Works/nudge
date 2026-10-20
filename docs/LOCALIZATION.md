@@ -3,7 +3,7 @@
 Nudge is available in **English** and **Persian (فارسی)**. Persian switches the whole app to right-to-left, uses Persian digits and shows dates in the Jalali calendar.
 
 ## Choosing the language
-Settings > Language: *System default* (follows the device: Persian if the device language is Persian, English otherwise), *English* or *فارسی*. The choice is stored in the settings table (key `language`). Changing it rebuilds every screen, so the app returns to the inbox.
+Settings > Language: *System default* (follows the device: Persian if the device language is Persian, English otherwise), *English* or *فارسی*. The choice is stored in the settings table (key `language`). Changing it rebuilds every open screen in place (the Settings screen stays open).
 
 ## How texts are translated
 - The English text is the source. Code writes `tr('Delete task?')`; in Persian `tr` looks the English text up in `lib/l10n/fa_strings.dart`. A text without an entry is shown in English.

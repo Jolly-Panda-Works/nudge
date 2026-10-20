@@ -24,12 +24,9 @@ Future<void> main() async {
     await services.language.load();
     await services.theme.load();
     unawaited(
-      services.start().then<void>(
-        (_) {},
-        onError: (Object _) {
-          // Queued events are retried on the next native signal.
-        },
-      ),
+      services.start().then<void>((_) {}, onError: (Object _) {
+        // Queued events are retried on the next native signal.
+      }),
     );
   } else {
     L10n.setLanguage(
@@ -74,9 +71,9 @@ class NudgeApp extends StatelessWidget {
       locale: Locale(L10n.language),
       supportedLocales: const <Locale>[Locale('en'), Locale('fa')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      // A new key rebuilds every screen in the new language.
-      builder: (context, child) => KeyedSubtree(
-        key: ValueKey<String>(L10n.language),
+      // Screens are rebuilt in place when the language changes.
+      builder: (context, child) => _RebuildOnLanguage(
+        language: L10n.language,
         child: child ?? const SizedBox.shrink(),
       ),
       home: services != null
@@ -88,13 +85,49 @@ class NudgeApp extends StatelessWidget {
                   children: [
                     const Text('$appName v$appVersion'),
                     if (startupError != null)
-                      Text(
-                        tr('Startup failed: {error}', {'error': startupError}),
-                      ),
+                      Text(tr('Startup failed: {error}', {'error': startupError})),
                   ],
                 ),
               ),
             ),
     );
   }
+}
+
+/// Texts are written with `tr(...)`, which widgets do not depend on, so a
+/// language change does not rebuild them by itself. This marks every widget
+/// below for rebuilding (like a hot reload does), keeping the open screens
+/// and their state.
+class _RebuildOnLanguage extends StatefulWidget {
+  const _RebuildOnLanguage({required this.language, required this.child});
+
+  final String language;
+  final Widget child;
+
+  @override
+  State<_RebuildOnLanguage> createState() => _RebuildOnLanguageState();
+}
+
+class _RebuildOnLanguageState extends State<_RebuildOnLanguage> {
+  @override
+  void didUpdateWidget(_RebuildOnLanguage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.language != widget.language) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _markAllForRebuild();
+      });
+    }
+  }
+
+  void _markAllForRebuild() {
+    void visit(Element element) {
+      element.markNeedsBuild();
+      element.visitChildren(visit);
+    }
+
+    (context as Element).visitChildren(visit);
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

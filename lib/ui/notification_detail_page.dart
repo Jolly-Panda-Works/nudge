@@ -49,7 +49,11 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
         ),
       ),
     );
-    if (mounted) setState(() => _linkedTask = _findTask());
+    if (mounted) {
+      setState(() {
+        _linkedTask = _findTask();
+      });
+    }
   }
 
   Future<void> _viewTask(TaskItem task) async {
@@ -58,7 +62,11 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
         builder: (_) => TaskDetailPage(task: task, services: services),
       ),
     );
-    if (mounted) setState(() => _linkedTask = _findTask());
+    if (mounted) {
+      setState(() {
+        _linkedTask = _findTask();
+      });
+    }
   }
 
   Future<void> _openOriginal() async {
@@ -74,10 +82,8 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
     final confirmed = await confirmAction(
       context,
       title: tr('Delete notification?'),
-      message: tr(
-        'It will be removed from Nudge. The original notification in '
-        'the source app is not affected.',
-      ),
+      message: tr('It will be removed from Nudge. The original notification in '
+          'the source app is not affected.'),
       action: tr('Delete'),
     );
     if (!confirmed || !context.mounted) return;
@@ -113,106 +119,88 @@ class _NotificationDetailPageState extends State<NotificationDetailPage> {
           ),
         ],
       ),
-      body: ContentWidth(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            if (n.title != null)
-              SelectableText(n.title!, style: titleStyle)
-            else
-              Text(
-                n.isRedacted
-                    ? tr('Content hidden by Android')
-                    : tr('(no title)'),
-                style: titleStyle,
-              ),
-            const SizedBox(height: 12),
-            if (n.text != null)
-              SelectableText(n.text!)
-            else if (n.isRedacted)
-              Text(
-                tr(
-                  'The system did not share this notification\'s content with '
-                  'Nudge.',
-                ),
-              ),
-            const SizedBox(height: 24),
-            _Row(
-              label: tr('Source'),
-              value: imported
-                  ? tr('Shared or imported text')
-                  : n.appLabel ?? n.packageName,
+      body: ContentWidth(child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (n.title != null)
+            SelectableText(n.title!, style: titleStyle)
+          else
+            Text(
+              n.isRedacted ? tr('Content hidden by Android') : tr('(no title)'),
+              style: titleStyle,
             ),
-            if (!imported) _Row(label: tr('Package'), value: n.packageName),
-            _Row(
-              label: imported ? tr('Added') : tr('Posted'),
-              value: formatFullTimestamp(n.postedAt),
+          const SizedBox(height: 12),
+          if (n.text != null)
+            SelectableText(n.text!)
+          else if (n.isRedacted)
+            Text(
+              tr('The system did not share this notification\'s content with '
+              'Nudge.'),
             ),
+          const SizedBox(height: 24),
+          _Row(
+            label: tr('Source'),
+            value: imported ? tr('Shared or imported text') : n.appLabel ?? n.packageName,
+          ),
+          if (!imported) _Row(label: tr('Package'), value: n.packageName),
+          _Row(
+            label: imported ? tr('Added') : tr('Posted'),
+            value: formatFullTimestamp(n.postedAt),
+          ),
+          _Row(label: tr('First seen'), value: formatFullTimestamp(n.firstSeenAt)),
+          _Row(
+            label: tr('Last updated'),
+            value: formatFullTimestamp(n.lastUpdatedAt),
+          ),
+          _Row(label: tr('Updates'), value: tr('{count}', {'count': n.updateCount})),
+          if (!imported)
+            _Row(label: tr('Status'), value: removed ? tr('Dismissed') : tr('Active')),
+          if (!imported)
             _Row(
-              label: tr('First seen'),
-              value: formatFullTimestamp(n.firstSeenAt),
+              label: tr('Original action'),
+              value: n.source.hasContentAction
+                  ? tr('Existed when captured')
+                  : tr('None when captured'),
             ),
-            _Row(
-              label: tr('Last updated'),
-              value: formatFullTimestamp(n.lastUpdatedAt),
-            ),
-            _Row(
-              label: tr('Updates'),
-              value: tr('{count}', {'count': n.updateCount}),
-            ),
-            if (!imported)
-              _Row(
-                label: tr('Status'),
-                value: removed ? tr('Dismissed') : tr('Active'),
-              ),
-            if (!imported)
-              _Row(
-                label: tr('Original action'),
-                value: n.source.hasContentAction
-                    ? tr('Existed when captured')
-                    : tr('None when captured'),
-              ),
-            const SizedBox(height: 16),
-            FutureBuilder<TaskItem?>(
-              future: _linkedTask,
-              builder: (context, snapshot) {
-                final task = snapshot.data;
-                return Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    if (task != null)
-                      FilledButton.icon(
-                        onPressed: () => _viewTask(task),
-                        icon: const Icon(Icons.task_alt),
-                        label: Text(tr('View task')),
-                      )
-                    else if (snapshot.connectionState ==
-                        ConnectionState.done) ...[
-                      FilledButton.icon(
-                        onPressed: () => _createTask(TaskKind.task),
-                        icon: const Icon(Icons.add_task),
-                        label: Text(tr('Create task')),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: () => _createTask(TaskKind.reminder),
-                        icon: const Icon(Icons.alarm_add),
-                        label: Text(tr('Create reminder')),
-                      ),
-                    ],
-                    if (!imported)
-                      OutlinedButton.icon(
-                        onPressed: _openOriginal,
-                        icon: const Icon(Icons.open_in_new),
-                        label: Text(tr('Open original')),
-                      ),
+          const SizedBox(height: 16),
+          FutureBuilder<TaskItem?>(
+            future: _linkedTask,
+            builder: (context, snapshot) {
+              final task = snapshot.data;
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (task != null)
+                    FilledButton.icon(
+                      onPressed: () => _viewTask(task),
+                      icon: const Icon(Icons.task_alt),
+                      label: Text(tr('View task')),
+                    )
+                  else if (snapshot.connectionState == ConnectionState.done) ...[
+                    FilledButton.icon(
+                      onPressed: () => _createTask(TaskKind.task),
+                      icon: const Icon(Icons.add_task),
+                      label: Text(tr('Create task')),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => _createTask(TaskKind.reminder),
+                      icon: const Icon(Icons.alarm_add),
+                      label: Text(tr('Create reminder')),
+                    ),
                   ],
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+                  if (!imported)
+                    OutlinedButton.icon(
+                      onPressed: _openOriginal,
+                      icon: const Icon(Icons.open_in_new),
+                      label: Text(tr('Open original')),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      )),
     );
   }
 }
@@ -232,7 +220,10 @@ class _Row extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
           ),
           Expanded(child: Text(value)),
         ],

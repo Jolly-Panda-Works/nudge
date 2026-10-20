@@ -39,6 +39,13 @@ void main() {
 
     expect(harness.settings.language, 'fa');
     expect(L10n.language, 'fa');
+    // The Settings screen that is open is rebuilt in Persian, in place.
+    expect(find.text('زبان'), findsOneWidget);
+    expect(find.text('Language'), findsNothing);
+
+    // The screen underneath is in Persian too.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
     expect(find.text('هنوز اعلانی نیست'), findsOneWidget);
     expect(find.text('No notifications yet'), findsNothing);
   });
@@ -49,7 +56,8 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.settings));
     await tester.pumpAndSettle();
-    expect(find.text('System default'), findsOneWidget);
+    // The Language and Theme tiles both start as "System default".
+    expect(find.text('System default'), findsNWidgets(2));
     await tester.tap(find.text('Language'));
     await tester.pumpAndSettle();
 

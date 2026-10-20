@@ -10,7 +10,11 @@ import 'time_format.dart';
 import '../l10n/l10n.dart';
 
 class TaskDetailPage extends StatefulWidget {
-  const TaskDetailPage({required this.task, required this.services, super.key});
+  const TaskDetailPage({
+    required this.task,
+    required this.services,
+    super.key,
+  });
 
   final TaskItem task;
   final AppServices services;
@@ -76,10 +80,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final confirmed = await confirmAction(
       context,
       title: tr('Delete task?'),
-      message: tr(
-        'The task is removed from Nudge. The notification it came '
-        'from is not affected.',
-      ),
+      message: tr('The task is removed from Nudge. The notification it came '
+          'from is not affected.'),
       action: tr('Delete'),
     );
     if (!confirmed || !mounted) return;
@@ -114,9 +116,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          task.kind == TaskKind.reminder ? tr('Reminder') : tr('Task'),
-        ),
+        title: Text(task.kind == TaskKind.reminder ? tr('Reminder') : tr('Task')),
         actions: [
           if (task.status != TaskStatus.archived)
             IconButton(
@@ -131,81 +131,73 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           ),
         ],
       ),
-      body: ContentWidth(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            SelectableText(task.title, style: textTheme.titleLarge),
-            if (task.notes != null) ...[
-              const SizedBox(height: 12),
-              SelectableText(task.notes!),
-            ],
-            const SizedBox(height: 16),
-            _Row(label: tr('Status'), value: _statusLabel(task.status)),
-            if (task.dueAt != null)
-              _Row(label: tr('Due'), value: formatDue(task.dueAt!)),
-            if (task.snoozedUntil != null)
-              _Row(
-                label: tr('Snoozed until'),
-                value: formatDue(task.snoozedUntil!),
-              ),
-            if (remindAt == null && task.kind == TaskKind.reminder)
-              _Row(label: tr('Due'), value: tr('Not set')),
-            if (source != null)
-              _Row(
-                label: tr('From'),
-                value: source.appLabel ?? source.packageName,
-              ),
-            _Row(
-              label: tr('Created'),
-              value: formatFullTimestamp(task.createdAt),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (task.status == TaskStatus.open)
-                  FilledButton.icon(
-                    onPressed: () => _apply(() => tasks.markDone(task.id)),
-                    icon: const Icon(Icons.check),
-                    label: Text(tr('Mark done')),
-                  ),
-                if (task.status == TaskStatus.done)
-                  FilledButton.icon(
-                    onPressed: () => _apply(() => tasks.reopen(task.id)),
-                    icon: const Icon(Icons.undo),
-                    label: Text(tr('Reopen')),
-                  ),
-                if (task.status == TaskStatus.open)
-                  OutlinedButton.icon(
-                    onPressed: _snooze,
-                    icon: const Icon(Icons.snooze),
-                    label: Text(tr('Snooze')),
-                  ),
-                if (task.status == TaskStatus.archived)
-                  OutlinedButton.icon(
-                    onPressed: () => _apply(() => tasks.restore(task.id)),
-                    icon: const Icon(Icons.unarchive_outlined),
-                    label: Text(tr('Restore')),
-                  )
-                else
-                  OutlinedButton.icon(
-                    onPressed: () => _apply(() => tasks.archive(task.id)),
-                    icon: const Icon(Icons.archive_outlined),
-                    label: Text(tr('Archive')),
-                  ),
-                if (source != null)
-                  OutlinedButton.icon(
-                    onPressed: _openOriginal,
-                    icon: const Icon(Icons.open_in_new),
-                    label: Text(tr('Open original')),
-                  ),
-              ],
-            ),
+      body: ContentWidth(child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          SelectableText(task.title, style: textTheme.titleLarge),
+          if (task.notes != null) ...[
+            const SizedBox(height: 12),
+            SelectableText(task.notes!),
           ],
-        ),
-      ),
+          const SizedBox(height: 16),
+          _Row(label: tr('Status'), value: _statusLabel(task.status)),
+          if (task.dueAt != null)
+            _Row(label: tr('Due'), value: formatDue(task.dueAt!)),
+          if (task.snoozedUntil != null)
+            _Row(label: tr('Snoozed until'), value: formatDue(task.snoozedUntil!)),
+          if (remindAt == null && task.kind == TaskKind.reminder)
+            _Row(label: tr('Due'), value: tr('Not set')),
+          if (source != null)
+            _Row(
+              label: tr('From'),
+              value: source.appLabel ?? source.packageName,
+            ),
+          _Row(label: tr('Created'), value: formatFullTimestamp(task.createdAt)),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (task.status == TaskStatus.open)
+                FilledButton.icon(
+                  onPressed: () => _apply(() => tasks.markDone(task.id)),
+                  icon: const Icon(Icons.check),
+                  label: Text(tr('Mark done')),
+                ),
+              if (task.status == TaskStatus.done)
+                FilledButton.icon(
+                  onPressed: () => _apply(() => tasks.reopen(task.id)),
+                  icon: const Icon(Icons.undo),
+                  label: Text(tr('Reopen')),
+                ),
+              if (task.status == TaskStatus.open)
+                OutlinedButton.icon(
+                  onPressed: _snooze,
+                  icon: const Icon(Icons.snooze),
+                  label: Text(tr('Snooze')),
+                ),
+              if (task.status == TaskStatus.archived)
+                OutlinedButton.icon(
+                  onPressed: () => _apply(() => tasks.restore(task.id)),
+                  icon: const Icon(Icons.unarchive_outlined),
+                  label: Text(tr('Restore')),
+                )
+              else
+                OutlinedButton.icon(
+                  onPressed: () => _apply(() => tasks.archive(task.id)),
+                  icon: const Icon(Icons.archive_outlined),
+                  label: Text(tr('Archive')),
+                ),
+              if (source != null)
+                OutlinedButton.icon(
+                  onPressed: _openOriginal,
+                  icon: const Icon(Icons.open_in_new),
+                  label: Text(tr('Open original')),
+                ),
+            ],
+          ),
+        ],
+      )),
     );
   }
 }
@@ -220,12 +212,10 @@ String _statusLabel(TaskStatus status) => switch (status) {
 /// the action.
 String sourceOutcomeMessage(SourceOpenOutcome outcome) => switch (outcome) {
   SourceOpenOutcome.openedOriginal => tr('Opened the original notification'),
-  SourceOpenOutcome.openedApp => tr(
-    'The notification is gone, so the app was opened instead',
-  ),
-  SourceOpenOutcome.unavailable => tr(
-    'The original is not available. The saved content is kept here.',
-  ),
+  SourceOpenOutcome.openedApp =>
+    tr('The notification is gone, so the app was opened instead'),
+  SourceOpenOutcome.unavailable =>
+    tr('The original is not available. The saved content is kept here.'),
 };
 
 class _Row extends StatelessWidget {

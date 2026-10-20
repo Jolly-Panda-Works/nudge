@@ -1,29 +1,20 @@
-Files in this zip (changed since 0.15.0), 0.16.0:
+Files in this zip (changed since 0.16.0), 0.16.1:
   CHANGELOG.md
   GIT_COMMIT.txt
-  ROADMAP.md
-  STATUS.md
   VERSIONS.md
-  android/app/src/main/kotlin/app/nudge/calendars/CalendarChannels.kt
-  docs/CALENDAR_INTEGRATION.md
-  docs/DEVELOPMENT.md
+  docs/LOCALIZATION.md
   lib/app_info.dart
-  lib/application/calendar_integration.dart
-  lib/application/events_by_day.dart
-  lib/domain/external_event.dart
-  lib/l10n/fa_strings.dart
-  lib/platform/calendar_platform.dart
-  lib/platform/method_channel_calendar_platform.dart
-  lib/platform/noop_calendar_platform.dart
-  lib/ui/calendar_agenda_view.dart
-  lib/ui/calendar_day_view.dart
-  lib/ui/calendar_event_tile.dart
-  lib/ui/calendar_page.dart
-  lib/ui/calendar_week_view.dart
+  lib/app_services.dart
+  lib/application/language_controller.dart
+  lib/main.dart
+  lib/ui/calendars_page.dart
+  lib/ui/inbox_page.dart
+  lib/ui/notification_detail_page.dart
+  lib/ui/settings_page.dart
+  lib/ui/task_detail_page.dart
+  lib/ui/task_form_page.dart
   pubspec.yaml
-  test/application/calendar_integration_test.dart
-  test/application/events_by_day_test.dart
-  test/platform/method_channel_calendar_platform_test.dart
-  test/support/fake_calendar_platform.dart
-  test/ui/calendar_events_test.dart
+  test/support/in_memory_task_repository.dart
+  test/ui/language_ui_test.dart
+  test/ui/responsive_test.dart
 Deleted: none
