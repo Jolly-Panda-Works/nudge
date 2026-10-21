@@ -1,32 +1,6 @@
-Files in this zip (changed since 0.16.2), 0.17.0:
+Files in this zip (CI diagnostics only):
+  .github/workflows/ci.yml
   CHANGELOG.md
   GIT_COMMIT.txt
-  ROADMAP.md
-  STATUS.md
-  VERSIONS.md
-  android/app/src/main/kotlin/app/nudge/calendars/CalendarChannels.kt
-  docs/CALENDAR_INTEGRATION.md
-  docs/DEVELOPMENT.md
-  lib/app_info.dart
-  lib/application/calendar_integration.dart
-  lib/data/drift_capture_settings_repository.dart
-  lib/domain/capture_settings_repository.dart
-  lib/domain/event_draft.dart
-  lib/domain/external_event.dart
-  lib/l10n/fa_strings.dart
-  lib/platform/calendar_platform.dart
-  lib/platform/method_channel_calendar_platform.dart
-  lib/platform/noop_calendar_platform.dart
-  lib/ui/calendar_event_tile.dart
-  lib/ui/calendar_page.dart
-  lib/ui/event_form_page.dart
-  lib/ui/task_detail_page.dart
-  pubspec.yaml
-  test/application/calendar_integration_test.dart
-  test/data/drift_capture_settings_repository_test.dart
-  test/domain/event_draft_test.dart
-  test/platform/method_channel_calendar_platform_test.dart
-  test/support/fake_calendar_platform.dart
-  test/support/in_memory_repositories.dart
-  test/ui/event_form_test.dart
+  docs/RELEASING.md
 Deleted: none

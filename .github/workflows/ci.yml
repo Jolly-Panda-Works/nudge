@@ -212,11 +212,20 @@ jobs:
       - name: Describe the APKs
         continue-on-error: true
         run: |
-          aapt2=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          tools=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)
           for apk in dist/*.apk; do
             {
               echo "### $(basename "$apk") ($(du -h "$apk" | cut -f1))"
-              "$aapt2" dump badging "$apk" | grep -E "^(package:|sdkVersion|targetSdkVersion|native-code)" || true
+              "$tools/aapt2" dump badging "$apk" | grep -E "^(package:|sdkVersion|targetSdkVersion|native-code|application-debuggable|testOnly)" || true
+              echo "testOnly flag in the manifest: $("$tools/aapt2" dump xmltree "$apk" --file AndroidManifest.xml | grep -c testOnly || true) (0 is right)"
+              if "$tools/zipalign" -c -P 16 -v 4 "$apk" > /dev/null 2>&1; then
+                echo "zipalign: ok (4-byte aligned, native libraries 16 KB aligned)"
+              elif "$tools/zipalign" -c 4 "$apk" > /dev/null 2>&1; then
+                echo "zipalign: ok (4-byte aligned; native libraries are not 16 KB aligned)"
+              else
+                echo "zipalign: PROBLEM"
+              fi
+              "$tools/apksigner" verify --verbose --print-certs "$apk" 2>&1 | grep -E "^(Verifies|Verified using|Number of signers|Signer #1 certificate (DN|SHA-256))|ERROR|WARNING" || echo "apksigner: PROBLEM"
               echo
             } | tee -a "$GITHUB_STEP_SUMMARY"
           done

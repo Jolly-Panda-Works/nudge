@@ -11,6 +11,7 @@ All notable changes are documented here. Format based on
 - Kotlin `createEvent`, `updateEvent`, `deleteEvent`, `eventExists`, and a marker for repeating events (asked from the Events table, not the Instances view); Dart `EventDraft`, `CalendarPlatform` write methods, `CalendarIntegration.createEvent/updateEvent/deleteEvent/addTaskToCalendar`, `CalendarWriteException`.
 - Tests for the draft rules, the service (permission, read-only, repeating, invalid drafts, task links), the channel arguments (including all-day UTC midnights), the Drift link storage, and the screens (create, edit, delete, cancel, repeating, read-only, add a task).
 - Persian texts for all new messages; `docs/CALENDAR_INTEGRATION.md` updated.
+- CI: the Android job summary now also shows, for every APK, the `testOnly` flag, zipalign alignment (including 16 KB native libraries) and the `apksigner` verification, to find out why a phone refuses to install it.
 ### Known limitations
 - Not run on a device: events written to the Google and Samsung calendars, their sync, and all-day and time-zone behaviour are unchecked. No alerts or guests on events; the calendar of an existing event cannot be changed; repeating events are not editable; a task's event is not updated when the task changes.
 
