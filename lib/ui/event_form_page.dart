@@ -74,8 +74,15 @@ class _EventFormPageState extends State<EventFormPage> {
     if (event != null) {
       _title = TextEditingController(text: event.title);
       _allDay = event.allDay;
-      _startDay = DateTime(event.start.year, event.start.month, event.start.day);
-      _startTime = TimeOfDay(hour: event.start.hour, minute: event.start.minute);
+      _startDay = DateTime(
+        event.start.year,
+        event.start.month,
+        event.start.day,
+      );
+      _startTime = TimeOfDay(
+        hour: event.start.hour,
+        minute: event.start.minute,
+      );
       // An all-day event's end is the midnight after its last day.
       final last = event.allDay
           ? event.end.subtract(const Duration(days: 1))
@@ -278,8 +285,9 @@ class _EventFormPageState extends State<EventFormPage> {
             border: const OutlineInputBorder(),
           ),
           textInputAction: TextInputAction.next,
-          validator: (value) =>
-              (value == null || value.trim().isEmpty) ? tr('Enter a title') : null,
+          validator: (value) => (value == null || value.trim().isEmpty)
+              ? tr('Enter a title')
+              : null,
         ),
         const SizedBox(height: 16),
         if (editing != null)

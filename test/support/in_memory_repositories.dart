@@ -19,12 +19,13 @@ class InMemoryNotificationRepository implements NotificationRepository {
   }
 
   List<CapturedNotification> _snapshot(bool includeRemoved) {
-    final items = _items
-        .where(
-          (n) => includeRemoved || n.status == NotificationStatus.active,
-        )
-        .toList()
-      ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
+    final items =
+        _items
+            .where(
+              (n) => includeRemoved || n.status == NotificationStatus.active,
+            )
+            .toList()
+          ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
     return items;
   }
 
@@ -175,8 +176,7 @@ class InMemorySettingsRepository implements CaptureSettingsRepository {
   Future<String?> getDefaultCalendarId() async => defaultCalendarId;
 
   @override
-  Future<void> setDefaultCalendarId(String? id) async =>
-      defaultCalendarId = id;
+  Future<void> setDefaultCalendarId(String? id) async => defaultCalendarId = id;
 
   @override
   Future<String> getThemeMode() async => themeMode;

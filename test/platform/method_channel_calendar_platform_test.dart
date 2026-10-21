@@ -102,7 +102,13 @@ void main() {
           'eventId': '5',
           'calendarId': '1',
           'title': 'Standup',
-          'beginMillis': DateTime.utc(2026, 10, 18, 6, 30).millisecondsSinceEpoch,
+          'beginMillis': DateTime.utc(
+            2026,
+            10,
+            18,
+            6,
+            30,
+          ).millisecondsSinceEpoch,
           'endMillis': DateTime.utc(2026, 10, 18, 7).millisecondsSinceEpoch,
           'allDay': false,
           'color': -14575885,
@@ -267,7 +273,9 @@ void main() {
     });
 
     test('a refused write becomes a platform exception', () async {
-      handle((call) async => throw PlatformException(code: 'permission_denied'));
+      handle(
+        (call) async => throw PlatformException(code: 'permission_denied'),
+      );
 
       await expectLater(
         platform.deleteEvent('42'),
@@ -299,17 +307,19 @@ void main() {
     });
 
     test('repeating events are marked when listed', () async {
-      handle((call) async => <Map<String, Object?>>[
-        <String, Object?>{
-          'eventId': '5',
-          'calendarId': '1',
-          'title': 'Standup',
-          'beginMillis': DateTime.utc(2026, 10, 18, 6).millisecondsSinceEpoch,
-          'endMillis': DateTime.utc(2026, 10, 18, 7).millisecondsSinceEpoch,
-          'allDay': false,
-          'recurring': true,
-        },
-      ]);
+      handle(
+        (call) async => <Map<String, Object?>>[
+          <String, Object?>{
+            'eventId': '5',
+            'calendarId': '1',
+            'title': 'Standup',
+            'beginMillis': DateTime.utc(2026, 10, 18, 6).millisecondsSinceEpoch,
+            'endMillis': DateTime.utc(2026, 10, 18, 7).millisecondsSinceEpoch,
+            'allDay': false,
+            'recurring': true,
+          },
+        ],
+      );
 
       final events = await platform.listEvents(
         from: DateTime(2026, 10, 17),

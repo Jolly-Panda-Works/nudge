@@ -128,9 +128,7 @@ class FakeCalendarPlatform implements CalendarPlatform {
     calendarId: d.calendarId,
     title: d.cleanTitle,
     start: d.start,
-    end: d.allDay
-        ? DateTime(d.end.year, d.end.month, d.end.day + 1)
-        : d.end,
+    end: d.allDay ? DateTime(d.end.year, d.end.month, d.end.day + 1) : d.end,
     allDay: d.allDay,
   );
 

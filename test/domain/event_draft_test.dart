@@ -75,15 +75,18 @@ void main() {
     expect(d.endMillis, DateTime(2026, 10, 18, 10).millisecondsSinceEpoch);
   });
 
-  test('all-day events are sent as UTC midnights, the end after the last day', () {
-    final d = draft(
-      start: DateTime(2026, 10, 20),
-      end: DateTime(2026, 10, 22),
-      allDay: true,
-    );
-    expect(d.beginMillis, DateTime.utc(2026, 10, 20).millisecondsSinceEpoch);
-    expect(d.endMillis, DateTime.utc(2026, 10, 23).millisecondsSinceEpoch);
-  });
+  test(
+    'all-day events are sent as UTC midnights, the end after the last day',
+    () {
+      final d = draft(
+        start: DateTime(2026, 10, 20),
+        end: DateTime(2026, 10, 22),
+        allDay: true,
+      );
+      expect(d.beginMillis, DateTime.utc(2026, 10, 20).millisecondsSinceEpoch);
+      expect(d.endMillis, DateTime.utc(2026, 10, 23).millisecondsSinceEpoch);
+    },
+  );
 
   test('the end of an all-day event at a month end rolls over', () {
     final d = draft(

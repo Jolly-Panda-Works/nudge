@@ -436,8 +436,7 @@ class _CalendarPageState extends State<CalendarPage>
     final last = DateTime(first.year, first.month, first.day + 6);
     final a = system.fromDate(first);
     final b = system.fromDate(last);
-    String month(int m) =>
-        CalendarNames.month(system.id, m, persian: _persian);
+    String month(int m) => CalendarNames.month(system.id, m, persian: _persian);
     if (a.year == b.year && a.month == b.month) {
       return '${_num(a.day)} – ${_num(b.day)} ${month(b.month)} ${_num(b.year)}';
     }
@@ -482,7 +481,9 @@ class _CalendarPageState extends State<CalendarPage>
           ),
           IconButton(
             icon: const Icon(Icons.translate),
-            tooltip: _rtl ? tr('Show Gregorian dates') : tr('Show Jalali dates'),
+            tooltip: _rtl
+                ? tr('Show Gregorian dates')
+                : tr('Show Jalali dates'),
             onPressed: system == null ? null : _toggleSystem,
           ),
         ],
@@ -496,10 +497,7 @@ class _CalendarPageState extends State<CalendarPage>
             ),
       body: _failed
           ? Center(
-              child: FilledButton(
-                onPressed: _load,
-                child: Text(tr('Retry')),
-              ),
+              child: FilledButton(onPressed: _load, child: Text(tr('Retry'))),
             )
           : system == null
           ? const Center(child: CircularProgressIndicator())
@@ -508,38 +506,36 @@ class _CalendarPageState extends State<CalendarPage>
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: SingleChildScrollView(
- scrollDirection: Axis.horizontal,
- child: SegmentedButton<CalendarViewMode>(
-                    segments: [
-                      ButtonSegment<CalendarViewMode>(
-                        value: CalendarViewMode.month,
-                        label: Text(tr('Month')),
-                      ),
-                      ButtonSegment<CalendarViewMode>(
-                        value: CalendarViewMode.week,
-                        label: Text(tr('Week')),
-                      ),
-                      ButtonSegment<CalendarViewMode>(
-                        value: CalendarViewMode.day,
-                        label: Text(tr('Day')),
-                      ),
-                      ButtonSegment<CalendarViewMode>(
-                        value: CalendarViewMode.agenda,
-                        label: Text(tr('Agenda')),
-                      ),
-                    ],
-                    selected: <CalendarViewMode>{_view},
-                    showSelectedIcon: false,
-                    onSelectionChanged: (selection) =>
-                        _setView(selection.first),
+                    scrollDirection: Axis.horizontal,
+                    child: SegmentedButton<CalendarViewMode>(
+                      segments: [
+                        ButtonSegment<CalendarViewMode>(
+                          value: CalendarViewMode.month,
+                          label: Text(tr('Month')),
+                        ),
+                        ButtonSegment<CalendarViewMode>(
+                          value: CalendarViewMode.week,
+                          label: Text(tr('Week')),
+                        ),
+                        ButtonSegment<CalendarViewMode>(
+                          value: CalendarViewMode.day,
+                          label: Text(tr('Day')),
+                        ),
+                        ButtonSegment<CalendarViewMode>(
+                          value: CalendarViewMode.agenda,
+                          label: Text(tr('Agenda')),
+                        ),
+                      ],
+                      selected: <CalendarViewMode>{_view},
+                      showSelectedIcon: false,
+                      onSelectionChanged: (selection) =>
+                          _setView(selection.first),
+                    ),
                   ),
-),
                 ),
                 Expanded(
                   child: Directionality(
-                    textDirection: _rtl
-                        ? TextDirection.rtl
-                        : TextDirection.ltr,
+                    textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
                     child: StreamBuilder<List<TaskItem>>(
                       stream: _tasks,
                       builder: (context, snapshot) {
@@ -607,7 +603,12 @@ class _CalendarPageState extends State<CalendarPage>
             behavior: HitTestBehavior.translucent,
             onHorizontalDragEnd: _onSwipe,
             child: switch (_view) {
-              CalendarViewMode.month => _monthView(context, system, byDay, today),
+              CalendarViewMode.month => _monthView(
+                context,
+                system,
+                byDay,
+                today,
+              ),
               CalendarViewMode.week => CalendarWeekView(
                 system: system,
                 weekStart: startOfWeek(_selected, system.defaultWeekStart),
@@ -657,70 +658,69 @@ class _CalendarPageState extends State<CalendarPage>
     final grid = MonthGrid.build(system: system, year: _year, month: _month);
     final scheme = Theme.of(context).colorScheme;
     final weekdayRow = Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            children: [
-              for (final weekday in grid.columnWeekdays)
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      CalendarNames.weekday(
-                        weekday,
-                        persian: _persian,
-                        short: true,
-                      ),
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: _isWeekend(weekday)
-                            ? scheme.error
-                            : scheme.onSurfaceVariant,
-                      ),
-                    ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        children: [
+          for (final weekday in grid.columnWeekdays)
+            Expanded(
+              child: Center(
+                child: Text(
+                  CalendarNames.weekday(
+                    weekday,
+                    persian: _persian,
+                    short: true,
+                  ),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: _isWeekend(weekday)
+                        ? scheme.error
+                        : scheme.onSurfaceVariant,
                   ),
                 ),
-            ],
-          ),
-        );
-    final cells = Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              children: [
-                for (final week in grid.weeks)
-                  Expanded(
-                    child: Row(
-                      children: [
-                        for (final cell in week)
-                          Expanded(
-                            child: _DayCell(
-                              cell: cell,
-                              persian: _persian,
-                              isToday: cell.date == today,
-                              isSelected: cell.date == _selected,
-                              isWeekend: _isWeekend(cell.date.weekday),
-                              tasks: byDay[cell.date] ?? const <TaskItem>[],
-                              events:
-                                  _eventsByDay[cell.date] ??
-                                  const <ExternalEvent>[],
-                              label: _semanticLabel(
-                                system,
-                                cell,
-                                byDay[cell.date]?.length ?? 0,
-                                _eventsByDay[cell.date]?.length ?? 0,
-                              ),
-                              onTap: () => setState(() {
-                                _selected = cell.date;
-                                if (!cell.inMonth) {
-                                  _year = cell.calendarDate.year;
-                                  _month = cell.calendarDate.month;
-                                }
-                              }),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-              ],
+              ),
             ),
-          );
+        ],
+      ),
+    );
+    final cells = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        children: [
+          for (final week in grid.weeks)
+            Expanded(
+              child: Row(
+                children: [
+                  for (final cell in week)
+                    Expanded(
+                      child: _DayCell(
+                        cell: cell,
+                        persian: _persian,
+                        isToday: cell.date == today,
+                        isSelected: cell.date == _selected,
+                        isWeekend: _isWeekend(cell.date.weekday),
+                        tasks: byDay[cell.date] ?? const <TaskItem>[],
+                        events:
+                            _eventsByDay[cell.date] ?? const <ExternalEvent>[],
+                        label: _semanticLabel(
+                          system,
+                          cell,
+                          byDay[cell.date]?.length ?? 0,
+                          _eventsByDay[cell.date]?.length ?? 0,
+                        ),
+                        onTap: () => setState(() {
+                          _selected = cell.date;
+                          if (!cell.inMonth) {
+                            _year = cell.calendarDate.year;
+                            _month = cell.calendarDate.month;
+                          }
+                        }),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
     return LayoutBuilder(
       builder: (context, constraints) {
         final agenda = _dayAgenda(context, system, byDay);
@@ -732,7 +732,10 @@ class _CalendarPageState extends State<CalendarPage>
               Expanded(
                 flex: 3,
                 child: Column(
-                  children: [weekdayRow, Expanded(child: cells)],
+                  children: [
+                    weekdayRow,
+                    Expanded(child: cells),
+                  ],
                 ),
               ),
               const VerticalDivider(width: 1),
@@ -758,10 +761,7 @@ class _CalendarPageState extends State<CalendarPage>
     int count,
     int eventCount,
   ) {
-    final weekday = CalendarNames.weekday(
-      cell.date.weekday,
-      persian: _persian,
-    );
+    final weekday = CalendarNames.weekday(cell.date.weekday, persian: _persian);
     final date = calendarDayText(system, cell.date, persian: _persian);
     final tasks = count == 0
         ? ''

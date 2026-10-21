@@ -294,9 +294,7 @@ void main() {
   group('tasks in the calendar', () {
     Future<AppHarness> openTask(WidgetTester tester, {DateTime? due}) async {
       final harness = harnessWithCalendars();
-      await harness.tasks.create(
-        TaskDraft(title: 'Call Sara', dueAt: due),
-      );
+      await harness.tasks.create(TaskDraft(title: 'Call Sara', dueAt: due));
       await harness.pump(tester);
       await tester.tap(find.byIcon(Icons.checklist));
       await tester.pumpAndSettle();

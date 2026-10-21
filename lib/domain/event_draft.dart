@@ -47,10 +47,6 @@ final class EventDraft {
   /// The end instant (exclusive). For an all-day event, the UTC midnight
   /// after the last day.
   int get endMillis => allDay
-      ? DateTime.utc(
-          end.year,
-          end.month,
-          end.day + 1,
-        ).millisecondsSinceEpoch
+      ? DateTime.utc(end.year, end.month, end.day + 1).millisecondsSinceEpoch
       : end.millisecondsSinceEpoch;
 }

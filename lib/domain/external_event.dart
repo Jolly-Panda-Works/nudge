@@ -50,19 +50,17 @@ final class ExternalEvent {
   /// Identifies this occurrence (event and start).
   String get key => '$eventId@${start.millisecondsSinceEpoch}';
 
-  ExternalEvent withCalendar({
-    required String label,
-    required bool canWrite,
-  }) => ExternalEvent(
-    eventId: eventId,
-    calendarId: calendarId,
-    title: title,
-    start: start,
-    end: end,
-    allDay: allDay,
-    color: color,
-    calendarLabel: label,
-    recurring: recurring,
-    canWrite: canWrite,
-  );
+  ExternalEvent withCalendar({required String label, required bool canWrite}) =>
+      ExternalEvent(
+        eventId: eventId,
+        calendarId: calendarId,
+        title: title,
+        start: start,
+        end: end,
+        allDay: allDay,
+        color: color,
+        calendarLabel: label,
+        recurring: recurring,
+        canWrite: canWrite,
+      );
 }

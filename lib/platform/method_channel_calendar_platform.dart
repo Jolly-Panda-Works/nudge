@@ -61,7 +61,9 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
       return calendars;
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
+        error.code == 'permission_denied'
+            ? 'permission_denied'
+            : 'query_failed',
       );
     }
   }
@@ -114,7 +116,9 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
       return events;
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
+        error.code == 'permission_denied'
+            ? 'permission_denied'
+            : 'query_failed',
       );
     }
   }
@@ -155,17 +159,22 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
       return await action();
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied' ? 'permission_denied' : 'write_failed',
+        error.code == 'permission_denied'
+            ? 'permission_denied'
+            : 'write_failed',
       );
     }
   }
 
   @override
   Future<String> createEvent(EventDraft draft) => _write(() async {
-    final id = await _channel.invokeMethod<String>('createEvent', <String, Object?>{
-      ..._draftArguments(draft),
-      'calendarId': draft.calendarId,
-    });
+    final id = await _channel.invokeMethod<String>(
+      'createEvent',
+      <String, Object?>{
+        ..._draftArguments(draft),
+        'calendarId': draft.calendarId,
+      },
+    );
     if (id == null || id.isEmpty) {
       throw const CalendarPlatformException('write_failed');
     }
@@ -200,7 +209,9 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
           false;
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
+        error.code == 'permission_denied'
+            ? 'permission_denied'
+            : 'query_failed',
       );
     }
   }

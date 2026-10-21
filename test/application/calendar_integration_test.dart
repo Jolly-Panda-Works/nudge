@@ -116,10 +116,7 @@ void main() {
     platform.granted = allowed;
     settings.calendarIntegration = true;
     settings.defaultCalendarId = '2';
-    platform.calendars = [
-      calendar('1'),
-      calendar('2', name: 'Work'),
-    ];
+    platform.calendars = [calendar('1'), calendar('2', name: 'Work')];
 
     expect((await integration.load()).defaultId, '2');
   });
@@ -302,10 +299,7 @@ void main() {
       platform.calendars = [calendar('1')];
       platform.eventsFail = true;
 
-      expect(
-        integration.events(from: from, to: to),
-        throwsA(isA<Exception>()),
-      );
+      expect(integration.events(from: from, to: to), throwsA(isA<Exception>()));
     });
 
     test('opening an event goes to the platform', () async {
@@ -335,7 +329,9 @@ void main() {
       ];
     }
 
-    Future<CalendarWriteProblem?> problemOf(Future<Object?> Function() act) async {
+    Future<CalendarWriteProblem?> problemOf(
+      Future<Object?> Function() act,
+    ) async {
       try {
         await act();
         return null;
@@ -411,13 +407,18 @@ void main() {
 
     test('an event is changed, keeping its calendar', () async {
       allow();
-      platform.events = [event('e1', calendarId: '1', start: DateTime(2026, 10, 18, 9))];
+      platform.events = [
+        event('e1', calendarId: '1', start: DateTime(2026, 10, 18, 9)),
+      ];
       final found = (await integration.events(
         from: DateTime(2026, 10, 18),
         to: DateTime(2026, 10, 19),
       )).single;
 
-      await integration.updateEvent(found, draft(calendarId: '2', title: 'Moved'));
+      await integration.updateEvent(
+        found,
+        draft(calendarId: '2', title: 'Moved'),
+      );
 
       expect(platform.updated.single.$1, 'e1');
       expect(platform.updated.single.$2.title, 'Moved');
@@ -427,7 +428,12 @@ void main() {
     test('a repeating event is not changed or deleted', () async {
       allow();
       platform.events = [
-        event('r', calendarId: '1', start: DateTime(2026, 10, 18, 9), recurring: true),
+        event(
+          'r',
+          calendarId: '1',
+          start: DateTime(2026, 10, 18, 9),
+          recurring: true,
+        ),
       ];
       final found = (await integration.events(
         from: DateTime(2026, 10, 18),
@@ -450,7 +456,9 @@ void main() {
 
     test('an event of a read-only calendar is not editable', () async {
       allow();
-      platform.events = [event('h', calendarId: '2', start: DateTime(2026, 10, 18, 9))];
+      platform.events = [
+        event('h', calendarId: '2', start: DateTime(2026, 10, 18, 9)),
+      ];
       final found = (await integration.events(
         from: DateTime(2026, 10, 18),
         to: DateTime(2026, 10, 19),
@@ -465,7 +473,9 @@ void main() {
 
     test('an event is deleted', () async {
       allow();
-      platform.events = [event('e1', calendarId: '1', start: DateTime(2026, 10, 18, 9))];
+      platform.events = [
+        event('e1', calendarId: '1', start: DateTime(2026, 10, 18, 9)),
+      ];
       final found = (await integration.events(
         from: DateTime(2026, 10, 18),
         to: DateTime(2026, 10, 19),
@@ -543,9 +553,7 @@ void main() {
     test('without a writable default calendar nothing is created', () async {
       platform.granted = allowed;
       settings.calendarIntegration = true;
-      platform.calendars = [
-        calendar('2', canWrite: false, isOwner: false),
-      ];
+      platform.calendars = [calendar('2', canWrite: false, isOwner: false)];
 
       expect(
         () => integration.addTaskToCalendar(
@@ -556,23 +564,31 @@ void main() {
       expect(platform.created, isEmpty);
     });
 
-    test('a link to a deleted event is forgotten, so it can be added again', () async {
-      allow();
-      final t = task(dueAt: DateTime(2026, 10, 20, 9));
-      await integration.addTaskToCalendar(t);
-      final eventId = settings.taskEventLinks['t1']!;
-      platform.events.removeWhere((e) => e.eventId == eventId);
-      platform.existing.remove(eventId);
+    test(
+      'a link to a deleted event is forgotten, so it can be added again',
+      () async {
+        allow();
+        final t = task(dueAt: DateTime(2026, 10, 20, 9));
+        await integration.addTaskToCalendar(t);
+        final eventId = settings.taskEventLinks['t1']!;
+        platform.events.removeWhere((e) => e.eventId == eventId);
+        platform.existing.remove(eventId);
 
-      expect(await integration.isTaskInCalendar('t1'), isFalse);
-      expect(settings.taskEventLinks, isEmpty);
-      expect(await integration.addTaskToCalendar(t), AddToCalendarResult.added);
-      expect(platform.created, hasLength(2));
-    });
+        expect(await integration.isTaskInCalendar('t1'), isFalse);
+        expect(settings.taskEventLinks, isEmpty);
+        expect(
+          await integration.addTaskToCalendar(t),
+          AddToCalendarResult.added,
+        );
+        expect(platform.created, hasLength(2));
+      },
+    );
 
     test('forgetTaskLink removes the link and keeps the event', () async {
       allow();
-      await integration.addTaskToCalendar(task(dueAt: DateTime(2026, 10, 20, 9)));
+      await integration.addTaskToCalendar(
+        task(dueAt: DateTime(2026, 10, 20, 9)),
+      );
 
       await integration.forgetTaskLink('t1');
 

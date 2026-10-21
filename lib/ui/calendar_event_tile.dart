@@ -49,7 +49,8 @@ class CalendarEventTile extends StatelessWidget {
 /// "All day", or "09:00 – 10:30".
 String eventTimeText(ExternalEvent event, {required bool persian}) {
   if (event.allDay) return tr('All day');
-  final text = '${formatTimeOfDay(event.start)} – ${formatTimeOfDay(event.end)}';
+  final text =
+      '${formatTimeOfDay(event.start)} – ${formatTimeOfDay(event.end)}';
   return persian ? CalendarNames.toPersianDigits(text) : text;
 }
 

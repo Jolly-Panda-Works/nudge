@@ -287,7 +287,9 @@ final class CalendarIntegration {
     }
     final permissions = await _platform.permissions();
     if (!permissions.read || !permissions.write) {
-      throw const CalendarWriteException(CalendarWriteProblem.noWritePermission);
+      throw const CalendarWriteException(
+        CalendarWriteProblem.noWritePermission,
+      );
     }
     final List<ExternalCalendar> calendars;
     try {
@@ -321,14 +323,16 @@ final class CalendarIntegration {
 
   /// Saves a new event and returns its id.
   Future<String> createEvent(EventDraft draft) async {
-    if (!draft.isValid) throw ArgumentError.value(draft, 'draft', draft.problem);
+    if (!draft.isValid)
+      throw ArgumentError.value(draft, 'draft', draft.problem);
     await _writableCalendar(draft.calendarId);
     return _guard(() => _platform.createEvent(draft));
   }
 
   /// Changes an event (not a repeating one). The calendar cannot be changed.
   Future<void> updateEvent(ExternalEvent event, EventDraft draft) async {
-    if (!draft.isValid) throw ArgumentError.value(draft, 'draft', draft.problem);
+    if (!draft.isValid)
+      throw ArgumentError.value(draft, 'draft', draft.problem);
     if (event.recurring) {
       throw const CalendarWriteException(CalendarWriteProblem.recurring);
     }
@@ -346,7 +350,8 @@ final class CalendarIntegration {
         ),
       ),
     );
-    if (!changed) throw const CalendarWriteException(CalendarWriteProblem.failed);
+    if (!changed)
+      throw const CalendarWriteException(CalendarWriteProblem.failed);
   }
 
   /// Deletes an event (not a repeating one).
@@ -356,7 +361,8 @@ final class CalendarIntegration {
     }
     await _writableCalendar(event.calendarId);
     final deleted = await _guard(() => _platform.deleteEvent(event.eventId));
-    if (!deleted) throw const CalendarWriteException(CalendarWriteProblem.failed);
+    if (!deleted)
+      throw const CalendarWriteException(CalendarWriteProblem.failed);
   }
 
   // ------------------------------------------------------------ task links
@@ -385,11 +391,14 @@ final class CalendarIntegration {
     if (at == null) {
       throw const CalendarWriteException(CalendarWriteProblem.noTime);
     }
-    if (await isTaskInCalendar(task.id)) return AddToCalendarResult.alreadyAdded;
+    if (await isTaskInCalendar(task.id))
+      return AddToCalendarResult.alreadyAdded;
     final state = await load();
     final calendarId = state.defaultId;
     if (calendarId == null) {
-      throw const CalendarWriteException(CalendarWriteProblem.noWritableCalendar);
+      throw const CalendarWriteException(
+        CalendarWriteProblem.noWritableCalendar,
+      );
     }
     final id = await createEvent(
       EventDraft(
