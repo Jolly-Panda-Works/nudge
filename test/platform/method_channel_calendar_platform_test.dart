@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nudge/domain/event_draft.dart';
 import 'package:nudge/platform/calendar_platform.dart';
 import '../support/fake_calendar_platform.dart' show event;
 import 'package:nudge/platform/method_channel_calendar_platform.dart';
@@ -101,13 +102,7 @@ void main() {
           'eventId': '5',
           'calendarId': '1',
           'title': 'Standup',
-          'beginMillis': DateTime.utc(
-            2026,
-            10,
-            18,
-            6,
-            30,
-          ).millisecondsSinceEpoch,
+          'beginMillis': DateTime.utc(2026, 10, 18, 6, 30).millisecondsSinceEpoch,
           'endMillis': DateTime.utc(2026, 10, 18, 7).millisecondsSinceEpoch,
           'allDay': false,
           'color': -14575885,
@@ -181,5 +176,148 @@ void main() {
       DateTime.utc(2026, 10, 20).millisecondsSinceEpoch,
     );
     expect(sent!['allDay'], isTrue);
+  });
+
+  group('writing', () {
+    Map<Object?, Object?>? sent;
+    String? method;
+
+    void record(Object? answer) {
+      handle((call) async {
+        method = call.method;
+        sent = call.arguments as Map<Object?, Object?>;
+        return answer;
+      });
+    }
+
+    test('a timed event is created with instants', () async {
+      record('42');
+
+      final id = await platform.createEvent(
+        EventDraft(
+          calendarId: '3',
+          title: ' Lunch ',
+          notes: 'Bring cash',
+          start: DateTime(2026, 10, 18, 12),
+          end: DateTime(2026, 10, 18, 13),
+          allDay: false,
+        ),
+      );
+
+      expect(id, '42');
+      expect(method, 'createEvent');
+      expect(sent!['calendarId'], '3');
+      expect(sent!['title'], 'Lunch');
+      expect(sent!['notes'], 'Bring cash');
+      expect(
+        sent!['beginMillis'],
+        DateTime(2026, 10, 18, 12).millisecondsSinceEpoch,
+      );
+      expect(sent!['allDay'], isFalse);
+    });
+
+    test('an all-day event is created with UTC midnights', () async {
+      record('43');
+
+      await platform.createEvent(
+        EventDraft(
+          calendarId: '3',
+          title: 'Trip',
+          start: DateTime(2026, 10, 20),
+          end: DateTime(2026, 10, 21),
+          allDay: true,
+        ),
+      );
+
+      expect(
+        sent!['beginMillis'],
+        DateTime.utc(2026, 10, 20).millisecondsSinceEpoch,
+      );
+      expect(
+        sent!['endMillis'],
+        DateTime.utc(2026, 10, 22).millisecondsSinceEpoch,
+      );
+      expect(sent!['allDay'], isTrue);
+    });
+
+    test('an event is updated and deleted by id', () async {
+      record(true);
+      final draft = EventDraft(
+        calendarId: '3',
+        title: 'Moved',
+        start: DateTime(2026, 10, 18, 12),
+        end: DateTime(2026, 10, 18, 13),
+        allDay: false,
+      );
+
+      expect(await platform.updateEvent('42', draft), isTrue);
+      expect(method, 'updateEvent');
+      expect(sent!['eventId'], '42');
+
+      expect(await platform.deleteEvent('42'), isTrue);
+      expect(method, 'deleteEvent');
+      expect(sent!['eventId'], '42');
+    });
+
+    test('an existing event is asked about by id', () async {
+      record(false);
+
+      expect(await platform.eventExists('42'), isFalse);
+      expect(method, 'eventExists');
+    });
+
+    test('a refused write becomes a platform exception', () async {
+      handle((call) async => throw PlatformException(code: 'permission_denied'));
+
+      await expectLater(
+        platform.deleteEvent('42'),
+        throwsA(
+          isA<CalendarPlatformException>().having(
+            (e) => e.code,
+            'code',
+            'permission_denied',
+          ),
+        ),
+      );
+    });
+
+    test('a missing id from the platform is a failure', () async {
+      record(null);
+
+      await expectLater(
+        platform.createEvent(
+          EventDraft(
+            calendarId: '3',
+            title: 'X',
+            start: DateTime(2026, 10, 18, 12),
+            end: DateTime(2026, 10, 18, 13),
+            allDay: false,
+          ),
+        ),
+        throwsA(isA<CalendarPlatformException>()),
+      );
+    });
+
+    test('repeating events are marked when listed', () async {
+      handle((call) async => <Map<String, Object?>>[
+        <String, Object?>{
+          'eventId': '5',
+          'calendarId': '1',
+          'title': 'Standup',
+          'beginMillis': DateTime.utc(2026, 10, 18, 6).millisecondsSinceEpoch,
+          'endMillis': DateTime.utc(2026, 10, 18, 7).millisecondsSinceEpoch,
+          'allDay': false,
+          'recurring': true,
+        },
+      ]);
+
+      final events = await platform.listEvents(
+        from: DateTime(2026, 10, 17),
+        to: DateTime(2026, 10, 25),
+        calendarIds: <String>{'1'},
+      );
+
+      expect(events.single.recurring, isTrue);
+    });
   });
 }

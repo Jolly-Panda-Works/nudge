@@ -204,7 +204,13 @@ Design and status: [docs/CALENDAR_INTEGRATION.md](docs/CALENDAR_INTEGRATION.md).
 - [ ] Verify on devices: recurring events, all-day events across time zones, large calendars
 
 ### Next
-- [ ] Section 3: create, edit and delete events in the chosen calendar; link tasks to events without duplicates; handle read-only calendars and sync failures
+### Section 3: create, edit and delete events (done in code, 0.17.0; not compiled or run on a device)
+- [x] Create events in a chosen writable calendar (title, all day, start, end)
+- [x] Edit and delete events of writable calendars; repeating events and read-only calendars are not changed (the calendar app is offered)
+- [x] Add a task to the calendar from its details, never twice; the link is forgotten when the event or the task is deleted
+- [x] Permission, read-only and provider failures are reported in plain language; invalid drafts are refused
+- [ ] Verify on devices: events appear in the Google and Samsung calendar apps and sync; all-day and time-zone behaviour
+- [ ] Editing repeating events, guests, alerts, moving an event to another calendar
 
 ## M5: Windows build and secure synchronization (not started)
 - [x] Windows release build runs in CI (the app is still a placeholder)

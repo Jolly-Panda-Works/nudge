@@ -1,6 +1,8 @@
 import '../domain/capture_settings_repository.dart';
+import '../domain/event_draft.dart';
 import '../domain/external_calendar.dart';
 import '../domain/external_event.dart';
+import '../domain/task.dart';
 import '../platform/calendar_platform.dart';
 
 /// What happened when the user asked to turn the integration on.
@@ -14,6 +16,49 @@ enum EnableOutcome {
 
   /// This platform has no calendar provider.
   unsupported,
+}
+
+/// Why a change to the device calendars was not made.
+enum CalendarWriteProblem {
+  /// The integration is off.
+  notEnabled,
+
+  /// The calendar permission (or its write part) is missing.
+  noWritePermission,
+
+  /// There is no calendar that accepts new events (none chosen, or all are
+  /// read only).
+  noWritableCalendar,
+
+  /// The calendar of the event does not accept changes.
+  readOnly,
+
+  /// A repeating event: edited in the calendar app.
+  recurring,
+
+  /// The task has no time to put in a calendar.
+  noTime,
+
+  /// The provider refused or failed.
+  failed,
+}
+
+final class CalendarWriteException implements Exception {
+  const CalendarWriteException(this.problem);
+
+  final CalendarWriteProblem problem;
+
+  @override
+  String toString() => 'CalendarWriteException($problem)';
+}
+
+/// What adding a task to the calendar did.
+enum AddToCalendarResult {
+  /// A new event was created.
+  added,
+
+  /// The task already has its event; nothing new was created.
+  alreadyAdded,
 }
 
 /// A snapshot of the integration for the screens.
@@ -139,7 +184,7 @@ final class CalendarIntegration {
     final calendars = await _platform.listCalendars();
     final visible = await _visibleIds(calendars);
     if (visible.isEmpty) return const <ExternalEvent>[];
-    final labels = <String, String>{for (final c in calendars) c.id: c.label};
+    final byId = <String, ExternalCalendar>{for (final c in calendars) c.id: c};
     // A day of padding on both sides: all-day events are stored in UTC.
     final found = await _platform.listEvents(
       from: from.subtract(const Duration(days: 1)),
@@ -148,7 +193,10 @@ final class CalendarIntegration {
     );
     return <ExternalEvent>[
       for (final event in found)
-        event.withCalendarLabel(labels[event.calendarId] ?? ''),
+        event.withCalendar(
+          label: byId[event.calendarId]?.label ?? '',
+          canWrite: byId[event.calendarId]?.canWrite ?? false,
+        ),
     ];
   }
 
@@ -227,4 +275,137 @@ final class CalendarIntegration {
     }
     await _settings.setDefaultCalendarId(calendar?.id);
   }
+
+  // ---------------------------------------------------------------- writing
+
+  /// The calendar if it exists, is shown to be writable and the permission to
+  /// write is granted; otherwise throws the matching problem.
+  Future<ExternalCalendar> _writableCalendar(String calendarId) async {
+    if (!_platform.isSupported ||
+        !await _settings.getCalendarIntegrationEnabled()) {
+      throw const CalendarWriteException(CalendarWriteProblem.notEnabled);
+    }
+    final permissions = await _platform.permissions();
+    if (!permissions.read || !permissions.write) {
+      throw const CalendarWriteException(CalendarWriteProblem.noWritePermission);
+    }
+    final List<ExternalCalendar> calendars;
+    try {
+      calendars = await _platform.listCalendars();
+    } on CalendarPlatformException {
+      throw const CalendarWriteException(CalendarWriteProblem.failed);
+    }
+    for (final c in calendars) {
+      if (c.id == calendarId) {
+        if (!c.canWrite) {
+          throw const CalendarWriteException(CalendarWriteProblem.readOnly);
+        }
+        return c;
+      }
+    }
+    throw const CalendarWriteException(CalendarWriteProblem.noWritableCalendar);
+  }
+
+  /// Runs a platform write and turns its failures into a problem.
+  Future<T> _guard<T>(Future<T> Function() action) async {
+    try {
+      return await action();
+    } on CalendarPlatformException catch (error) {
+      throw CalendarWriteException(
+        error.code == 'permission_denied'
+            ? CalendarWriteProblem.noWritePermission
+            : CalendarWriteProblem.failed,
+      );
+    }
+  }
+
+  /// Saves a new event and returns its id.
+  Future<String> createEvent(EventDraft draft) async {
+    if (!draft.isValid) throw ArgumentError.value(draft, 'draft', draft.problem);
+    await _writableCalendar(draft.calendarId);
+    return _guard(() => _platform.createEvent(draft));
+  }
+
+  /// Changes an event (not a repeating one). The calendar cannot be changed.
+  Future<void> updateEvent(ExternalEvent event, EventDraft draft) async {
+    if (!draft.isValid) throw ArgumentError.value(draft, 'draft', draft.problem);
+    if (event.recurring) {
+      throw const CalendarWriteException(CalendarWriteProblem.recurring);
+    }
+    await _writableCalendar(event.calendarId);
+    final changed = await _guard(
+      () => _platform.updateEvent(
+        event.eventId,
+        EventDraft(
+          calendarId: event.calendarId,
+          title: draft.title,
+          notes: draft.notes,
+          start: draft.start,
+          end: draft.end,
+          allDay: draft.allDay,
+        ),
+      ),
+    );
+    if (!changed) throw const CalendarWriteException(CalendarWriteProblem.failed);
+  }
+
+  /// Deletes an event (not a repeating one).
+  Future<void> deleteEvent(ExternalEvent event) async {
+    if (event.recurring) {
+      throw const CalendarWriteException(CalendarWriteProblem.recurring);
+    }
+    await _writableCalendar(event.calendarId);
+    final deleted = await _guard(() => _platform.deleteEvent(event.eventId));
+    if (!deleted) throw const CalendarWriteException(CalendarWriteProblem.failed);
+  }
+
+  // ------------------------------------------------------------ task links
+
+  /// True when the task already has an event that still exists. A link to an
+  /// event that was deleted is forgotten.
+  Future<bool> isTaskInCalendar(String taskId) async {
+    final eventId = await _settings.getTaskEventLink(taskId);
+    if (eventId == null) return false;
+    if (!_platform.isSupported) return true;
+    try {
+      if (await _platform.eventExists(eventId)) return true;
+    } on CalendarPlatformException {
+      // Cannot tell (for example no permission): keep the link.
+      return true;
+    }
+    await _settings.setTaskEventLink(taskId, null);
+    return false;
+  }
+
+  /// Puts a task with a time into the default calendar, one hour long (an
+  /// event of the same title, with the task's notes). A task that already has
+  /// its event is not added twice.
+  Future<AddToCalendarResult> addTaskToCalendar(TaskItem task) async {
+    final at = task.remindAt;
+    if (at == null) {
+      throw const CalendarWriteException(CalendarWriteProblem.noTime);
+    }
+    if (await isTaskInCalendar(task.id)) return AddToCalendarResult.alreadyAdded;
+    final state = await load();
+    final calendarId = state.defaultId;
+    if (calendarId == null) {
+      throw const CalendarWriteException(CalendarWriteProblem.noWritableCalendar);
+    }
+    final id = await createEvent(
+      EventDraft(
+        calendarId: calendarId,
+        title: task.title,
+        notes: task.notes,
+        start: at.toLocal(),
+        end: at.toLocal().add(const Duration(hours: 1)),
+        allDay: false,
+      ),
+    );
+    await _settings.setTaskEventLink(task.id, id);
+    return AddToCalendarResult.added;
+  }
+
+  /// Forgets the link of a task (when the task is deleted). The event stays.
+  Future<void> forgetTaskLink(String taskId) =>
+      _settings.setTaskEventLink(taskId, null);
 }

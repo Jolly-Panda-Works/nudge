@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../app_services.dart';
+import '../application/calendar_integration.dart';
 import '../application/events_by_day.dart';
 import '../application/tasks_by_day.dart';
 import '../domain/calendar/calendar_date.dart';
@@ -16,6 +17,7 @@ import 'calendar_agenda_view.dart';
 import 'calendar_day_view.dart';
 import 'calendar_event_tile.dart';
 import 'calendar_week_view.dart';
+import 'event_form_page.dart';
 import 'calendar_widgets.dart';
 import 'content_width.dart';
 import 'dialogs.dart';
@@ -154,8 +156,47 @@ class _CalendarPageState extends State<CalendarPage>
         context,
         event,
         onOpenInCalendarApp: () => widget.services.calendars.openEvent(event),
+        onEdit: event.editable ? () => unawaited(_editEvent(event)) : null,
+        onDelete: event.editable ? () => unawaited(_deleteEvent(event)) : null,
       ),
     );
+  }
+
+  /// Reads the events again after a change.
+  void _eventsChanged() {
+    if (mounted) setState(() => _requestedRange = null);
+  }
+
+  Future<void> _editEvent(ExternalEvent event) async {
+    final changed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => EventFormPage(services: widget.services, event: event),
+      ),
+    );
+    if (changed ?? false) _eventsChanged();
+  }
+
+  Future<void> _deleteEvent(ExternalEvent event) async {
+    final confirmed = await confirmAction(
+      context,
+      title: tr('Delete event?'),
+      message: tr(
+        'The event is removed from its calendar on this device (and from the '
+        'account it syncs with).',
+      ),
+      action: tr('Delete'),
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      await widget.services.calendars.deleteEvent(event);
+      _eventsChanged();
+    } on CalendarWriteException catch (error) {
+      if (mounted) showMessage(context, calendarWriteMessage(error.problem));
+    } on Exception {
+      if (mounted) {
+        showMessage(context, calendarWriteMessage(CalendarWriteProblem.failed));
+      }
+    }
   }
 
   /// The date named in [system], or null when it is outside the supported
@@ -313,13 +354,57 @@ class _CalendarPageState extends State<CalendarPage>
     });
   }
 
-  Future<void> _addTask() async {
+  Future<void> _newTask() async {
     await Navigator.of(context).push<TaskItem>(
       MaterialPageRoute<TaskItem>(
         builder: (_) =>
             TaskFormPage(services: widget.services, initialDate: _selected),
       ),
     );
+  }
+
+  Future<void> _newEvent() async {
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) =>
+            EventFormPage(services: widget.services, initialDay: _selected),
+      ),
+    );
+    if (saved ?? false) _eventsChanged();
+  }
+
+  /// With device calendars available the button offers a task or an event;
+  /// otherwise it creates a task.
+  Future<void> _add() async {
+    if (!widget.services.calendars.isSupported) {
+      await _newTask();
+      return;
+    }
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.add_task),
+              title: Text(tr('New task')),
+              onTap: () => Navigator.of(sheetContext).pop('task'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.event),
+              title: Text(tr('New event')),
+              onTap: () => Navigator.of(sheetContext).pop('event'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (choice == 'task') {
+      await _newTask();
+    } else if (choice == 'event') {
+      await _newEvent();
+    }
   }
 
   void _openTask(TaskItem task) {
@@ -351,7 +436,8 @@ class _CalendarPageState extends State<CalendarPage>
     final last = DateTime(first.year, first.month, first.day + 6);
     final a = system.fromDate(first);
     final b = system.fromDate(last);
-    String month(int m) => CalendarNames.month(system.id, m, persian: _persian);
+    String month(int m) =>
+        CalendarNames.month(system.id, m, persian: _persian);
     if (a.year == b.year && a.month == b.month) {
       return '${_num(a.day)} – ${_num(b.day)} ${month(b.month)} ${_num(b.year)}';
     }
@@ -396,9 +482,7 @@ class _CalendarPageState extends State<CalendarPage>
           ),
           IconButton(
             icon: const Icon(Icons.translate),
-            tooltip: _rtl
-                ? tr('Show Gregorian dates')
-                : tr('Show Jalali dates'),
+            tooltip: _rtl ? tr('Show Gregorian dates') : tr('Show Jalali dates'),
             onPressed: system == null ? null : _toggleSystem,
           ),
         ],
@@ -406,13 +490,16 @@ class _CalendarPageState extends State<CalendarPage>
       floatingActionButton: system == null
           ? null
           : FloatingActionButton(
-              onPressed: _addTask,
+              onPressed: _add,
               tooltip: tr('New task on the selected day'),
               child: const Icon(Icons.add),
             ),
       body: _failed
           ? Center(
-              child: FilledButton(onPressed: _load, child: Text(tr('Retry'))),
+              child: FilledButton(
+                onPressed: _load,
+                child: Text(tr('Retry')),
+              ),
             )
           : system == null
           ? const Center(child: CircularProgressIndicator())
@@ -421,36 +508,38 @@ class _CalendarPageState extends State<CalendarPage>
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SegmentedButton<CalendarViewMode>(
-                      segments: [
-                        ButtonSegment<CalendarViewMode>(
-                          value: CalendarViewMode.month,
-                          label: Text(tr('Month')),
-                        ),
-                        ButtonSegment<CalendarViewMode>(
-                          value: CalendarViewMode.week,
-                          label: Text(tr('Week')),
-                        ),
-                        ButtonSegment<CalendarViewMode>(
-                          value: CalendarViewMode.day,
-                          label: Text(tr('Day')),
-                        ),
-                        ButtonSegment<CalendarViewMode>(
-                          value: CalendarViewMode.agenda,
-                          label: Text(tr('Agenda')),
-                        ),
-                      ],
-                      selected: <CalendarViewMode>{_view},
-                      showSelectedIcon: false,
-                      onSelectionChanged: (selection) =>
-                          _setView(selection.first),
-                    ),
+ scrollDirection: Axis.horizontal,
+ child: SegmentedButton<CalendarViewMode>(
+                    segments: [
+                      ButtonSegment<CalendarViewMode>(
+                        value: CalendarViewMode.month,
+                        label: Text(tr('Month')),
+                      ),
+                      ButtonSegment<CalendarViewMode>(
+                        value: CalendarViewMode.week,
+                        label: Text(tr('Week')),
+                      ),
+                      ButtonSegment<CalendarViewMode>(
+                        value: CalendarViewMode.day,
+                        label: Text(tr('Day')),
+                      ),
+                      ButtonSegment<CalendarViewMode>(
+                        value: CalendarViewMode.agenda,
+                        label: Text(tr('Agenda')),
+                      ),
+                    ],
+                    selected: <CalendarViewMode>{_view},
+                    showSelectedIcon: false,
+                    onSelectionChanged: (selection) =>
+                        _setView(selection.first),
                   ),
+),
                 ),
                 Expanded(
                   child: Directionality(
-                    textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
+                    textDirection: _rtl
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
                     child: StreamBuilder<List<TaskItem>>(
                       stream: _tasks,
                       builder: (context, snapshot) {
@@ -518,12 +607,7 @@ class _CalendarPageState extends State<CalendarPage>
             behavior: HitTestBehavior.translucent,
             onHorizontalDragEnd: _onSwipe,
             child: switch (_view) {
-              CalendarViewMode.month => _monthView(
-                context,
-                system,
-                byDay,
-                today,
-              ),
+              CalendarViewMode.month => _monthView(context, system, byDay, today),
               CalendarViewMode.week => CalendarWeekView(
                 system: system,
                 weekStart: startOfWeek(_selected, system.defaultWeekStart),
@@ -573,69 +657,70 @@ class _CalendarPageState extends State<CalendarPage>
     final grid = MonthGrid.build(system: system, year: _year, month: _month);
     final scheme = Theme.of(context).colorScheme;
     final weekdayRow = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(
-        children: [
-          for (final weekday in grid.columnWeekdays)
-            Expanded(
-              child: Center(
-                child: Text(
-                  CalendarNames.weekday(
-                    weekday,
-                    persian: _persian,
-                    short: true,
-                  ),
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: _isWeekend(weekday)
-                        ? scheme.error
-                        : scheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-    final cells = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Column(
-        children: [
-          for (final week in grid.weeks)
-            Expanded(
-              child: Row(
-                children: [
-                  for (final cell in week)
-                    Expanded(
-                      child: _DayCell(
-                        cell: cell,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            children: [
+              for (final weekday in grid.columnWeekdays)
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      CalendarNames.weekday(
+                        weekday,
                         persian: _persian,
-                        isToday: cell.date == today,
-                        isSelected: cell.date == _selected,
-                        isWeekend: _isWeekend(cell.date.weekday),
-                        tasks: byDay[cell.date] ?? const <TaskItem>[],
-                        events:
-                            _eventsByDay[cell.date] ?? const <ExternalEvent>[],
-                        label: _semanticLabel(
-                          system,
-                          cell,
-                          byDay[cell.date]?.length ?? 0,
-                          _eventsByDay[cell.date]?.length ?? 0,
-                        ),
-                        onTap: () => setState(() {
-                          _selected = cell.date;
-                          if (!cell.inMonth) {
-                            _year = cell.calendarDate.year;
-                            _month = cell.calendarDate.month;
-                          }
-                        }),
+                        short: true,
+                      ),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: _isWeekend(weekday)
+                            ? scheme.error
+                            : scheme.onSurfaceVariant,
                       ),
                     ),
-                ],
-              ),
+                  ),
+                ),
+            ],
+          ),
+        );
+    final cells = Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Column(
+              children: [
+                for (final week in grid.weeks)
+                  Expanded(
+                    child: Row(
+                      children: [
+                        for (final cell in week)
+                          Expanded(
+                            child: _DayCell(
+                              cell: cell,
+                              persian: _persian,
+                              isToday: cell.date == today,
+                              isSelected: cell.date == _selected,
+                              isWeekend: _isWeekend(cell.date.weekday),
+                              tasks: byDay[cell.date] ?? const <TaskItem>[],
+                              events:
+                                  _eventsByDay[cell.date] ??
+                                  const <ExternalEvent>[],
+                              label: _semanticLabel(
+                                system,
+                                cell,
+                                byDay[cell.date]?.length ?? 0,
+                                _eventsByDay[cell.date]?.length ?? 0,
+                              ),
+                              onTap: () => setState(() {
+                                _selected = cell.date;
+                                if (!cell.inMonth) {
+                                  _year = cell.calendarDate.year;
+                                  _month = cell.calendarDate.month;
+                                }
+                              }),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
-        ],
-      ),
-    );
+          );
     return LayoutBuilder(
       builder: (context, constraints) {
         final agenda = _dayAgenda(context, system, byDay);
@@ -647,10 +732,7 @@ class _CalendarPageState extends State<CalendarPage>
               Expanded(
                 flex: 3,
                 child: Column(
-                  children: [
-                    weekdayRow,
-                    Expanded(child: cells),
-                  ],
+                  children: [weekdayRow, Expanded(child: cells)],
                 ),
               ),
               const VerticalDivider(width: 1),
@@ -676,7 +758,10 @@ class _CalendarPageState extends State<CalendarPage>
     int count,
     int eventCount,
   ) {
-    final weekday = CalendarNames.weekday(cell.date.weekday, persian: _persian);
+    final weekday = CalendarNames.weekday(
+      cell.date.weekday,
+      persian: _persian,
+    );
     final date = calendarDayText(system, cell.date, persian: _persian);
     final tasks = count == 0
         ? ''

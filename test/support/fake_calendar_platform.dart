@@ -1,3 +1,4 @@
+import 'package:nudge/domain/event_draft.dart';
 import 'package:nudge/domain/external_calendar.dart';
 import 'package:nudge/domain/external_event.dart';
 import 'package:nudge/platform/calendar_platform.dart';
@@ -32,6 +33,7 @@ ExternalEvent event(
   DateTime? end,
   bool allDay = false,
   int? color,
+  bool recurring = false,
 }) {
   return ExternalEvent(
     eventId: id,
@@ -41,6 +43,7 @@ ExternalEvent event(
     end: end ?? start.add(const Duration(hours: 1)),
     allDay: allDay,
     color: color,
+    recurring: recurring,
   );
 }
 
@@ -60,6 +63,12 @@ class FakeCalendarPlatform implements CalendarPlatform {
   bool eventsFail = false;
   final List<Set<String>> eventQueries = <Set<String>>[];
   final List<ExternalEvent> opened = <ExternalEvent>[];
+  final List<EventDraft> created = <EventDraft>[];
+  final List<(String, EventDraft)> updated = <(String, EventDraft)>[];
+  final List<String> deleted = <String>[];
+  final Set<String> existing = <String>{};
+  bool writeFails = false;
+  int _nextId = 100;
 
   @override
   bool get isSupported => supported;
@@ -113,4 +122,50 @@ class FakeCalendarPlatform implements CalendarPlatform {
     opened.add(event);
     return true;
   }
+
+  ExternalEvent _fromDraft(String id, EventDraft d) => ExternalEvent(
+    eventId: id,
+    calendarId: d.calendarId,
+    title: d.cleanTitle,
+    start: d.start,
+    end: d.allDay
+        ? DateTime(d.end.year, d.end.month, d.end.day + 1)
+        : d.end,
+    allDay: d.allDay,
+  );
+
+  @override
+  Future<String> createEvent(EventDraft draft) async {
+    if (writeFails) throw const CalendarPlatformException('write_failed');
+    created.add(draft);
+    final id = 'n${_nextId++}';
+    existing.add(id);
+    events.add(_fromDraft(id, draft));
+    return id;
+  }
+
+  @override
+  Future<bool> updateEvent(String eventId, EventDraft draft) async {
+    if (writeFails) throw const CalendarPlatformException('write_failed');
+    if (!events.any((e) => e.eventId == eventId)) return false;
+    updated.add((eventId, draft));
+    events
+      ..removeWhere((e) => e.eventId == eventId)
+      ..add(_fromDraft(eventId, draft));
+    return true;
+  }
+
+  @override
+  Future<bool> deleteEvent(String eventId) async {
+    if (writeFails) throw const CalendarPlatformException('write_failed');
+    final had = events.any((e) => e.eventId == eventId);
+    events.removeWhere((e) => e.eventId == eventId);
+    existing.remove(eventId);
+    if (had) deleted.add(eventId);
+    return had;
+  }
+
+  @override
+  Future<bool> eventExists(String eventId) async =>
+      existing.contains(eventId) || events.any((e) => e.eventId == eventId);
 }

@@ -83,6 +83,20 @@ void main() {
     expect(await repo.getCalendarIntegrationEnabled(), isFalse);
   });
 
+  test('a task keeps its calendar event link until it is forgotten', () async {
+    expect(await repo.getTaskEventLink('t1'), isNull);
+
+    await repo.setTaskEventLink('t1', '77');
+    await repo.setTaskEventLink('t2', '88');
+
+    expect(await repo.getTaskEventLink('t1'), '77');
+    expect(await repo.getTaskEventLink('t2'), '88');
+
+    await repo.setTaskEventLink('t1', null);
+    expect(await repo.getTaskEventLink('t1'), isNull);
+    expect(await repo.getTaskEventLink('t2'), '88');
+  });
+
   test('listRules returns the saved apps with their labels', () async {
     await repo.addRule('com.chat', appLabel: 'Chat');
     await repo.addRule('com.mail');
@@ -92,7 +106,10 @@ void main() {
       'com.chat',
       'com.mail',
     });
-    expect(rules.firstWhere((r) => r.packageName == 'com.chat').label, 'Chat');
+    expect(
+      rules.firstWhere((r) => r.packageName == 'com.chat').label,
+      'Chat',
+    );
     expect(
       rules.firstWhere((r) => r.packageName == 'com.mail').displayName,
       'com.mail',

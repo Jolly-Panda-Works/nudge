@@ -4,6 +4,16 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.17.0] - 2026-10-20
+### Added
+- M4 section 3: creating, editing and deleting events of the device calendars. The `+` button on the Calendar screen offers New task or New event; an event form has a title, a calendar (writable ones only), an all-day switch and start and end. Tapping an event shows Edit and Delete when its calendar accepts changes and it does not repeat; repeating events and read-only calendars only show, with "Open in calendar app".
+- Add to calendar in a task's details: a one-hour event with the task's title and notes in the default calendar, never added twice. The link is remembered (`task_event:<task id>` in the settings table), forgotten if the event is deleted elsewhere or the task is deleted.
+- Kotlin `createEvent`, `updateEvent`, `deleteEvent`, `eventExists`, and a marker for repeating events (asked from the Events table, not the Instances view); Dart `EventDraft`, `CalendarPlatform` write methods, `CalendarIntegration.createEvent/updateEvent/deleteEvent/addTaskToCalendar`, `CalendarWriteException`.
+- Tests for the draft rules, the service (permission, read-only, repeating, invalid drafts, task links), the channel arguments (including all-day UTC midnights), the Drift link storage, and the screens (create, edit, delete, cancel, repeating, read-only, add a task).
+- Persian texts for all new messages; `docs/CALENDAR_INTEGRATION.md` updated.
+### Known limitations
+- Not run on a device: events written to the Google and Samsung calendars, their sync, and all-day and time-zone behaviour are unchecked. No alerts or guests on events; the calendar of an existing event cannot be changed; repeating events are not editable; a task's event is not updated when the task changes.
+
 ## [0.16.2] - 2026-10-20
 ### Fixed
 - The last failing test: the language test went back with `pageBack()`, which could not find a back button on the test platform. It now pops the navigator directly. The CI run of 0.16.1 had 320 tests passing, analysis clean and formatting clean.

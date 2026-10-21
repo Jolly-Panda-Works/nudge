@@ -1,16 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../app_services.dart';
+import '../application/calendar_integration.dart';
 import '../application/source_navigator.dart';
 import '../domain/task.dart';
 import 'content_width.dart';
 import 'dialogs.dart';
+import 'event_form_page.dart';
 import 'task_form_page.dart';
 import 'time_format.dart';
 import '../l10n/l10n.dart';
 
 class TaskDetailPage extends StatefulWidget {
-  const TaskDetailPage({required this.task, required this.services, super.key});
+  const TaskDetailPage({
+    required this.task,
+    required this.services,
+    super.key,
+  });
 
   final TaskItem task;
   final AppServices services;
@@ -21,6 +29,46 @@ class TaskDetailPage extends StatefulWidget {
 
 class _TaskDetailPageState extends State<TaskDetailPage> {
   late TaskItem _task = widget.task;
+
+  /// Null while unknown; true when the task has its event in a calendar.
+  bool? _inCalendar;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.services.calendars.isSupported) {
+      unawaited(_checkCalendar());
+    }
+  }
+
+  Future<void> _checkCalendar() async {
+    try {
+      final linked = await widget.services.calendars.isTaskInCalendar(_task.id);
+      if (mounted) setState(() => _inCalendar = linked);
+    } on Exception {
+      // The button stays hidden until the next visit.
+    }
+  }
+
+  Future<void> _addToCalendar() async {
+    try {
+      final result = await widget.services.calendars.addTaskToCalendar(_task);
+      if (!mounted) return;
+      setState(() => _inCalendar = true);
+      showMessage(
+        context,
+        result == AddToCalendarResult.added
+            ? tr('Added to your calendar')
+            : tr('This task is already in your calendar'),
+      );
+    } on CalendarWriteException catch (error) {
+      if (mounted) showMessage(context, calendarWriteMessage(error.problem));
+    } on Exception {
+      if (mounted) {
+        showMessage(context, calendarWriteMessage(CalendarWriteProblem.failed));
+      }
+    }
+  }
 
   /// Runs a change; null from the repository means the task is gone.
   Future<void> _apply(Future<TaskItem?> Function() change) async {
@@ -76,10 +124,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final confirmed = await confirmAction(
       context,
       title: tr('Delete task?'),
-      message: tr(
-        'The task is removed from Nudge. The notification it came '
-        'from is not affected.',
-      ),
+      message: tr('The task is removed from Nudge. The notification it came '
+          'from is not affected.'),
       action: tr('Delete'),
     );
     if (!confirmed || !mounted) return;
@@ -87,6 +133,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final messenger = ScaffoldMessenger.of(context);
     try {
       await widget.services.tasks.delete(_task.id);
+      await widget.services.calendars.forgetTaskLink(_task.id);
       navigator.pop();
       messenger.showSnackBar(SnackBar(content: Text(tr('Task deleted'))));
     } on Exception {
@@ -114,9 +161,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          task.kind == TaskKind.reminder ? tr('Reminder') : tr('Task'),
-        ),
+        title: Text(task.kind == TaskKind.reminder ? tr('Reminder') : tr('Task')),
         actions: [
           if (task.status != TaskStatus.archived)
             IconButton(
@@ -131,81 +176,88 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           ),
         ],
       ),
-      body: ContentWidth(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            SelectableText(task.title, style: textTheme.titleLarge),
-            if (task.notes != null) ...[
-              const SizedBox(height: 12),
-              SelectableText(task.notes!),
-            ],
-            const SizedBox(height: 16),
-            _Row(label: tr('Status'), value: _statusLabel(task.status)),
-            if (task.dueAt != null)
-              _Row(label: tr('Due'), value: formatDue(task.dueAt!)),
-            if (task.snoozedUntil != null)
-              _Row(
-                label: tr('Snoozed until'),
-                value: formatDue(task.snoozedUntil!),
-              ),
-            if (remindAt == null && task.kind == TaskKind.reminder)
-              _Row(label: tr('Due'), value: tr('Not set')),
-            if (source != null)
-              _Row(
-                label: tr('From'),
-                value: source.appLabel ?? source.packageName,
-              ),
-            _Row(
-              label: tr('Created'),
-              value: formatFullTimestamp(task.createdAt),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (task.status == TaskStatus.open)
-                  FilledButton.icon(
-                    onPressed: () => _apply(() => tasks.markDone(task.id)),
-                    icon: const Icon(Icons.check),
-                    label: Text(tr('Mark done')),
-                  ),
-                if (task.status == TaskStatus.done)
-                  FilledButton.icon(
-                    onPressed: () => _apply(() => tasks.reopen(task.id)),
-                    icon: const Icon(Icons.undo),
-                    label: Text(tr('Reopen')),
-                  ),
-                if (task.status == TaskStatus.open)
-                  OutlinedButton.icon(
-                    onPressed: _snooze,
-                    icon: const Icon(Icons.snooze),
-                    label: Text(tr('Snooze')),
-                  ),
-                if (task.status == TaskStatus.archived)
-                  OutlinedButton.icon(
-                    onPressed: () => _apply(() => tasks.restore(task.id)),
-                    icon: const Icon(Icons.unarchive_outlined),
-                    label: Text(tr('Restore')),
-                  )
-                else
-                  OutlinedButton.icon(
-                    onPressed: () => _apply(() => tasks.archive(task.id)),
-                    icon: const Icon(Icons.archive_outlined),
-                    label: Text(tr('Archive')),
-                  ),
-                if (source != null)
-                  OutlinedButton.icon(
-                    onPressed: _openOriginal,
-                    icon: const Icon(Icons.open_in_new),
-                    label: Text(tr('Open original')),
-                  ),
-              ],
-            ),
+      body: ContentWidth(child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          SelectableText(task.title, style: textTheme.titleLarge),
+          if (task.notes != null) ...[
+            const SizedBox(height: 12),
+            SelectableText(task.notes!),
           ],
-        ),
-      ),
+          const SizedBox(height: 16),
+          _Row(label: tr('Status'), value: _statusLabel(task.status)),
+          if (task.dueAt != null)
+            _Row(label: tr('Due'), value: formatDue(task.dueAt!)),
+          if (task.snoozedUntil != null)
+            _Row(label: tr('Snoozed until'), value: formatDue(task.snoozedUntil!)),
+          if (remindAt == null && task.kind == TaskKind.reminder)
+            _Row(label: tr('Due'), value: tr('Not set')),
+          if (source != null)
+            _Row(
+              label: tr('From'),
+              value: source.appLabel ?? source.packageName,
+            ),
+          _Row(label: tr('Created'), value: formatFullTimestamp(task.createdAt)),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (task.status == TaskStatus.open)
+                FilledButton.icon(
+                  onPressed: () => _apply(() => tasks.markDone(task.id)),
+                  icon: const Icon(Icons.check),
+                  label: Text(tr('Mark done')),
+                ),
+              if (task.status == TaskStatus.done)
+                FilledButton.icon(
+                  onPressed: () => _apply(() => tasks.reopen(task.id)),
+                  icon: const Icon(Icons.undo),
+                  label: Text(tr('Reopen')),
+                ),
+              if (task.status == TaskStatus.open)
+                OutlinedButton.icon(
+                  onPressed: _snooze,
+                  icon: const Icon(Icons.snooze),
+                  label: Text(tr('Snooze')),
+                ),
+              if (task.status == TaskStatus.archived)
+                OutlinedButton.icon(
+                  onPressed: () => _apply(() => tasks.restore(task.id)),
+                  icon: const Icon(Icons.unarchive_outlined),
+                  label: Text(tr('Restore')),
+                )
+              else
+                OutlinedButton.icon(
+                  onPressed: () => _apply(() => tasks.archive(task.id)),
+                  icon: const Icon(Icons.archive_outlined),
+                  label: Text(tr('Archive')),
+                ),
+              if (widget.services.calendars.isSupported &&
+                  _inCalendar != null &&
+                  task.remindAt != null &&
+                  task.status != TaskStatus.archived)
+                OutlinedButton.icon(
+                  onPressed: _inCalendar! ? null : _addToCalendar,
+                  icon: Icon(
+                    _inCalendar! ? Icons.event_available : Icons.event,
+                  ),
+                  label: Text(
+                    _inCalendar!
+                        ? tr('In your calendar')
+                        : tr('Add to calendar'),
+                  ),
+                ),
+              if (source != null)
+                OutlinedButton.icon(
+                  onPressed: _openOriginal,
+                  icon: const Icon(Icons.open_in_new),
+                  label: Text(tr('Open original')),
+                ),
+            ],
+          ),
+        ],
+      )),
     );
   }
 }
@@ -220,12 +272,10 @@ String _statusLabel(TaskStatus status) => switch (status) {
 /// the action.
 String sourceOutcomeMessage(SourceOpenOutcome outcome) => switch (outcome) {
   SourceOpenOutcome.openedOriginal => tr('Opened the original notification'),
-  SourceOpenOutcome.openedApp => tr(
-    'The notification is gone, so the app was opened instead',
-  ),
-  SourceOpenOutcome.unavailable => tr(
-    'The original is not available. The saved content is kept here.',
-  ),
+  SourceOpenOutcome.openedApp =>
+    tr('The notification is gone, so the app was opened instead'),
+  SourceOpenOutcome.unavailable =>
+    tr('The original is not available. The saved content is kept here.'),
 };
 
 class _Row extends StatelessWidget {

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 
 import '../domain/external_calendar.dart';
+import '../domain/event_draft.dart';
 import '../domain/external_event.dart';
 import 'calendar_platform.dart';
 
@@ -60,9 +61,7 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
       return calendars;
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied'
-            ? 'permission_denied'
-            : 'query_failed',
+        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
       );
     }
   }
@@ -108,15 +107,14 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
             end: _instant(end.toInt(), allDay: allDay),
             allDay: allDay,
             color: color is int ? color : null,
+            recurring: item['recurring'] == true,
           ),
         );
       }
       return events;
     } on PlatformException catch (error) {
       throw CalendarPlatformException(
-        error.code == 'permission_denied'
-            ? 'permission_denied'
-            : 'query_failed',
+        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
       );
     }
   }
@@ -141,5 +139,69 @@ final class MethodChannelCalendarPlatform implements CalendarPlatform {
           'allDay': event.allDay,
         }) ??
         false;
+  }
+
+  Map<String, Object?> _draftArguments(EventDraft draft) => <String, Object?>{
+    'title': draft.cleanTitle,
+    'notes': draft.notes,
+    'beginMillis': draft.beginMillis,
+    'endMillis': draft.endMillis,
+    'allDay': draft.allDay,
+  };
+
+  /// Runs a write and maps the platform's error codes.
+  Future<T> _write<T>(Future<T> Function() action) async {
+    try {
+      return await action();
+    } on PlatformException catch (error) {
+      throw CalendarPlatformException(
+        error.code == 'permission_denied' ? 'permission_denied' : 'write_failed',
+      );
+    }
+  }
+
+  @override
+  Future<String> createEvent(EventDraft draft) => _write(() async {
+    final id = await _channel.invokeMethod<String>('createEvent', <String, Object?>{
+      ..._draftArguments(draft),
+      'calendarId': draft.calendarId,
+    });
+    if (id == null || id.isEmpty) {
+      throw const CalendarPlatformException('write_failed');
+    }
+    return id;
+  });
+
+  @override
+  Future<bool> updateEvent(String eventId, EventDraft draft) => _write(
+    () async =>
+        await _channel.invokeMethod<bool>('updateEvent', <String, Object?>{
+          ..._draftArguments(draft),
+          'eventId': eventId,
+        }) ??
+        false,
+  );
+
+  @override
+  Future<bool> deleteEvent(String eventId) => _write(
+    () async =>
+        await _channel.invokeMethod<bool>('deleteEvent', <String, Object?>{
+          'eventId': eventId,
+        }) ??
+        false,
+  );
+
+  @override
+  Future<bool> eventExists(String eventId) async {
+    try {
+      return await _channel.invokeMethod<bool>('eventExists', <String, Object?>{
+            'eventId': eventId,
+          }) ??
+          false;
+    } on PlatformException catch (error) {
+      throw CalendarPlatformException(
+        error.code == 'permission_denied' ? 'permission_denied' : 'query_failed',
+      );
+    }
   }
 }

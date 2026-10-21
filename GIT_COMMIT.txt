@@ -1,14 +1,21 @@
-fix: Nudge v0.16.2 - installable updates (stable debug key), last failing test
+feat: Nudge v0.17.0 - create, edit and delete events (M4 section 3)
 
-- CI: builds without a release key use one shared debug key kept in the
-  Actions cache, so each build installs over the previous one (before,
-  every run created a new key and Android refused updates)
-- CI: print the wired AndroidManifest.xml and describe every APK
-  (package, SDK levels, ABIs, size) in the run summary
-- language test: pop the navigator instead of pageBack(), which found no
-  back button on the test platform
-- docs: what to do when the APK will not install
+- Calendar screen: the + button offers New task or New event; the event
+  form has a title, a writable calendar, an all-day switch, start and end
+- tapping an event shows Edit and Delete when its calendar accepts
+  changes and it does not repeat; repeating events and read-only
+  calendars only show, with "Open in calendar app"
+- Add to calendar in a task's details: a one-hour event in the default
+  calendar, never twice (link kept as task_event:<id> in settings,
+  forgotten when the event or the task is deleted)
+- Kotlin createEvent/updateEvent/deleteEvent/eventExists, repeating
+  events marked from the Events table
+- EventDraft, CalendarPlatform write methods, CalendarIntegration
+  write rules (integration on, write permission, writable calendar,
+  valid draft), CalendarWriteException
+- tests: draft, service, channel arguments, Drift link, screens;
+  Persian texts; docs
 
-CI of 0.16.1: analysis clean, formatting clean, 320 tests passed.
+Not run on a device: CI first.
 
-Milestone: stabilisation
+Milestone: M4 / Section 3

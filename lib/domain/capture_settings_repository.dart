@@ -47,6 +47,12 @@ abstract interface class CaptureSettingsRepository {
 
   Future<void> setDefaultCalendarId(String? id);
 
+  /// The device calendar event a task was added to, or null.
+  Future<String?> getTaskEventLink(String taskId);
+
+  /// Remembers (or, with null, forgets) the event of a task.
+  Future<void> setTaskEventLink(String taskId, String? eventId);
+
   Future<void> setThemeMode(String mode);
 
   Future<void> setLanguage(String language);

@@ -1,3 +1,4 @@
+import '../domain/event_draft.dart';
 import '../domain/external_calendar.dart';
 import '../domain/external_event.dart';
 
@@ -41,4 +42,17 @@ abstract interface class CalendarPlatform {
 
   /// Opens the event in the device's calendar app. False when it cannot be.
   Future<bool> openEvent(ExternalEvent event);
+
+  /// Saves a new event and returns its id. Throws
+  /// [CalendarPlatformException] (`permission_denied` or `write_failed`).
+  Future<String> createEvent(EventDraft draft);
+
+  /// Changes an event. False when it no longer exists.
+  Future<bool> updateEvent(String eventId, EventDraft draft);
+
+  /// Deletes an event. False when it no longer exists.
+  Future<bool> deleteEvent(String eventId);
+
+  /// True while the event is still in its calendar.
+  Future<bool> eventExists(String eventId);
 }

@@ -118,6 +118,20 @@ final class DriftCaptureSettingsRepository
   Future<void> setDefaultCalendarId(String? id) =>
       _write(_kCalendarDefault, id ?? '');
 
+  static String _linkKey(String taskId) => 'task_event:$taskId';
+
+  @override
+  Future<String?> getTaskEventLink(String taskId) async {
+    final raw = await _read(_linkKey(taskId));
+    return (raw == null || raw.isEmpty) ? null : raw;
+  }
+
+  @override
+  Future<void> setTaskEventLink(String taskId, String? eventId) =>
+      eventId == null
+      ? _remove(_linkKey(taskId))
+      : _write(_linkKey(taskId), eventId);
+
   @override
   Future<String> getThemeMode() async {
     final raw = await _read(_kThemeMode);
@@ -125,8 +139,10 @@ final class DriftCaptureSettingsRepository
   }
 
   @override
-  Future<void> setThemeMode(String mode) =>
-      _write(_kThemeMode, mode == 'light' || mode == 'dark' ? mode : 'system');
+  Future<void> setThemeMode(String mode) => _write(
+    _kThemeMode,
+    mode == 'light' || mode == 'dark' ? mode : 'system',
+  );
 
   @override
   Future<String> getLanguage() async {

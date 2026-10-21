@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -76,6 +77,55 @@ object CalendarChannels {
                     result.error("bad_args", "eventId, beginMillis and endMillis are required", null)
                 } else {
                     result.success(openEvent(activity, id, begin, end, allDay))
+                }
+            }
+            "createEvent" -> writeCall(result) {
+                val calendarId = call.argument<String>("calendarId")?.toLongOrNull()
+                val values = eventValues(call)
+                if (calendarId == null || values == null) {
+                    result.error("bad_args", "calendarId, title and times are required", null)
+                } else {
+                    values.put(CalendarContract.Events.CALENDAR_ID, calendarId)
+                    val uri = context.contentResolver.insert(CalendarContract.Events.CONTENT_URI, values)
+                    val id = uri?.lastPathSegment
+                    if (id == null) {
+                        result.error("write_failed", "The event could not be saved", null)
+                    } else {
+                        result.success(id)
+                    }
+                }
+            }
+            "updateEvent" -> writeCall(result) {
+                val eventId = call.argument<String>("eventId")?.toLongOrNull()
+                val values = eventValues(call)
+                if (eventId == null || values == null) {
+                    result.error("bad_args", "eventId, title and times are required", null)
+                } else {
+                    val uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId)
+                    result.success(context.contentResolver.update(uri, values, null, null) > 0)
+                }
+            }
+            "deleteEvent" -> writeCall(result) {
+                val eventId = call.argument<String>("eventId")?.toLongOrNull()
+                if (eventId == null) {
+                    result.error("bad_args", "eventId is required", null)
+                } else {
+                    val uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId)
+                    result.success(context.contentResolver.delete(uri, null, null) > 0)
+                }
+            }
+            "eventExists" -> {
+                val eventId = call.argument<String>("eventId")?.toLongOrNull()
+                if (eventId == null) {
+                    result.success(false)
+                } else {
+                    try {
+                        result.success(eventExists(context, eventId))
+                    } catch (e: SecurityException) {
+                        result.error("permission_denied", "Calendar permission is not granted", null)
+                    } catch (e: Exception) {
+                        result.error("query_failed", "The event could not be checked", null)
+                    }
                 }
             }
             else -> result.notImplemented()
@@ -180,9 +230,10 @@ object CalendarChannels {
             calendarIds.toTypedArray(),
             CalendarContract.Instances.BEGIN + " ASC",
         ) ?: return events
+        val rows = ArrayList<Map<String, Any?>>()
         cursor.use {
-            while (it.moveToNext() && events.size < MAX_INSTANCES) {
-                events.add(
+            while (it.moveToNext() && rows.size < MAX_INSTANCES) {
+                rows.add(
                     mapOf(
                         "eventId" to it.getLong(0).toString(),
                         "calendarId" to it.getLong(1).toString(),
@@ -194,6 +245,13 @@ object CalendarChannels {
                     ),
                 )
             }
+        }
+        // Repeating events are marked, so that the app does not edit them.
+        val repeating = repeatingEventIds(context, rows.map { it["eventId"] as String }.toSet())
+        for (row in rows) {
+            val copy = HashMap<String, Any?>(row)
+            copy["recurring"] = repeating.contains(row["eventId"] as String)
+            events.add(copy)
         }
         return events
     }
@@ -215,6 +273,83 @@ object CalendarChannels {
             true
         } catch (e: ActivityNotFoundException) {
             false
+        }
+    }
+
+    /** Ids (as text) among [ids] whose event repeats. Asked in chunks: SQLite limits the number of arguments. */
+    private fun repeatingEventIds(context: Context, ids: Set<String>): Set<String> {
+        val found = HashSet<String>()
+        for (chunk in ids.toList().chunked(400)) {
+            val placeholders = chunk.joinToString(",") { "?" }
+            val cursor = context.contentResolver.query(
+                CalendarContract.Events.CONTENT_URI,
+                arrayOf(
+                    CalendarContract.Events._ID,
+                    CalendarContract.Events.RRULE,
+                    CalendarContract.Events.RDATE,
+                ),
+                CalendarContract.Events._ID + " IN (" + placeholders + ")",
+                chunk.toTypedArray(),
+                null,
+            ) ?: continue
+            cursor.use {
+                while (it.moveToNext()) {
+                    val rule = it.getString(1) ?: ""
+                    val dates = it.getString(2) ?: ""
+                    if (rule.isNotEmpty() || dates.isNotEmpty()) found.add(it.getLong(0).toString())
+                }
+            }
+        }
+        return found
+    }
+
+    /** Runs a write and turns the usual failures into error codes. */
+    private fun writeCall(result: MethodChannel.Result, block: () -> Unit) {
+        try {
+            block()
+        } catch (e: SecurityException) {
+            result.error("permission_denied", "Calendar permission is not granted", null)
+        } catch (e: Exception) {
+            result.error("write_failed", "The change could not be saved", null)
+        }
+    }
+
+    /**
+     * The event columns for an insert or update. All-day events are stored the
+     * way Android expects: UTC midnights and the UTC time zone. Nothing from
+     * the content is logged.
+     */
+    private fun eventValues(call: MethodCall): ContentValues? {
+        val title = call.argument<String>("title") ?: return null
+        val begin = (call.argument<Number>("beginMillis"))?.toLong() ?: return null
+        val end = (call.argument<Number>("endMillis"))?.toLong() ?: return null
+        val allDay = call.argument<Boolean>("allDay") ?: false
+        val values = ContentValues()
+        values.put(CalendarContract.Events.TITLE, title)
+        values.put(CalendarContract.Events.DTSTART, begin)
+        values.put(CalendarContract.Events.DTEND, end)
+        values.put(CalendarContract.Events.ALL_DAY, if (allDay) 1 else 0)
+        values.put(
+            CalendarContract.Events.EVENT_TIMEZONE,
+            if (allDay) "UTC" else java.util.TimeZone.getDefault().id,
+        )
+        val notes = call.argument<String>("notes")
+        if (notes != null) values.put(CalendarContract.Events.DESCRIPTION, notes)
+        return values
+    }
+
+    /** True when the event is still in the calendar (not deleted). */
+    private fun eventExists(context: Context, eventId: Long): Boolean {
+        val uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId)
+        val cursor = context.contentResolver.query(
+            uri,
+            arrayOf(CalendarContract.Events._ID, CalendarContract.Events.DELETED),
+            null,
+            null,
+            null,
+        ) ?: return false
+        cursor.use {
+            return it.moveToFirst() && it.getInt(1) == 0
         }
     }
 }

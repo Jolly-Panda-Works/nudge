@@ -17,12 +17,20 @@ Android keeps the calendars of every account the user added (Google, Samsung and
 - If the provider fails, a line says so and tasks still work; with the integration off, unsupported or not allowed, nothing is read.
 - Limits: at most 3000 occurrences per read; an event spanning more than 31 days is shown on its first 31 days.
 
+## Creating and changing events (0.17.0, section 3)
+- **New event:** on the Calendar screen the `+` button offers *New task* or *New event* when device calendars are available. An event has a title, a calendar (only writable ones are offered; the default is the one chosen in Settings > Calendars), an all-day switch and start and end dates and times. It is written to the Calendar Provider, so the account's own sync sends it on.
+- **Edit and delete:** tapping an event shows *Edit* and *Delete* when its calendar accepts changes and the event does not repeat. The calendar of an event cannot be changed. Deleting asks first.
+- **Repeating events** are never changed by Nudge (changing one occurrence or the whole series is easy to get wrong); the details say so and offer "Open in calendar app". **Read-only calendars** (holidays, subscribed) only show.
+- **Tasks:** a task with a date and time has *Add to calendar* in its details. It creates a one-hour event with the task's title and notes in the default calendar and remembers the link (settings key `task_event:<task id>`), so the same task is never added twice. If the event is later deleted in a calendar app, the link is forgotten and the task can be added again. Deleting the task forgets the link and leaves the event.
+- **Times:** timed events are written as instants in the device's time zone; all-day events as UTC midnights with the UTC zone (the way Android stores them), the end being the midnight after the last day.
+- **Safety rules in code:** nothing is written while the integration is off or the write permission is missing; a calendar is checked to be writable before every write; an invalid draft (empty title, end not after the start) is refused before anything is sent.
+- Not done: reminders/alerts and guests on events, choosing a different calendar for an existing event, editing repeating events, showing the task link on the event, and updating the event when the task changes.
+
 ## What does not exist yet
-- Creating, editing or deleting events, and linking a task to an event without creating duplicates (section 3).
 - Windows: there is no calendar provider; external calendars on Windows will only come through a documented provider (M5/M6).
 
 ## Privacy
-Calendar names and account names are shown on screen and are never logged or exported. Only calendar ids are stored (to remember the choices). Since 0.16.0 the title, time and calendar of the events in the range on screen are read into memory to be shown; they are not stored, logged or exported, and event locations, notes and attendees are not read.
+Calendar names and account names are shown on screen and are never logged or exported. Only calendar ids are stored (to remember the choices). Since 0.16.0 the title, time and calendar of the events in the range on screen are read into memory to be shown; they are not stored, logged or exported, and event locations, notes and attendees are not read. Since 0.17.0 Nudge writes events the user creates or edits, and stores only the id of the event a task was added to.
 
 ## Verify on devices (not done)
 - A phone with a Google account and one with a Samsung account (with Samsung Calendar): both appear? Are Samsung's own calendars (for example "My calendar") listed and writable?

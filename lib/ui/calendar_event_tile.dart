@@ -49,8 +49,7 @@ class CalendarEventTile extends StatelessWidget {
 /// "All day", or "09:00 – 10:30".
 String eventTimeText(ExternalEvent event, {required bool persian}) {
   if (event.allDay) return tr('All day');
-  final text =
-      '${formatTimeOfDay(event.start)} – ${formatTimeOfDay(event.end)}';
+  final text = '${formatTimeOfDay(event.start)} – ${formatTimeOfDay(event.end)}';
   return persian ? CalendarNames.toPersianDigits(text) : text;
 }
 
@@ -59,6 +58,8 @@ Future<void> showEventDetails(
   BuildContext context,
   ExternalEvent event, {
   required Future<bool> Function() onOpenInCalendarApp,
+  VoidCallback? onEdit,
+  VoidCallback? onDelete,
 }) {
   return showDialog<void>(
     context: context,
@@ -83,9 +84,38 @@ Future<void> showEventDetails(
             Text(formatDue(event.start)),
             Text(formatDue(event.end)),
           ],
+          if (event.recurring) ...[
+            const SizedBox(height: 12),
+            Text(
+              tr('Repeating events are changed in the calendar app.'),
+              style: Theme.of(dialogContext).textTheme.bodySmall,
+            ),
+          ] else if (!event.canWrite) ...[
+            const SizedBox(height: 12),
+            Text(
+              tr('This calendar is read only.'),
+              style: Theme.of(dialogContext).textTheme.bodySmall,
+            ),
+          ],
         ],
       ),
       actions: [
+        if (onEdit != null)
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              onEdit();
+            },
+            child: Text(tr('Edit')),
+          ),
+        if (onDelete != null)
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              onDelete();
+            },
+            child: Text(tr('Delete')),
+          ),
         TextButton(
           onPressed: () async {
             final opened = await onOpenInCalendarApp();

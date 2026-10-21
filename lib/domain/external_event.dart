@@ -10,6 +10,8 @@ final class ExternalEvent {
     required this.allDay,
     this.color,
     this.calendarLabel = '',
+    this.recurring = false,
+    this.canWrite = false,
   });
 
   /// The provider's id of the event (the same for every occurrence).
@@ -34,10 +36,24 @@ final class ExternalEvent {
   /// The name of the calendar it belongs to (filled in by the app).
   final String calendarLabel;
 
+  /// True for an occurrence of a repeating event. Such events are not edited
+  /// in Nudge (changing one occurrence or the series is left to the calendar
+  /// app).
+  final bool recurring;
+
+  /// True when its calendar accepts changes (filled in by the app).
+  final bool canWrite;
+
+  /// True when Nudge may edit or delete it.
+  bool get editable => canWrite && !recurring;
+
   /// Identifies this occurrence (event and start).
   String get key => '$eventId@${start.millisecondsSinceEpoch}';
 
-  ExternalEvent withCalendarLabel(String label) => ExternalEvent(
+  ExternalEvent withCalendar({
+    required String label,
+    required bool canWrite,
+  }) => ExternalEvent(
     eventId: eventId,
     calendarId: calendarId,
     title: title,
@@ -46,5 +62,7 @@ final class ExternalEvent {
     allDay: allDay,
     color: color,
     calendarLabel: label,
+    recurring: recurring,
+    canWrite: canWrite,
   );
 }

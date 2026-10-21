@@ -1,3 +1,4 @@
+import '../domain/event_draft.dart';
 import '../domain/external_calendar.dart';
 import '../domain/external_event.dart';
 import 'calendar_platform.dart';
@@ -31,4 +32,17 @@ final class NoopCalendarPlatform implements CalendarPlatform {
 
   @override
   Future<bool> openEvent(ExternalEvent event) async => false;
+
+  @override
+  Future<String> createEvent(EventDraft draft) async =>
+      throw const CalendarPlatformException('write_failed');
+
+  @override
+  Future<bool> updateEvent(String eventId, EventDraft draft) async => false;
+
+  @override
+  Future<bool> deleteEvent(String eventId) async => false;
+
+  @override
+  Future<bool> eventExists(String eventId) async => false;
 }

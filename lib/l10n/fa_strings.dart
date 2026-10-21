@@ -4,266 +4,498 @@
 // (test/l10n/translations_test.dart) checks it. Placeholders such as {count}
 // must be kept as they are.
 const Map<String, String> faStrings = <String, String>{
-  'Startup failed: {error}': 'راه\u200Cاندازی ناموفق بود: {error}',
+  'Startup failed: {error}':
+      'راه\u200Cاندازی ناموفق بود: {error}',
   'Nothing planned in the next {days} days':
       'در {days} روز آینده چیزی برنامه\u200Cریزی نشده است',
-  'Could not save this choice.': 'این انتخاب ذخیره نشد.',
-  'Next month': 'ماه بعد',
-  'Previous month': 'ماه قبل',
-  'Next week': 'هفته بعد',
-  'Previous week': 'هفته قبل',
-  'Next day': 'روز بعد',
-  'Previous day': 'روز قبل',
-  'Calendar': 'تقویم',
-  'Today': 'امروز',
-  'Show Gregorian dates': 'نمایش تاریخ میلادی',
-  'Show Jalali dates': 'نمایش تاریخ شمسی',
-  'New task on the selected day': 'وظیفه\u200Cی جدید در روز انتخاب\u200Cشده',
-  'Retry': 'تلاش دوباره',
-  'Month': 'ماه',
-  'Week': 'هفته',
-  'Day': 'روز',
-  'Agenda': 'برنامه',
-  'No tasks on this day': 'برای این روز وظیفه\u200Cای نیست',
-  'Cancel': 'انصراف',
-  'Enter some text to import': 'متنی برای درون\u200Cریزی وارد کنید',
-  'Import text': 'درون\u200Cریزی متن',
-  'Title (optional)': 'عنوان (اختیاری)',
-  'Text': 'متن',
-  'Import': 'درون\u200Cریزی',
-  'Could not import the text.': 'متن درون\u200Cریزی نشد.',
-  'Tasks': 'وظایف',
-  'Settings': 'تنظیمات',
-  'Active': 'فعال',
-  'All': 'همه',
-  'Content hidden': 'محتوا پنهان است',
-  '(no title)': '(بدون عنوان)',
-  'Dismissed': 'بسته\u200Cشده',
-  'Notification access is off': 'دسترسی به اعلان\u200Cها خاموش است',
-  'Listener not connected': 'شنونده متصل نیست',
+  'Could not save this choice.':
+      'این انتخاب ذخیره نشد.',
+  'Next month':
+      'ماه بعد',
+  'Previous month':
+      'ماه قبل',
+  'Next week':
+      'هفته بعد',
+  'Previous week':
+      'هفته قبل',
+  'Next day':
+      'روز بعد',
+  'Previous day':
+      'روز قبل',
+  'Calendar':
+      'تقویم',
+  'Today':
+      'امروز',
+  'Show Gregorian dates':
+      'نمایش تاریخ میلادی',
+  'Show Jalali dates':
+      'نمایش تاریخ شمسی',
+  'New task on the selected day':
+      'وظیفه\u200Cی جدید در روز انتخاب\u200Cشده',
+  'Retry':
+      'تلاش دوباره',
+  'Month':
+      'ماه',
+  'Week':
+      'هفته',
+  'Day':
+      'روز',
+  'Agenda':
+      'برنامه',
+  'No tasks on this day':
+      'برای این روز وظیفه\u200Cای نیست',
+  'Cancel':
+      'انصراف',
+  'Enter some text to import':
+      'متنی برای درون\u200Cریزی وارد کنید',
+  'Import text':
+      'درون\u200Cریزی متن',
+  'Title (optional)':
+      'عنوان (اختیاری)',
+  'Text':
+      'متن',
+  'Import':
+      'درون\u200Cریزی',
+  'Could not import the text.':
+      'متن درون\u200Cریزی نشد.',
+  'Tasks':
+      'وظایف',
+  'Settings':
+      'تنظیمات',
+  'Active':
+      'فعال',
+  'All':
+      'همه',
+  'Content hidden':
+      'محتوا پنهان است',
+  '(no title)':
+      '(بدون عنوان)',
+  'Dismissed':
+      'بسته\u200Cشده',
+  'Notification access is off':
+      'دسترسی به اعلان\u200Cها خاموش است',
+  'Listener not connected':
+      'شنونده متصل نیست',
   'Nudge cannot capture notifications until you enable Notification Access for it.':
       'تا زمانی که دسترسی به اعلان\u200Cها را برای Nudge روشن نکنید، نمی\u200Cتواند اعلان\u200Cها را دریافت کند.',
   'Notification access is on, but the listener is not running. Try reconnecting.':
       'دسترسی به اعلان\u200Cها روشن است، اما شنونده در حال اجرا نیست. دوباره متصل کنید.',
-  'Enable': 'روشن کردن',
-  'Reconnect': 'اتصال دوباره',
+  'Enable':
+      'روشن کردن',
+  'Reconnect':
+      'اتصال دوباره',
   'Notification capture is available on Android.':
       'دریافت اعلان\u200Cها فقط در اندروید در دسترس است.',
   'Enable Notification Access to start capturing.':
       'برای شروع دریافت، دسترسی به اعلان\u200Cها را روشن کنید.',
   'New notifications from other apps will appear here.':
       'اعلان\u200Cهای تازه\u200Cی برنامه\u200Cهای دیگر اینجا نمایش داده می\u200Cشوند.',
-  'No notifications yet': 'هنوز اعلانی نیست',
-  'Could not load notifications': 'اعلان\u200Cها بارگیری نشدند',
-  'Delete notification?': 'اعلان حذف شود؟',
+  'No notifications yet':
+      'هنوز اعلانی نیست',
+  'Could not load notifications':
+      'اعلان\u200Cها بارگیری نشدند',
+  'Delete notification?':
+      'اعلان حذف شود؟',
   'It will be removed from Nudge. The original notification in the source app is not affected.':
       'از Nudge حذف می\u200Cشود. اعلان اصلی در برنامه\u200Cی مبدأ تغییری نمی\u200Cکند.',
-  'Delete': 'حذف',
-  'Notification deleted': 'اعلان حذف شد',
-  'Could not delete the notification.': 'اعلان حذف نشد.',
-  'Notification details': 'جزئیات اعلان',
-  'Delete notification': 'حذف اعلان',
-  'Content hidden by Android': 'محتوا را اندروید پنهان کرده است',
+  'Delete':
+      'حذف',
+  'Notification deleted':
+      'اعلان حذف شد',
+  'Could not delete the notification.':
+      'اعلان حذف نشد.',
+  'Notification details':
+      'جزئیات اعلان',
+  'Delete notification':
+      'حذف اعلان',
+  'Content hidden by Android':
+      'محتوا را اندروید پنهان کرده است',
   'The system did not share this notification\'s content with Nudge.':
       'سیستم محتوای این اعلان را در اختیار Nudge نگذاشته است.',
-  'Source': 'منبع',
+  'Source':
+      'منبع',
   'Shared or imported text':
       'متن هم\u200Cرسانی\u200Cشده یا درون\u200Cریزی\u200Cشده',
-  'Package': 'بسته',
-  'Added': 'افزوده\u200Cشده',
-  'Posted': 'زمان انتشار',
-  'First seen': 'اولین مشاهده',
-  'Last updated': 'آخرین به\u200Cروزرسانی',
-  'Updates': 'به\u200Cروزرسانی\u200Cها',
-  '{count}': '{count}',
-  'Status': 'وضعیت',
-  'Original action': 'عمل اصلی',
-  'Existed when captured': 'هنگام دریافت وجود داشت',
-  'None when captured': 'هنگام دریافت وجود نداشت',
-  'View task': 'مشاهده\u200Cی وظیفه',
-  'Create task': 'ساخت وظیفه',
-  'Create reminder': 'ساخت یادآور',
-  'Open original': 'باز کردن اصل اعلان',
-  'Could not open the settings screen.': 'صفحه\u200Cی تنظیمات باز نشد.',
-  'Reminder alerts': 'هشدار یادآورها',
-  'Checking': 'در حال بررسی',
-  'Allowed': 'مجاز',
+  'Package':
+      'بسته',
+  'Added':
+      'افزوده\u200Cشده',
+  'Posted':
+      'زمان انتشار',
+  'First seen':
+      'اولین مشاهده',
+  'Last updated':
+      'آخرین به\u200Cروزرسانی',
+  'Updates':
+      'به\u200Cروزرسانی\u200Cها',
+  '{count}':
+      '{count}',
+  'Status':
+      'وضعیت',
+  'Original action':
+      'عمل اصلی',
+  'Existed when captured':
+      'هنگام دریافت وجود داشت',
+  'None when captured':
+      'هنگام دریافت وجود نداشت',
+  'View task':
+      'مشاهده\u200Cی وظیفه',
+  'Create task':
+      'ساخت وظیفه',
+  'Create reminder':
+      'ساخت یادآور',
+  'Open original':
+      'باز کردن اصل اعلان',
+  'Could not open the settings screen.':
+      'صفحه\u200Cی تنظیمات باز نشد.',
+  'Reminder alerts':
+      'هشدار یادآورها',
+  'Checking':
+      'در حال بررسی',
+  'Allowed':
+      'مجاز',
   'Blocked: reminders will not be shown':
       'مسدود: یادآورها نمایش داده نمی\u200Cشوند',
-  'Exact timing': 'زمان\u200Cبندی دقیق',
+  'Exact timing':
+      'زمان\u200Cبندی دقیق',
   'Not allowed: alerts may arrive a few minutes late':
       'غیرمجاز: هشدارها ممکن است چند دقیقه دیر برسند',
-  'All apps': 'همه\u200Cی برنامه\u200Cها',
-  'Only selected apps': 'فقط برنامه\u200Cهای انتخاب\u200Cشده',
+  'All apps':
+      'همه\u200Cی برنامه\u200Cها',
+  'Only selected apps':
+      'فقط برنامه\u200Cهای انتخاب\u200Cشده',
   'All apps except selected':
       'همه\u200Cی برنامه\u200Cها به\u200Cجز انتخاب\u200Cشده\u200Cها',
-  'Forever': 'برای همیشه',
-  '{days} days': '{days} روز',
-  'Capture mode': 'حالت دریافت',
-  'Keep notifications for': 'نگه\u200Cداشتن اعلان\u200Cها به مدت',
-  'Could not apply the new setting.': 'تنظیم جدید اعمال نشد.',
+  'Forever':
+      'برای همیشه',
+  '{days} days':
+      '{days} روز',
+  'Capture mode':
+      'حالت دریافت',
+  'Keep notifications for':
+      'نگه\u200Cداشتن اعلان\u200Cها به مدت',
+  'Could not apply the new setting.':
+      'تنظیم جدید اعمال نشد.',
   'Could not open the settings screen on this device.':
       'صفحه\u200Cی تنظیمات در این دستگاه باز نشد.',
-  'Export data': 'برون\u200Cبری داده\u200Cها',
+  'Export data':
+      'برون\u200Cبری داده\u200Cها',
   'The export file contains the full text of every stored notification, plus your tasks, and is not encrypted. Keep it somewhere safe.':
       'پرونده\u200Cی برون\u200Cبری متن کامل همه\u200Cی اعلان\u200Cهای ذخیره\u200Cشده و وظایف شما را دارد و رمزگذاری نشده است. آن را در جای امنی نگه دارید.',
-  'Export': 'برون\u200Cبری',
-  'Export saved': 'برون\u200Cبری ذخیره شد',
-  'Exported to {location}': 'در {location} ذخیره شد',
-  'Export cancelled': 'برون\u200Cبری لغو شد',
+  'Export':
+      'برون\u200Cبری',
+  'Export saved':
+      'برون\u200Cبری ذخیره شد',
+  'Exported to {location}':
+      'در {location} ذخیره شد',
+  'Export cancelled':
+      'برون\u200Cبری لغو شد',
   'Export is not available on this platform':
       'برون\u200Cبری در این پلتفرم در دسترس نیست',
-  'Export failed.': 'برون\u200Cبری ناموفق بود.',
-  'Delete all notifications?': 'همه\u200Cی اعلان\u200Cها حذف شوند؟',
+  'Export failed.':
+      'برون\u200Cبری ناموفق بود.',
+  'Delete all notifications?':
+      'همه\u200Cی اعلان\u200Cها حذف شوند؟',
   'This removes every stored notification and anything still waiting to be stored. It cannot be undone. Your settings are kept.':
       'همه\u200Cی اعلان\u200Cهای ذخیره\u200Cشده و هر چیزی که در صف ذخیره است حذف می\u200Cشود. این کار برگشت\u200Cپذیر نیست. تنظیمات شما حفظ می\u200Cشود.',
-  'Deleted 1 notification': '۱ اعلان حذف شد',
-  'Deleted {count} notifications': '{count} اعلان حذف شد',
-  'Could not delete the notifications.': 'اعلان\u200Cها حذف نشدند.',
-  'Delete all tasks?': 'همه\u200Cی وظایف حذف شوند؟',
+  'Deleted 1 notification':
+      '۱ اعلان حذف شد',
+  'Deleted {count} notifications':
+      '{count} اعلان حذف شد',
+  'Could not delete the notifications.':
+      'اعلان\u200Cها حذف نشدند.',
+  'Delete all tasks?':
+      'همه\u200Cی وظایف حذف شوند؟',
   'This removes every task and reminder, including done and archived ones. It cannot be undone. Notifications are kept.':
       'همه\u200Cی وظایف و یادآورها، از جمله انجام\u200Cشده\u200Cها و بایگانی\u200Cشده\u200Cها، حذف می\u200Cشوند. این کار برگشت\u200Cپذیر نیست. اعلان\u200Cها حفظ می\u200Cشوند.',
-  'Deleted 1 task': '۱ وظیفه حذف شد',
-  'Deleted {count} tasks': '{count} وظیفه حذف شد',
-  'Could not delete the tasks.': 'وظایف حذف نشدند.',
-  'Notification access': 'دسترسی به اعلان\u200Cها',
-  'Not available on this platform': 'در این پلتفرم در دسترس نیست',
-  'checking': 'در حال بررسی',
-  'granted': 'داده شده',
-  'not granted': 'داده نشده',
-  'connected': 'متصل',
-  'not connected': 'متصل نیست',
-  'Access: {state}': 'دسترسی: {state}',
-  'Listener: {state}': 'شنونده: {state}',
+  'Deleted 1 task':
+      '۱ وظیفه حذف شد',
+  'Deleted {count} tasks':
+      '{count} وظیفه حذف شد',
+  'Could not delete the tasks.':
+      'وظایف حذف نشدند.',
+  'Notification access':
+      'دسترسی به اعلان\u200Cها',
+  'Not available on this platform':
+      'در این پلتفرم در دسترس نیست',
+  'checking':
+      'در حال بررسی',
+  'granted':
+      'داده شده',
+  'not granted':
+      'داده نشده',
+  'connected':
+      'متصل',
+  'not connected':
+      'متصل نیست',
+  'Access: {state}':
+      'دسترسی: {state}',
+  'Listener: {state}':
+      'شنونده: {state}',
   'Open Notification Access settings':
       'باز کردن تنظیمات دسترسی به اعلان\u200Cها',
-  'Reconnect listener': 'اتصال دوباره\u200Cی شنونده',
-  'Reminders': 'یادآورها',
-  'What to capture': 'چه چیزی دریافت شود',
-  'Choose apps': 'انتخاب برنامه\u200Cها',
+  'Reconnect listener':
+      'اتصال دوباره\u200Cی شنونده',
+  'Reminders':
+      'یادآورها',
+  'What to capture':
+      'چه چیزی دریافت شود',
+  'Choose apps':
+      'انتخاب برنامه\u200Cها',
   'Not used in "All apps" mode':
       'در حالت «همه\u200Cی برنامه\u200Cها» استفاده نمی\u200Cشود',
-  '{count} selected': '{count} انتخاب\u200Cشده',
-  'Ongoing notifications': 'اعلان\u200Cهای دائمی',
+  '{count} selected':
+      '{count} انتخاب\u200Cشده',
+  'Ongoing notifications':
+      'اعلان\u200Cهای دائمی',
   'Media players, navigation and other persistent notifications':
       'پخش\u200Cکننده\u200Cهای رسانه، مسیریابی و دیگر اعلان\u200Cهای ماندگار',
-  'Group summaries': 'خلاصه\u200Cی گروه\u200Cها',
+  'Group summaries':
+      'خلاصه\u200Cی گروه\u200Cها',
   'The combined entry apps post for a group of notifications':
       'ورودی ترکیبی که برنامه\u200Cها برای گروهی از اعلان\u200Cها می\u200Cگذارند',
-  'Your data': 'داده\u200Cهای شما',
-  'Stored notifications: {count}': 'اعلان\u200Cهای ذخیره\u200Cشده: {count}',
-  '{count} active': '{count} فعال',
+  'Your data':
+      'داده\u200Cهای شما',
+  'Stored notifications: {count}':
+      'اعلان\u200Cهای ذخیره\u200Cشده: {count}',
+  '{count} active':
+      '{count} فعال',
   'Save all stored notifications and tasks as a JSON file':
       'ذخیره\u200Cی همه\u200Cی اعلان\u200Cها و وظایف در یک پرونده\u200Cی JSON',
-  'Delete all notifications': 'حذف همه\u200Cی اعلان\u200Cها',
+  'Delete all notifications':
+      'حذف همه\u200Cی اعلان\u200Cها',
   'Removes stored notifications and anything still queued':
       'اعلان\u200Cهای ذخیره\u200Cشده و هر چیز در صف را حذف می\u200Cکند',
-  'Delete all tasks': 'حذف همه\u200Cی وظایف',
+  'Delete all tasks':
+      'حذف همه\u200Cی وظایف',
   'Removes every task and reminder, including done ones':
       'همه\u200Cی وظایف و یادآورها، از جمله انجام\u200Cشده\u200Cها، را حذف می\u200Cکند',
-  'About': 'درباره',
+  'About':
+      'درباره',
   'Only the selected apps are captured.':
       'فقط اعلان\u200Cهای برنامه\u200Cهای انتخاب\u200Cشده دریافت می\u200Cشوند.',
   'Notifications from the selected apps are ignored.':
       'اعلان\u200Cهای برنامه\u200Cهای انتخاب\u200Cشده نادیده گرفته می\u200Cشوند.',
-  'Add by package name': 'افزودن با نام بسته',
+  'Add by package name':
+      'افزودن با نام بسته',
   'No apps yet. Apps appear here after they post a notification, or add one by package name.':
       'هنوز برنامه\u200Cای نیست. برنامه\u200Cها پس از ارسال اعلان اینجا ظاهر می\u200Cشوند، یا یکی را با نام بسته اضافه کنید.',
   'Enter a package name such as com.example.app':
       'نام بسته\u200Cای مانند com.example.app را وارد کنید',
-  'Package name': 'نام بسته',
-  'Add': 'افزودن',
-  'Could not update the task.': 'وظیفه به\u200Cروزرسانی نشد.',
-  'In 15 minutes': '۱۵ دقیقه\u200Cی دیگر',
-  'In 1 hour': '۱ ساعت دیگر',
-  'In 3 hours': '۳ ساعت دیگر',
-  'Tomorrow at 09:00': 'فردا ساعت ۰۹:۰۰',
-  'Snooze until': 'تعویق تا',
-  'Delete task?': 'وظیفه حذف شود؟',
+  'Package name':
+      'نام بسته',
+  'Add':
+      'افزودن',
+  'Could not update the task.':
+      'وظیفه به\u200Cروزرسانی نشد.',
+  'In 15 minutes':
+      '۱۵ دقیقه\u200Cی دیگر',
+  'In 1 hour':
+      '۱ ساعت دیگر',
+  'In 3 hours':
+      '۳ ساعت دیگر',
+  'Tomorrow at 09:00':
+      'فردا ساعت ۰۹:۰۰',
+  'Snooze until':
+      'تعویق تا',
+  'Delete task?':
+      'وظیفه حذف شود؟',
   'The task is removed from Nudge. The notification it came from is not affected.':
       'وظیفه از Nudge حذف می\u200Cشود. اعلانی که از آن ساخته شده تغییری نمی\u200Cکند.',
-  'Task deleted': 'وظیفه حذف شد',
-  'Could not delete the task.': 'وظیفه حذف نشد.',
-  'Reminder': 'یادآور',
-  'Task': 'وظیفه',
-  'Edit': 'ویرایش',
-  'Delete task': 'حذف وظیفه',
-  'Due': 'سررسید',
-  'Snoozed until': 'تعویق تا',
-  'Not set': 'تنظیم نشده',
-  'From': 'از',
-  'Created': 'ساخته\u200Cشده',
-  'Mark done': 'انجام شد',
-  'Reopen': 'بازگشایی',
-  'Snooze': 'تعویق',
-  'Restore': 'بازگردانی',
-  'Archive': 'بایگانی',
-  'Open': 'باز',
-  'Done': 'انجام\u200Cشده',
-  'Archived': 'بایگانی\u200Cشده',
-  'Opened the original notification': 'اعلان اصلی باز شد',
+  'Task deleted':
+      'وظیفه حذف شد',
+  'Could not delete the task.':
+      'وظیفه حذف نشد.',
+  'Reminder':
+      'یادآور',
+  'Task':
+      'وظیفه',
+  'Edit':
+      'ویرایش',
+  'Delete task':
+      'حذف وظیفه',
+  'Due':
+      'سررسید',
+  'Snoozed until':
+      'تعویق تا',
+  'Not set':
+      'تنظیم نشده',
+  'From':
+      'از',
+  'Created':
+      'ساخته\u200Cشده',
+  'Mark done':
+      'انجام شد',
+  'Reopen':
+      'بازگشایی',
+  'Snooze':
+      'تعویق',
+  'Restore':
+      'بازگردانی',
+  'Archive':
+      'بایگانی',
+  'Open':
+      'باز',
+  'Done':
+      'انجام\u200Cشده',
+  'Archived':
+      'بایگانی\u200Cشده',
+  'Opened the original notification':
+      'اعلان اصلی باز شد',
   'The notification is gone, so the app was opened instead':
       'اعلان دیگر وجود ندارد، به\u200Cجای آن برنامه باز شد',
   'The original is not available. The saved content is kept here.':
       'اصل اعلان در دسترس نیست. محتوای ذخیره\u200Cشده همین\u200Cجا نگه داشته شده است.',
-  'A reminder needs a date and time': 'یادآور به تاریخ و ساعت نیاز دارد',
-  'This notification already has a task': 'این اعلان از قبل وظیفه دارد',
-  'Could not save the task.': 'وظیفه ذخیره نشد.',
-  'Edit task': 'ویرایش وظیفه',
-  'New reminder': 'یادآور جدید',
-  'New task': 'وظیفه\u200Cی جدید',
-  'Save': 'ذخیره',
-  'Title': 'عنوان',
-  'Enter a title': 'عنوان را وارد کنید',
-  'Notes': 'یادداشت\u200Cها',
-  'Date': 'تاریخ',
-  'Time': 'ساعت',
-  '09:00 (default)': '۰۹:۰۰ (پیش\u200Cفرض)',
-  'Clear date and time': 'پاک کردن تاریخ و ساعت',
-  'Due {time}': 'سررسید {time}',
+  'A reminder needs a date and time':
+      'یادآور به تاریخ و ساعت نیاز دارد',
+  'This notification already has a task':
+      'این اعلان از قبل وظیفه دارد',
+  'Could not save the task.':
+      'وظیفه ذخیره نشد.',
+  'Edit task':
+      'ویرایش وظیفه',
+  'New reminder':
+      'یادآور جدید',
+  'New task':
+      'وظیفه\u200Cی جدید',
+  'Save':
+      'ذخیره',
+  'Title':
+      'عنوان',
+  'Enter a title':
+      'عنوان را وارد کنید',
+  'Notes':
+      'یادداشت\u200Cها',
+  'Date':
+      'تاریخ',
+  'Time':
+      'ساعت',
+  '09:00 (default)':
+      '۰۹:۰۰ (پیش\u200Cفرض)',
+  'Clear date and time':
+      'پاک کردن تاریخ و ساعت',
+  'Due {time}':
+      'سررسید {time}',
   'A reminder shows an alert at the chosen time, with a Snooze button. Alerts need notifications to be allowed for Nudge.':
       'یادآور در زمان انتخاب\u200Cشده هشداری با دکمه\u200Cی تعویق نشان می\u200Cدهد. هشدارها به مجاز بودن اعلان\u200Cها برای Nudge نیاز دارند.',
-  'No open tasks': 'وظیفه\u200Cی بازی نیست',
-  'Nothing done yet': 'هنوز چیزی انجام نشده است',
-  'Nothing archived': 'چیزی بایگانی نشده است',
-  'Could not load the tasks.': 'وظایف بارگیری نشدند.',
-  'Reopen task': 'بازگشایی وظیفه',
-  'Mark task done': 'علامت\u200Cگذاری وظیفه به\u200Cعنوان انجام\u200Cشده',
-  'just now': 'همین الان',
-  '{n} min ago': '{n} دقیقه پیش',
-  'Yesterday {time}': 'دیروز {time}',
-  'Language': 'زبان',
-  'System default': 'پیش\u200Cفرض سیستم',
-  'Choose language': 'انتخاب زبان',
-  '1 task': '۱ وظیفه',
-  '{count} tasks': '{count} وظیفه',
-  'Theme': 'تم',
-  'Light': 'روشن',
-  'Dark': 'تیره',
-  'Choose theme': 'انتخاب تم',
-  'Calendars': 'تقویم\u200Cها',
+  'No open tasks':
+      'وظیفه\u200Cی بازی نیست',
+  'Nothing done yet':
+      'هنوز چیزی انجام نشده است',
+  'Nothing archived':
+      'چیزی بایگانی نشده است',
+  'Could not load the tasks.':
+      'وظایف بارگیری نشدند.',
+  'Reopen task':
+      'بازگشایی وظیفه',
+  'Mark task done':
+      'علامت\u200Cگذاری وظیفه به\u200Cعنوان انجام\u200Cشده',
+  'just now':
+      'همین الان',
+  '{n} min ago':
+      '{n} دقیقه پیش',
+  'Yesterday {time}':
+      'دیروز {time}',
+  'Language':
+      'زبان',
+  'System default':
+      'پیش\u200Cفرض سیستم',
+  'Choose language':
+      'انتخاب زبان',
+  '1 task':
+      '۱ وظیفه',
+  '{count} tasks':
+      '{count} وظیفه',
+  'Theme':
+      'تم',
+  'Light':
+      'روشن',
+  'Dark':
+      'تیره',
+  'Choose theme':
+      'انتخاب تم',
+  'Calendars':
+      'تقویم\u200Cها',
   'Calendars on this device are available on Android.':
       'تقویم\u200Cهای دستگاه فقط در اندروید در دسترس\u200Cاند.',
-  'Show device calendars': 'نمایش تقویم\u200Cهای دستگاه',
+  'Show device calendars':
+      'نمایش تقویم\u200Cهای دستگاه',
   'Reads the calendars of the accounts on this phone, such as Google or Samsung. Nudge asks for permission only when you turn this on.':
       'تقویم\u200Cهای حساب\u200Cهای این گوشی، مانند گوگل یا سامسونگ، را می\u200Cخواند. Nudge فقط وقتی این گزینه را روشن کنید مجوز می\u200Cخواهد.',
-  'Calendar access was not allowed': 'دسترسی به تقویم مجاز نشد',
-  'Calendar permission was turned off': 'مجوز تقویم خاموش شده است',
-  'Open settings': 'باز کردن تنظیمات',
-  'The calendars could not be read.': 'تقویم\u200Cها خوانده نشدند.',
-  'No calendars found on this device.': 'در این دستگاه تقویمی پیدا نشد.',
-  'Read only': 'فقط خواندنی',
-  'New events': 'رویدادهای جدید',
-  'Save new events to': 'ذخیره\u200Cی رویدادهای جدید در',
-  'No writable calendar': 'تقویم قابل\u200Cنوشتنی نیست',
-  'None': 'هیچ\u200Cکدام',
-  'Show calendars from this device': 'نمایش تقویم\u200Cهای این دستگاه',
-  'All day': 'تمام روز',
-  'Could not open the calendar app.': 'برنامه\u200Cی تقویم باز نشد.',
-  'Open in calendar app': 'باز کردن در برنامه\u200Cی تقویم',
-  'Close': 'بستن',
-  '1 event': '۱ رویداد',
-  '{count} events': '{count} رویداد',
+  'Calendar access was not allowed':
+      'دسترسی به تقویم مجاز نشد',
+  'Calendar permission was turned off':
+      'مجوز تقویم خاموش شده است',
+  'Open settings':
+      'باز کردن تنظیمات',
+  'The calendars could not be read.':
+      'تقویم\u200Cها خوانده نشدند.',
+  'No calendars found on this device.':
+      'در این دستگاه تقویمی پیدا نشد.',
+  'Read only':
+      'فقط خواندنی',
+  'New events':
+      'رویدادهای جدید',
+  'Save new events to':
+      'ذخیره\u200Cی رویدادهای جدید در',
+  'No writable calendar':
+      'تقویم قابل\u200Cنوشتنی نیست',
+  'None':
+      'هیچ\u200Cکدام',
+  'Show calendars from this device':
+      'نمایش تقویم\u200Cهای این دستگاه',
+  'All day':
+      'تمام روز',
+  'Could not open the calendar app.':
+      'برنامه\u200Cی تقویم باز نشد.',
+  'Open in calendar app':
+      'باز کردن در برنامه\u200Cی تقویم',
+  'Close':
+      'بستن',
+  '1 event':
+      '۱ رویداد',
+  '{count} events':
+      '{count} رویداد',
   'Events of the device calendars could not be read.':
       'رویدادهای تقویم\u200Cهای دستگاه خوانده نشدند.',
+  'Turn on device calendars in Settings > Calendars first.':
+      'اول در تنظیمات > تقویم\u200Cها، تقویم\u200Cهای دستگاه را روشن کنید.',
+  'Nudge is not allowed to change your calendars. Allow it in the app settings.':
+      'Nudge اجازه\u200Cی تغییر تقویم\u200Cهای شما را ندارد. در تنظیمات برنامه آن را مجاز کنید.',
+  'There is no calendar to save events to. Choose one in Settings > Calendars.':
+      'تقویمی برای ذخیره\u200Cی رویدادها نیست. در تنظیمات > تقویم\u200Cها یکی را انتخاب کنید.',
+  'This calendar is read only.':
+      'این تقویم فقط\u200Cخواندنی است.',
+  'Repeating events are changed in the calendar app.':
+      'رویدادهای تکرارشونده در برنامه\u200Cی تقویم تغییر می\u200Cکنند.',
+  'Give the task a date and time first.':
+      'اول برای وظیفه تاریخ و ساعت تعیین کنید.',
+  'The change could not be saved.':
+      'تغییر ذخیره نشد.',
+  'The end must be after the start':
+      'پایان باید بعد از شروع باشد',
+  'Delete event?':
+      'رویداد حذف شود؟',
+  'The event is removed from its calendar on this device (and from the account it syncs with).':
+      'رویداد از تقویم این دستگاه (و از حسابی که با آن همگام می\u200Cشود) حذف می\u200Cشود.',
+  'New event':
+      'رویداد جدید',
+  'Edit event':
+      'ویرایش رویداد',
+  'Delete event':
+      'حذف رویداد',
+  'The calendar of an event cannot be changed':
+      'تقویمِ یک رویداد قابل تغییر نیست',
+  'Starts':
+      'شروع',
+  'Ends':
+      'پایان',
+  'Added to your calendar':
+      'به تقویم شما افزوده شد',
+  'This task is already in your calendar':
+      'این وظیفه از قبل در تقویم شما هست',
+  'In your calendar':
+      'در تقویم شما',
+  'Add to calendar':
+      'افزودن به تقویم',
 };
