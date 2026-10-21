@@ -12,6 +12,7 @@ All notable changes are documented here. Format based on
 - Tests for the draft rules, the service (permission, read-only, repeating, invalid drafts, task links), the channel arguments (including all-day UTC midnights), the Drift link storage, and the screens (create, edit, delete, cancel, repeating, read-only, add a task).
 - Persian texts for all new messages; `docs/CALENDAR_INTEGRATION.md` updated.
 - CI: the Android job summary now also shows, for every APK, the `testOnly` flag, zipalign alignment (including 16 KB native libraries) and the `apksigner` verification, to find out why a phone refuses to install it.
+- Docs: the install problem "App blocked to protect your device" is Google Play Protect's enhanced fraud protection (Nudge declares notification access), with the ways around it, in docs/RELEASING.md.
 ### Known limitations
 - Not run on a device: events written to the Google and Samsung calendars, their sync, and all-day and time-zone behaviour are unchecked. No alerts or guests on events; the calendar of an existing event cannot be changed; repeating events are not editable; a task's event is not updated when the task changes.
 

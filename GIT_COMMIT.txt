@@ -1,9 +1,10 @@
-ci: Nudge - APK install diagnostics
+docs: Nudge - explain the "App blocked to protect your device" install block
 
-- the Android job summary shows, for every APK, the testOnly flag, the
-  zipalign check (4-byte and 16 KB native libraries) and the apksigner
-  verification, next to the package, SDK levels and ABIs
-- docs/RELEASING.md: how to get the real install error code and what
-  each one means
+- docs/RELEASING.md: the block is Google Play Protect's enhanced fraud
+  protection for sideloaded apps that declare notification access (not a
+  fault in the APK); there is no "Install anyway" button; ways forward
+  (adb, an app-store style installer, Play Protect off for the install,
+  Google Play), what is known and what is untested
+- changelog
 
-No app code changed.
+No app code changed. Includes the CI diagnostics of the previous zip.

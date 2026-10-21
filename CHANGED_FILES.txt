@@ -1,4 +1,4 @@
-Files in this zip (CI diagnostics only):
+Files in this zip (documentation and CI diagnostics):
   .github/workflows/ci.yml
   CHANGELOG.md
   GIT_COMMIT.txt
