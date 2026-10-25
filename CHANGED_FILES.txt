@@ -1,6 +1,19 @@
-Files in this zip (documentation and CI diagnostics):
-  .github/workflows/ci.yml
+Files in this zip (changed since 0.17.1), 0.17.2:
   CHANGELOG.md
   GIT_COMMIT.txt
-  docs/RELEASING.md
+  VERSIONS.md
+  assets/branding/app_icon.ico
+  assets/branding/ic_launcher_hdpi.png
+  assets/branding/ic_launcher_mdpi.png
+  assets/branding/ic_launcher_xhdpi.png
+  assets/branding/ic_launcher_xxhdpi.png
+  assets/branding/ic_launcher_xxxhdpi.png
+  assets/branding/play_feature_1024x500.png
+  assets/branding/play_icon_512.png
+  docs/PLAY.md
+  docs/play/listing.md
+  lib/app_info.dart
+  pubspec.yaml
+  tools/make_icons.py
+  tools/wire_capture.py
 Deleted: none

@@ -1,4 +1,4 @@
-# Pinned versions (Nudge 0.17.0+28)
+# Pinned versions (Nudge 0.17.2+30)
 
 Direct dependencies are pinned to exact versions in `pubspec.yaml`. The versions below were resolved by pub on the GitHub Actions runner (Ubuntu, Flutter 3.35.0) on 2026-10-14. `pubspec.lock` is committed, so transitive dependencies are locked too.
 

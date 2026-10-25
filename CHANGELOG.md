@@ -4,6 +4,28 @@ All notable changes are documented here. Format based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/) (pre-1.0).
 
+## [0.17.2] - 2026-10-20
+### Added
+- An original app icon: a white N with an amber notification dot on an indigo gradient. `tools/make_icons.py` draws it (needs Pillow, not run in CI) into `assets/branding/`: the five Android launcher PNGs, a Windows `.ico`, and the Google Play graphics (512 x 512 icon, 1024 x 500 feature graphic).
+- `tools/wire_capture.py` copies the launcher icons into the generated Android project (and removes a template adaptive icon that would hide them) and the `.ico` into the Windows runner, so every build has Nudge's icon instead of Flutter's.
+- `docs/play/listing.md`: draft Play listing texts in English and Persian, the graphics table and a screenshot list.
+### Known limitations
+- The icon was only looked at as an image; it has not been seen on a phone's launcher or in the Windows taskbar. The listing texts must be checked against the app before publishing. Screenshots must be taken on a phone.
+
+## [0.17.1] - 2026-10-20
+Makes the app installable on phones: through Google Play.
+### Why
+Play Protect blocks apps installed from a browser or file manager when they declare notification access ("App blocked to protect your device", no "Install anyway"). Nudge's purpose is notification access, so no sideloaded build can be installed on such phones. An app from Google Play is not blocked.
+### Added
+- CI builds an Android App Bundle (`..._android.aab`) next to the APKs and attaches it to the release, but only when the release-key secrets exist (Play refuses debug-signed bundles). The release notes say what the file is for.
+- `docs/PLAY.md`: step by step to get Nudge onto phones through Google Play's internal testing track (upload key with `tools/make_keystore.sh` in a Codespace, secrets, Play Console, testers and the opt-in link), what Play asks for later, and what to do when something fails.
+- A disclosure before Android's Notification Access screen opens (from the inbox banner and from Settings): what reading notifications means, that they stay on the device and are not sent anywhere, and that they can be deleted in Settings. It asks for consent (Continue or Cancel). Persian text included.
+- The Android job summary lists the APK's `uses-permission` entries, so the Play data-safety answers (no internet permission) can be checked.
+### Changed
+- docs/RELEASING.md points to PLAY.md as the way forward for the install block.
+### Known limitations
+- Nothing here has been run: the bundle has never been built (it needs the key secrets), uploaded to Play, or installed from Play. The Play account, the upload key and the testers are set up by the owner. Play may ask for declarations (exact alarms, calendar) before a public release; internal testing does not.
+
 ## [0.17.0] - 2026-10-20
 ### Added
 - M4 section 3: creating, editing and deleting events of the device calendars. The `+` button on the Calendar screen offers New task or New event; an event form has a title, a calendar (writable ones only), an all-day switch and start and end. Tapping an event shows Edit and Delete when its calendar accepts changes and it does not repeat; repeating events and read-only calendars only show, with "Open in calendar app".

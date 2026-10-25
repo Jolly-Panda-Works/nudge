@@ -304,6 +304,49 @@ def patch_gradle() -> None:
         print('build.gradle.kts already wired')
 
 
+BRANDING = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'branding')
+
+LAUNCHER_ICONS = {
+    'mdpi': 'ic_launcher_mdpi.png',
+    'hdpi': 'ic_launcher_hdpi.png',
+    'xhdpi': 'ic_launcher_xhdpi.png',
+    'xxhdpi': 'ic_launcher_xxhdpi.png',
+    'xxxhdpi': 'ic_launcher_xxxhdpi.png',
+}
+
+
+def patch_android_icons() -> None:
+    """Replaces the default Flutter launcher icons with Nudge's own."""
+    res = 'android/app/src/main/res'
+    if not os.path.isdir(res):
+        print('No Android res folder; icons not changed')
+        return
+    # A newer template may ship an adaptive icon that would hide the PNGs.
+    adaptive = os.path.join(res, 'mipmap-anydpi-v26', 'ic_launcher.xml')
+    if os.path.isfile(adaptive):
+        os.remove(adaptive)
+    copied = 0
+    for density, name in LAUNCHER_ICONS.items():
+        source = os.path.join(BRANDING, name)
+        target_dir = os.path.join(res, f'mipmap-{density}')
+        if not os.path.isfile(source) or not os.path.isdir(target_dir):
+            continue
+        with open(source, 'rb') as src, open(
+                os.path.join(target_dir, 'ic_launcher.png'), 'wb') as dst:
+            dst.write(src.read())
+        copied += 1
+    print(f'Android launcher icons replaced: {copied} of {len(LAUNCHER_ICONS)}')
+
+
+def brand_windows_icon() -> None:
+    source = os.path.join(BRANDING, 'app_icon.ico')
+    target = 'windows/runner/resources/app_icon.ico'
+    if os.path.isfile(source) and os.path.isdir(os.path.dirname(target)):
+        with open(source, 'rb') as src, open(target, 'wb') as dst:
+            dst.write(src.read())
+        print('Windows icon replaced')
+
+
 def brand_windows() -> None:
     main_cpp = 'windows/runner/main.cpp'
     resources = 'windows/runner/Runner.rc'
@@ -337,5 +380,7 @@ if __name__ == '__main__':
         patch_main_activity()
         patch_manifest()
         patch_gradle()
+        patch_android_icons()
     if only in (None, 'windows') and (only == 'windows' or os.path.isdir('windows')):
         brand_windows()
+        brand_windows_icon()

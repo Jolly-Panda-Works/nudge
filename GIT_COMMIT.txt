@@ -1,10 +1,13 @@
-docs: Nudge - explain the "App blocked to protect your device" install block
+feat: Nudge v0.17.2 - app icon and Google Play listing drafts
 
-- docs/RELEASING.md: the block is Google Play Protect's enhanced fraud
-  protection for sideloaded apps that declare notification access (not a
-  fault in the APK); there is no "Install anyway" button; ways forward
-  (adb, an app-store style installer, Play Protect off for the install,
-  Google Play), what is known and what is untested
-- changelog
+- original icon (white N, amber notification dot, indigo gradient)
+  drawn by tools/make_icons.py into assets/branding/: Android launcher
+  PNGs, Windows .ico, Play icon 512x512 and feature graphic 1024x500
+- wire_capture.py puts the icons into the generated Android and Windows
+  projects (and drops a template adaptive icon that would hide them)
+- docs/play/listing.md: listing texts in English and Persian, graphics
+  table, screenshot list
 
-No app code changed. Includes the CI diagnostics of the previous zip.
+Not seen on a device. Format by workflow.
+
+Milestone: distribution
